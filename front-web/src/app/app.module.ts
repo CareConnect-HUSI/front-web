@@ -7,7 +7,8 @@ import { HeaderComponent } from './componentTools/header/header.component';
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
-import { NursesAssignmentComponent } from './patients/nurses-assignment/nurses-assignment.component';
+import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
+import { StockComponent } from './inventory/stock/stock.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { NursesAssignmentComponent } from './patients/nurses-assignment/nurses-a
     RegisterPatientComponent,
     PatientInfoComponent,
     NursesAssignmentComponent,
+    StockComponent,
   ],
   imports: [
     BrowserModule,
