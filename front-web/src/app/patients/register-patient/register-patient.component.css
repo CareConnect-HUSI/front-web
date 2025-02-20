@@ -6,6 +6,7 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
 }
 
 .title {
@@ -14,11 +15,13 @@
     color: #2a4d69;
 }
 
-.section {
+.section2 {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 250px);
     gap: 15px;
     margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 40px;
 }
 
 h3 {

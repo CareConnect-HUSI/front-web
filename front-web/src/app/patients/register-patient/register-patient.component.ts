@@ -29,6 +29,7 @@ export class RegisterPatientComponent implements OnInit {
       }),
       tratamiento: this.fb.array([])
     });
+    
     this.agregarMedicamento();
   }
 
