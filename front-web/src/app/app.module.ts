@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './componentTools/header/header.component';
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     RegisterPatientComponent,
+    PatientInfoComponent,
   ],
   imports: [
     BrowserModule,
