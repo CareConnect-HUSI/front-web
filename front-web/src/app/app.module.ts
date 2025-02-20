@@ -7,6 +7,7 @@ import { HeaderComponent } from './componentTools/header/header.component';
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
+import { NursesAssignmentComponent } from './patients/nurses-assignment/nurses-assignment.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { PatientInfoComponent } from './patients/patient-info/patient-info.compo
     HeaderComponent,
     RegisterPatientComponent,
     PatientInfoComponent,
+    NursesAssignmentComponent,
   ],
   imports: [
     BrowserModule,
