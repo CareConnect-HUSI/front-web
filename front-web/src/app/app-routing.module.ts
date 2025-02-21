@@ -4,12 +4,14 @@ import { RegisterPatientComponent } from './patients/register-patient/register-p
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
 import { StockComponent } from './inventory/stock/stock.component';
+import { LoginComponent } from './componentTools/login/login.component';
 
 const routes: Routes = [
   { path: 'registro-pacientes', component: RegisterPatientComponent },
   { path: 'paciente', component: PatientInfoComponent},
   { path: 'assignment', component: NursesAssignmentComponent},
-  { path: 'inventario', component: StockComponent}
+  { path: 'inventario', component: StockComponent},
+  { path: 'login', component: LoginComponent },
 ];
 
 @NgModule({
@@ -17,3 +19,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+

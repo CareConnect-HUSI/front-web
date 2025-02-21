@@ -1,0 +1,58 @@
+/* Contenedor principal */
+.login-container {
+    background-color: #f8f9fa;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  /* Título de la aplicación */
+  .logo-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Tarjeta de login */
+  .login-card {
+    background: white;
+    display: flex;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    width: 750px;
+    height: 380px;
+    overflow: hidden;
+  }
+  
+  /* Sección del logo */
+  .logo-container {
+    background: #e9f0ff;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .logo {
+    width: 140px;
+  }
+  
+  /* Sección del formulario */
+  .form-container {
+    width: 60%;
+    padding: 30px;
+  }
+  
+  .btn-primary {
+    background-color: #2c4e94;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1f3b70;
+  }
+  
