@@ -11,6 +11,7 @@ import { RegisterPatientComponent } from './patients/register-patient/register-p
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
 import { StockComponent } from './inventory/stock/stock.component';
+import { MedInfoComponent } from './inventory/med-info/med-info.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { StockComponent } from './inventory/stock/stock.component';
     PatientInfoComponent,
     NursesAssignmentComponent,
     StockComponent,
+    MedInfoComponent,
   ],
   imports: [
     BrowserModule,
