@@ -7,6 +7,7 @@ import { HeaderComponent } from './componentTools/header/header.component';
 import { LoginComponent } from './componentTools/login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';  
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
+
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
 import { StockComponent } from './inventory/stock/stock.component';
@@ -16,7 +17,6 @@ import { StockComponent } from './inventory/stock/stock.component';
     AppComponent,
     HeaderComponent,
     LoginComponent,
-    HeaderComponent,
     RegisterPatientComponent,
     PatientInfoComponent,
     NursesAssignmentComponent,
@@ -24,8 +24,6 @@ import { StockComponent } from './inventory/stock/stock.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
     AppRoutingModule,
     ReactiveFormsModule
   ],

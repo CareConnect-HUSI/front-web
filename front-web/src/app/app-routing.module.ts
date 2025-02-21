@@ -7,12 +7,11 @@ import { StockComponent } from './inventory/stock/stock.component';
 import { LoginComponent } from './componentTools/login/login.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
   { path: 'registro-pacientes', component: RegisterPatientComponent },
   { path: 'paciente', component: PatientInfoComponent},
   { path: 'assignment', component: NursesAssignmentComponent},
-  { path: 'inventario', component: StockComponent}
-
+  { path: 'inventario', component: StockComponent},
+  { path: 'login', component: LoginComponent },
 ];
 
 @NgModule({
