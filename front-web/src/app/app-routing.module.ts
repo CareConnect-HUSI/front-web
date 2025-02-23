@@ -6,14 +6,16 @@ import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-ass
 import { StockComponent } from './inventory/stock/stock.component';
 import { LoginComponent } from './componentTools/login/login.component';
 import { MedInfoComponent } from './inventory/med-info/med-info.component';
+import { PatientsListComponent } from './patients/patients-list/patients-list.component';
 
 const routes: Routes = [
   { path: 'registro-pacientes', component: RegisterPatientComponent },
-  { path: 'paciente', component: PatientInfoComponent},
+  { path: 'paciente/id', component: PatientInfoComponent},
   { path: 'assignment', component: NursesAssignmentComponent},
   { path: 'inventario', component: StockComponent},
   { path: 'login', component: LoginComponent },
-  { path: 'medicamento', component: MedInfoComponent}
+  { path: 'medicamento', component: MedInfoComponent},
+  {path: 'pacientes', component: PatientsListComponent}
 ];
 
 @NgModule({
