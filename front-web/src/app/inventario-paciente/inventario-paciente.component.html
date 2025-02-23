@@ -1,0 +1,22 @@
+<div class="inventario-container">
+    <div class="header">
+    </div>
+  
+    <!-- Modal flotante -->
+    <div class="inventario-card shadow-lg">
+      
+      <!-- Título -->
+      <h3 class="text-center">Seleccione el paciente para verificar su inventario</h3>
+  
+      <!-- Lista de pacientes -->
+      <div class="lista-pacientes">
+        <div *ngFor="let paciente of pacientes" class="paciente-item">
+          <span>{{ paciente.documento }}</span>
+          <span>{{ paciente.nombre }}</span>
+          <button class="btn btn-outline-primary" (click)="verInventario(paciente)">Ver inventario</button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+  
