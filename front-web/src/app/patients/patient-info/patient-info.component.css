@@ -1,0 +1,114 @@
+.patient-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+  }
+  
+  .profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .profile-icon {
+    width: 80px;
+    height: 80px;
+    background: lightblue;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+  }
+  
+  .edit-button {
+    background: none;
+    border: none;
+    color: #2c5697;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .section {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #f7f7f7;
+  }
+  
+  .treatment-table table {
+    font-size: 1.0em;
+    width: 80%;
+    overflow-y: scroll;
+    border-collapse: separate;
+    border-spacing: 0px;
+    margin-top: 10px;
+  }
+  
+  .treatment-table th, .treatment-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .buttons button {
+    padding: 8px 12px;
+    border: none;
+    background: #2c5697;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .history-box {
+    width: 80%;
+    height: 100px;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    background: white;
+    margin-top: 10px;
+  }
+
+  .section2 {
+    display: grid;
+    grid-template-columns: repeat(2, 30% 70%);
+    gap: 60px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 40px;
+    
+}
+ 
+.section-treatment{
+   margin-top: 20px;
+   padding: 10px;
+   border-radius: 5px;
+   background: #f7f7f7;
+}
+
+.h3{
+  margin-top: 20px;
+}
+
+.edit-button{
+  padding: 8px 12px;
+    border: none;
+    background: #2c5697;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}

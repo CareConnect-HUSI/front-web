@@ -1,0 +1,47 @@
+<div class="patient-container">
+    <div class="profile-section">
+      <div class="profile-icon">
+        <i class="fa fa-user"></i>
+      </div>
+    </div>
+  
+    <div class="section2">
+    <div class="section">
+      <h3>Datos personales</h3>
+    </div>
+  
+    <div class="section-tratment">
+      <h3>Tratamiento</h3>
+      <div class="treatment-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre medicamento</th>
+              <th>Cantidad</th>
+              <th>Días tratamiento</th>
+              <th>Posología</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of treatment">
+              <td>{{ med.nombre }}</td>
+              <td>{{ med.cantidad }}</td>
+              <td>{{ med.dias }}</td>
+              <td>{{ med.posologia }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="buttons">
+        <button (click)="editTreatment()">Cambiar</button>
+        <button (click)="viewTreatment()">Ver</button>
+      </div>
+      <div class="section-historial">
+        <h3>Historial médico</h3>
+        <textarea class="history-box" readonly></textarea>
+      </div>
+    </div>
+    </div>
+    <button class="edit-button">Modificar</button>
+  </div>
+  
