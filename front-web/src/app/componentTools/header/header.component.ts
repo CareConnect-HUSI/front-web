@@ -20,7 +20,6 @@ export class HeaderComponent {
   }
 
   logout() {
-    // Aquí iría la lógica para cerrar sesión
     console.log("Cerrar sesión");
     this.router.navigate(['/login']);
   }
