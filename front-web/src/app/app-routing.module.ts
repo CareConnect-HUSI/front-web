@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
+
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
@@ -15,7 +17,9 @@ const routes: Routes = [
   { path: 'inventario', component: StockComponent},
   { path: 'login', component: LoginComponent },
   { path: 'medicamento', component: MedInfoComponent},
-  {path: 'pacientes', component: PatientsListComponent}
+  {path: 'pacientes', component: PatientsListComponent},
+  { path: 'pacientes', component: VerPacientesComponent },
+  { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' }
 ];
 
 @NgModule({
