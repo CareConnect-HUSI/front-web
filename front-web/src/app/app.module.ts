@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './componentTools/header/header.component';
+import { AsignarEnfermerasComponent } from './asignar-enfermeras/asignar-enfermeras.component';
+
 import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 
 import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
@@ -22,6 +24,7 @@ import { PatientsListComponent } from './patients/patients-list/patients-list.co
   declarations: [
     AppComponent,
     HeaderComponent,
+    AsignarEnfermerasComponent,
     InventarioComponent,
     VerPacientesComponent,
     LoginComponent,
@@ -31,7 +34,6 @@ import { PatientsListComponent } from './patients/patients-list/patients-list.co
     StockComponent,
     MedInfoComponent,
     PatientsListComponent,
-
   ],
   imports: [
     BrowserModule,

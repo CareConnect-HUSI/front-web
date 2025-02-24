@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AsignarEnfermerasComponent } from './asignar-enfermeras/asignar-enfermeras.component';
 
 import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'inventario-paciente', component: StockComponent},
   { path: 'login', component: LoginComponent },
   { path: 'medicamento', component: MedInfoComponent},
+  { path: 'asignar', component: AsignarEnfermerasComponent },
   {path: 'pacientes', component: PatientsListComponent},
   { path: 'inventario', component: InventarioComponent },
   { path: 'pacientes', component: VerPacientesComponent },
