@@ -1,0 +1,54 @@
+<div class="patient-container">
+    <div class="section">
+        <h2>Enfermera</h2>
+      </div>
+
+      <div class="table-container">
+        <table id="myTable" class="tablita">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>7:00am</td>
+                    <td>Luis Pérez</td>
+                    <td>Calle 25 #12-14</td>
+                    <td>Finalizado</td>
+                </tr>
+                <tr>
+                    <td>7:30am</td>
+                    <td>Ana Ruíz</td>
+                    <td>Calle 25 #12-14</td>
+                    <td>Finalizado</td>
+                </tr>
+                <tr>
+                    <td>8:00am</td>
+                    <td>Carlos Cruz</td>
+                    <td>Calle 25 #12-14</td>
+                    <td>En proceso</td>
+                </tr>
+                <tr>
+                    <td>8:30am</td>
+                    <td>Alejannndro</td>
+                    <td>Calle 25 #12-14</td>
+                    <td>En espera</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>  
+    <div class="addBtn-container">
+        <a [routerLink]="'/bazares'">
+            <i class="bx bx-left-arrow-alt"></i>
+            Regresar
+        </a>
+        <a class="btn-save" id="saveBazar">
+            <i class="bx bxs-route"></i>
+            Ver ruta
+        </a>
+    </div>
+</div>
