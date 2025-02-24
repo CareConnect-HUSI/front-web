@@ -1,0 +1,97 @@
+<div class="register-container">
+  <h2 class="title">Registrar Paciente</h2>
+
+  <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
+    <div class="section">
+      <h3>Datos personales</h3>
+
+      <div class="section2" formGroupName="personalInfo">
+        <div class="form-group">
+          <label>Nombres</label>
+          <input formControlName="nombres" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input formControlName="apellidos" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Tipo de Documento</label>
+          <select formControlName="tipoDocumento">
+            <option>CC</option>
+            <option>TI</option>
+            <option>Pasaporte</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>N° de Documento</label>
+          <input formControlName="numeroDocumento" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input formControlName="direccion" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Localidad</label>
+          <select formControlName="localidad">
+            <option>Suba</option>
+            <option>Usaquén</option>
+            <option>Chapinero</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Barrio</label>
+          <input formControlName="barrio" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Celular</label>
+          <input formControlName="celular" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Nombre Familiar</label>
+          <input formControlName="nombreFamiliar" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Parentesco</label>
+          <input formControlName="parentesco" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Foto</label>
+          <input type="file" formControlName="foto" />
+          <i class='bx bx-load'></i>
+        </div>
+      </div>
+    </div>
+
+    <h3>Tratamiento</h3>
+    <table>
+      <thead>
+        <tr class="enunciado">
+          <th>Nombre medicamento</th>
+          <th>Cantidad</th>
+          <th>Días tratamiento</th>
+          <th>Posología</th>
+          <th>Inicio</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let med of tratamiento.controls; let i = index" [formGroup]="med">
+          <td><input type="text" formControlName="medicamento" placeholder="Medicamento" /></td>
+          <td><input type="number" formControlName="cantidad" placeholder="Cantidad" /></td>
+          <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+          <td><input type="text" formControlName="posologia" placeholder="Cada cuánto" /></td>
+          <td><input type="date" formControlName="fechaInicio" /></td>
+          <td>
+            <button type="button" (click)="eliminarMedicamento(i)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="button" (click)="agregarMedicamento()" class="add-btn">➕ Agregar Medicamento</button>
+
+    <div class="buttons">
+      <button type="submit" class="save-btn">Guardar</button>
+    </div>
+  </form>
+</div>
