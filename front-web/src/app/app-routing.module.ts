@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+
+import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
 
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
@@ -14,12 +16,14 @@ const routes: Routes = [
   { path: 'registro-pacientes', component: RegisterPatientComponent },
   { path: 'paciente/id', component: PatientInfoComponent},
   { path: 'assignment', component: NursesAssignmentComponent},
-  { path: 'inventario', component: StockComponent},
+  { path: 'inventario-paciente', component: StockComponent},
   { path: 'login', component: LoginComponent },
   { path: 'medicamento', component: MedInfoComponent},
   {path: 'pacientes', component: PatientsListComponent},
+  { path: 'inventario', component: InventarioComponent },
   { path: 'pacientes', component: VerPacientesComponent },
   { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' }
+
 ];
 
 @NgModule({
