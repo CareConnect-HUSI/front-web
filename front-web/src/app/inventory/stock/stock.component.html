@@ -1,42 +1,38 @@
 <div class="patient-container">
     <div class="section">
-        <h4 id="titulo">N° de documento: </h4>
-        <h4>123456789</h4>
-        <h4 id="titulo">Nombre: </h4>
-        <h4>Luis Pérez</h4>
+        <h4 id="titulo">N° de Documento:</h4>
+        <h4>{{ documentoPaciente }}</h4>
+        <h4 id="titulo">Nombre:</h4>
+        <h4>{{ nombrePaciente }}</h4>
     </div>
 
-      <div class="table-container">
+    <div class="table-container">
         <table id="myTable" class="tablita">
             <thead>
                 <tr>
-                    <th>Nombre del medicamento</th>
-                    <th>Catidad</th>
+                    <th>Nombre medicamento</th>
+                    <th>Cantidad</th>
                     <th>Usado</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Insulina</td>
-                    <td>3</td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <td>Medicamento 2</td>
-                    <td>5</td>
-                    <td>3</td>
+                <tr *ngFor="let item of inventario">
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>{{ item.usado }}</td>
                 </tr>
             </tbody>
         </table>
     </div>  
+
     <div class="addBtn-container">
-        <a [routerLink]="'/inicio'">
-            <i class="bx bx-left-arrow-alt"></i>
-            Agregar
-        </a>
-        <a class="btn-save" id="saveBazar">
-            <i class="bx bxs-route"></i>
+        <a class="btn-save" id="modify">
+            <i class="bx bxs-edit" routerLink="/inventario"></i>
             Modificar
+        </a>
+        <a class="btn-save" id="add">
+            <i class="bx bx-plus" routerLink="/inventario"></i>
+            Agregar
         </a>
     </div>
 </div>

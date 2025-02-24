@@ -1,0 +1,87 @@
+.cronograma-container {
+    width: 100%;
+    max-width: 95%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 8px;
+}
+
+th {
+    background: #00bcd4;
+    color: white;
+    font-size: 14px;
+}
+
+.tarea {
+    font-size: 12px;
+    background: #e3f2fd;
+}
+
+.auxiliar {
+    font-weight: bold;
+    background: #b2ebf2;
+}
+
+.paciente {
+    font-weight: bold;
+    color: #333;
+}
+
+.medicamento {
+    font-style: italic;
+    color: #00796b;
+}
+
+.ubicacion {
+    font-size: 11px;
+    color: #9e9e9e;
+}
+
+.buttons-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-modify, .btn-download {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: white;
+    border-radius: 5px;
+}
+
+.btn-modify {
+    background: #0288d1;
+}
+
+.btn-download {
+    background: #388e3c;
+}

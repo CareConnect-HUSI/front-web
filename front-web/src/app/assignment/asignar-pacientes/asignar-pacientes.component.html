@@ -1,0 +1,39 @@
+<div class="asignar-container">
+    <h3 class="text-center">Seleccione los pacientes a asignar hoy</h3>
+
+    <div class="seleccion-container">
+        <div class="lista-pacientes">
+            <h4>Pacientes</h4>
+            <div class="search-box">
+                <input type="text" placeholder="Buscar por nombre o documento" [(ngModel)]="filtro" (input)="filtrarPacientes()">
+                <i class="bx bx-search"></i>
+            </div>
+            <ul>
+                <li *ngFor="let paciente of pacientesDisponibles">
+                    <span>{{ paciente.nombre }}</span>
+                    <input type="checkbox" (change)="moverPaciente(paciente)">
+                </li>
+            </ul>
+        </div>
+
+        <div class="acciones">
+            <button (click)="moverPaciente(pacientesDisponibles[0])" [disabled]="pacientesDisponibles.length === 0">➡</button>
+            <button (click)="removerPaciente(pacientesSeleccionados[0])" [disabled]="pacientesSeleccionados.length === 0">⬅</button>
+        </div>
+
+        <div class="lista-pacientes">
+            <h4>Pacientes Seleccionados</h4>
+            <ul>
+                <li *ngFor="let paciente of pacientesSeleccionados">
+                    <span>{{ paciente.nombre }}</span>
+                    <input type="checkbox" (change)="removerPaciente(paciente)">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="botones-container">
+        <button class="btn btn-cancelar" routerLink="/cronograma">Cancelar</button>
+        <button class="btn btn-seleccionar" routerLink="/asignar-enfermeras">Seleccionar Enfermeras</button>
+    </div>
+</div>
