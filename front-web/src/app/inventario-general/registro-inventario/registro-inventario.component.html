@@ -1,0 +1,56 @@
+<div class="container">
+  <h2 class="title">Registrar Inventario</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+            <th>Ingresado por</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of inventario">
+            <td>{{ item.codigo }}</td>
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>{{ item.fecha }}</td>
+            <td>{{ item.ingresadoPor }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Agregar Manual</h3>
+      <table>
+        <thead>
+          <tr class="enunciado">
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Fecha de registro</th>
+            <th>Ingresado por</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" placeholder="Código" [(ngModel)]="nuevoItem.codigo"></td>
+            <td><input type="text" placeholder="Nombre" [(ngModel)]="nuevoItem.nombre"></td>
+            <td><input type="number" placeholder="Cantidad" [(ngModel)]="nuevoItem.cantidad"></td>
+            <td><input type="date" [(ngModel)]="nuevoItem.fecha"></td>
+            <td><input type="text" placeholder="Ingresado por" [(ngModel)]="nuevoItem.ingresadoPor"></td>
+            <td><button (click)="agregarItem()">➕</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Agregar Digital</h3>
+      <div class="ingreso-digital">
+        <input type="file" (change)="cargarArchivo($event)">
+        <p>Ingrese el archivo para realizar la lectura y realizar el registro automatico</p>
+      </div>
+  
+      <button class="btn btn-seleccionar" routerLink="/inventario-total">Guardar</button>
+    </div>
+  </div>
+  

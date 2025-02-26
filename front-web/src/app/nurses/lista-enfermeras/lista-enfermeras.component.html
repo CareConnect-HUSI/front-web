@@ -1,0 +1,24 @@
+<h1>Enfermeras</h1>
+<div class="nurses-container">
+  <div class="dropdown">
+    <button class="dropdown-btn" (click)="toggleDropdown()">
+      {{ tipoSeleccionado }}
+      <span [class.rotate]="mostrarDropdown">▼</span>
+    </button>
+    <div class="dropdown-content" *ngIf="mostrarDropdown">
+      <a *ngFor="let tipo of tiposEnfermeras" (click)="cambiarTipo(tipo)">{{ tipo }}</a>
+    </div>
+  </div>
+  
+  
+    <div *ngFor="let enfermera of enfermeras" class="nurse-card" [class.selected]="enfermera === enfermeraSeleccionada">
+      <img [src]="enfermera.imagen" alt="Enfermera">
+      <span>{{ enfermera.nombre }}</span>
+      <button class="assign-btn" (click)="seleccionarEnfermera(enfermera)">
+        Ver asignación
+      </button>      
+    </div>
+  
+    <button class="btn btn-seleccionar" routerLink="/registro-enfermeras">Agregar</button>
+  </div>
+  

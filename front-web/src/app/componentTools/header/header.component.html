@@ -19,8 +19,8 @@
       <li (mouseenter)="showDropdown('enfermeras')" (mouseleave)="hideDropdown()">
         <a href="#">Enfermeras</a>
         <ul class="dropdown-menu" *ngIf="activeDropdown === 'enfermeras'">
-          <li><a routerLink="/enfermeras/turnos">Lista de Enfermeras</a></li>
-          <li><a routerLink="/registrar-enfermera">Registrar Enfermeras</a></li>
+          <li><a routerLink="/lista-enfermeras">Lista de Enfermeras</a></li>
+          <li><a routerLink="/registro-enfermeras">Registrar Enfermeras</a></li>
         </ul>
       </li>
 
@@ -35,7 +35,9 @@
       <li (mouseenter)="showDropdown('inventario')" (mouseleave)="hideDropdown()">
         <a href="#" routerLink="/inventario">Inventario</a>
         <ul class="dropdown-menu" *ngIf="activeDropdown === 'inventario'">
-          <li><a routerLink="/inventario">Ver Inventario</a></li>
+          <li><a routerLink="/inventario-total">Inventario General</a></li>
+          <li><a routerLink="/registro-inventario">Registrar Inventario</a></li>
+          <li><a routerLink="/inventario">Inventario por pacientes</a></li>
         </ul>
       </li>
     </ul>

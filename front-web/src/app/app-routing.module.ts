@@ -4,6 +4,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
 
+import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
+import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
+import { InventarioTotalComponent } from './inventario-general/inventario-total/inventario-total.component';
+import { RegistroInventarioComponent } from './inventario-general/registro-inventario/registro-inventario.component';
+import { InfoMedicamentoComponent } from './inventario-general/info-medicamento/info-medicamento.component';
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
@@ -19,7 +24,7 @@ const routes: Routes = [
   { path: 'cronograma', component: CronogramaComponent },
   { path: 'registro-pacientes', component: RegisterPatientComponent },
   { path: 'paciente/:documento', component: PatientInfoComponent},
-  { path: 'assignment', component: NursesAssignmentComponent},
+  { path: 'nurses-assignment/:id', component: NursesAssignmentComponent},
   { path: 'inventario-paciente/:documento', component: StockComponent},
   { path: 'login', component: LoginComponent },
   { path: 'medicamento', component: MedInfoComponent},
@@ -28,6 +33,11 @@ const routes: Routes = [
   { path: 'asignar-pacientes', component: AsignarPacientesComponent },
   { path: 'asignar-enfermeras', component: AsignarEnfermerasComponent },
   { path: 'pacientes', component: VerPacientesComponent },
+  { path: 'inventario-total', component: InventarioTotalComponent },
+  { path: 'registro-inventario', component: RegistroInventarioComponent },
+  { path: 'info-medicamento', component: InfoMedicamentoComponent },
+  { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
+  { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
   { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' }
 
 ];

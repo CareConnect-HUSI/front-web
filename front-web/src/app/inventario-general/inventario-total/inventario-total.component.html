@@ -1,0 +1,34 @@
+<div class="container">
+  <h1>Inventario General</h1>
+
+  <input type="text" [(ngModel)]="filtro" placeholder="Buscar por nombre o identificación" class="search-input">
+
+  <div class="table-wrapper">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Disponible</th>
+            <th>Utilizado</th>
+            <th>Total</th>
+            <th>Información</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inventario of mediFiltrados()">
+            <td>{{ inventario.codigo }}</td>
+            <td>{{ inventario.nombre }}</td>
+            <td>{{ inventario.disponibles }}</td>
+            <td>{{ inventario.utilizados }}</td>
+            <td>{{ inventario.total }}</td>
+            <td><a routerLink="/medicamento/{{ inventario.codigo }}" class="ver-link">Ver</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <button class="btn btn-seleccionar" routerLink="/registro-inventario">Agregar</button>
+</div>
