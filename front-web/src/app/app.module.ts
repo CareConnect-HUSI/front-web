@@ -19,6 +19,11 @@ import { PatientsListComponent } from './patients/patients-list/patients-list.co
 import { CronogramaComponent } from './inventory/cronograma/cronograma.component';
 import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asignar-pacientes.component';
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
+import { InventarioTotalComponent } from './inventario-general/inventario-total/inventario-total.component';
+import { RegistroInventarioComponent } from './inventario-general/registro-inventario/registro-inventario.component';
+import { InfoMedicamentoComponent } from './inventario-general/info-medicamento/info-medicamento.component';
+import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
+import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
 
 
 @NgModule({
@@ -36,7 +41,12 @@ import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asig
     PatientsListComponent,
     CronogramaComponent,
     AsignarPacientesComponent,
-    AsignarEnfermerasComponent
+    AsignarEnfermerasComponent,
+    InventarioTotalComponent,
+    RegistroInventarioComponent,
+    InfoMedicamentoComponent,
+    RegistroEnfermerasComponent,
+    ListaEnfermerasComponent
   ],
   imports: [
     BrowserModule,
