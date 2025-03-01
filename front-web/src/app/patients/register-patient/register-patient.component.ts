@@ -8,7 +8,11 @@ import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 })
 export class RegisterPatientComponent implements OnInit {
   patientForm!: FormGroup;
-  nuevoMedicamento!: FormGroup;
+  listaProcedimientos: string[] = [
+    'Curación',
+    'Hemocultivo',
+    'Curación de Cateter',
+  ];
 
   constructor(private fb: FormBuilder) {}
 
@@ -27,30 +31,46 @@ export class RegisterPatientComponent implements OnInit {
         parentesco: ['Hermano'],
         foto: [null]
       }),
-      tratamiento: this.fb.array([])
+      tratamiento: this.fb.array([]),
+      procedimientos: this.fb.array([])
     });
-    
+
     this.agregarMedicamento();
   }
 
-  get tratamiento(): FormArray<FormGroup> {
+  get tratamiento(): FormArray <FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;
   }
-  
-   
+
+  get procedimientos(): FormArray <FormGroup> {
+    return this.patientForm.get('procedimientos') as FormArray <FormGroup>;
+  }
 
   agregarMedicamento() {
     const medicamentoForm = this.fb.group({
       medicamento: [''],
-      cantidad: [''],
+      dosis: [''],
+      frecuencia: [''],
       diasTratamiento: [''],
-      posologia: [''],
-      fechaInicio: ['']
+      fechaInicio: [''],
+      fechaFin: ['']
     });
-  
+
     this.tratamiento.push(medicamentoForm);
   }
-  
+
+  agregarProcedimiento() {
+    const procedimientoForm = this.fb.group({
+      procedimiento: [''],
+      frecuencia: [''],
+      diasTratamiento: [''],
+      fechaInicio: [''],
+      fechaFin: ['']
+    });
+
+    this.procedimientos.push(procedimientoForm);
+  }
+
   eliminarMedicamento(index: number) {
     if (this.tratamiento.length > 1) {
       this.tratamiento.removeAt(index);
@@ -58,7 +78,15 @@ export class RegisterPatientComponent implements OnInit {
       alert('Debe haber al menos un medicamento en el tratamiento.');
     }
   }
-  
+
+  eliminarProcedimiento(index: number) {
+    if (this.procedimientos.length > 1) {
+      this.procedimientos.removeAt(index);
+    } else {
+      alert('Debe haber al menos un procedimiento.');
+    }
+  }
+
   onSubmit() {
     console.log('Datos del Paciente:', this.patientForm.value);
     alert('Paciente registrado con éxito');
