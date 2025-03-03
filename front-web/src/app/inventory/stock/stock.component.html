@@ -1,38 +1,95 @@
 <div class="patient-container">
     <div class="section">
-        <h4 id="titulo">N° de Documento:</h4>
-        <h4>{{ documentoPaciente }}</h4>
-        <h4 id="titulo">Nombre:</h4>
-        <h4>{{ nombrePaciente }}</h4>
+      <h4 id="titulo">N° de Documento:</h4>
+      <h4>{{ documentoPaciente }}</h4>
+      <h4 id="titulo">Nombre:</h4>
+      <h4>{{ nombrePaciente }}</h4>
     </div>
-
+  
     <div class="table-container">
-        <table id="myTable" class="tablita">
-            <thead>
-                <tr>
-                    <th>Nombre medicamento</th>
-                    <th>Cantidad</th>
-                    <th>Usado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of inventario">
-                    <td>{{ item.nombre }}</td>
-                    <td>{{ item.cantidad }}</td>
-                    <td>{{ item.usado }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>  
-
-    <div class="addBtn-container">
-        <a class="btn-save" id="modify">
-            <i class="bx bxs-edit" routerLink="/inventario"></i>
-            Modificar
-        </a>
-        <a class="btn-save" id="add">
-            <i class="bx bx-plus" routerLink="/inventario"></i>
-            Agregar
-        </a>
+      <table id="myTable" class="tablita">
+        <thead>
+          <tr>
+            <th>Medicamento</th>
+            <th>Dosis</th>
+            <th>Vía</th>
+            <th>Frecuencia</th>
+            <th>Cantidad</th>
+            <th colspan="3">Lunes</th>
+            <th colspan="3">Martes</th>
+            <th colspan="3">Miércoles</th>
+            <th colspan="3">Jueves</th>
+            <th colspan="3">Viernes</th>
+            <th colspan="3">Sábado</th>
+            <th colspan="3">Domingo</th>
+            <th>Total</th>
+            <th>Inventario Total</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th>M</th>
+            <th>T</th>
+            <th>N</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of inventario">
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.dosis }}</td>
+            <td>{{ item.via }}</td>
+            <td>{{ item.frecuencia }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td *ngFor="let dia of item.calendario">
+              <span *ngIf="dia.M">{{ dia.M }}</span>
+              <span *ngIf="!dia.M">-</span>
+            </td>
+            <td *ngFor="let dia of item.calendario">
+              <span *ngIf="dia.T">{{ dia.T }}</span>
+              <span *ngIf="!dia.T">-</span>
+            </td>
+            <td *ngFor="let dia of item.calendario">
+              <span *ngIf="dia.N">{{ dia.N }}</span>
+              <span *ngIf="!dia.N">-</span>
+            </td>
+            <td>{{ item.cantidad - item.usado }}</td>
+            <td>{{ item.cantidad }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-</div>
+  
+    <div class="addBtn-container">
+      <a class="btn-save" id="modify">
+        <i class="bx bxs-edit" routerLink="/inventario"></i>
+        Modificar
+      </a>
+      <a class="btn-save" id="add">
+        <i class="bx bx-plus" routerLink="/inventario"></i>
+        Agregar
+      </a>
+    </div>
+  </div>
