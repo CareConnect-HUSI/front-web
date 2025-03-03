@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
-import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
+import { InventarioComponent } from './inventory/inventario-paciente/inventario-paciente.component';
+import { VerPacientesComponent } from './patients/ver-pacientes/ver-pacientes.component';
 
 import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
 import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
@@ -16,7 +16,7 @@ import { StockComponent } from './inventory/stock/stock.component';
 import { LoginComponent } from './componentTools/login/login.component';
 import { MedInfoComponent } from './inventory/med-info/med-info.component';
 import { PatientsListComponent } from './patients/patients-list/patients-list.component';
-import { CronogramaComponent } from './inventory/cronograma/cronograma.component';
+import { CronogramaComponent } from './assignment/cronograma/cronograma.component';
 import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asignar-pacientes.component';
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
 

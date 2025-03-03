@@ -1,0 +1,43 @@
+<div class="cronograma-container">
+    <h2 class="title">Cronograma</h2>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th class="header-auxiliar">AUXILIAR</th>
+                    <th *ngFor="let hora of horarios" class="header-hora">{{ hora }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let auxiliar of auxiliares">
+                    <td class="auxiliar">{{ auxiliar.nombre }}</td>
+            
+                    <td *ngFor="let hora of horarios" class="drop-zone"
+                        [class.drop-enabled]="modoEdicion"
+                        cdkDropList
+                        [cdkDropListData]="getTareaArray(auxiliar, hora)"
+                        (cdkDropListDropped)="moverTarea($event, auxiliar, hora)">
+                        
+                        <ng-container *ngIf="getTareaPorHora(auxiliar, hora) as tarea">
+                            <div cdkDrag class="tarea">
+                                <span class="paciente">{{ tarea.paciente }}</span>
+                                <span class="medicamento">{{ tarea.medicamento }}</span>
+                                <span class="ubicacion">{{ tarea.ubicacion }}</span>
+                            </div>
+                        </ng-container>
+            
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+
+    <div class="buttons-container">
+        <button (click)="toggleEdicion()" class="btn-modify">
+            {{ modoEdicion ? "Guardar" : "Modificar" }}
+        </button>
+        <button class="btn-download">Descargar</button>
+    </div>
+</div>
