@@ -1,5 +1,7 @@
 <h1>Enfermeras</h1>
+
 <div class="nurses-container">
+  <!-- Dropdown para filtrar enfermeras -->
   <div class="dropdown">
     <button class="dropdown-btn" (click)="toggleDropdown()">
       {{ tipoSeleccionado }}
@@ -9,16 +11,25 @@
       <a *ngFor="let tipo of tiposEnfermeras" (click)="cambiarTipo(tipo)">{{ tipo }}</a>
     </div>
   </div>
-  
-  
-    <div *ngFor="let enfermera of enfermeras" class="nurse-card" [class.selected]="enfermera === enfermeraSeleccionada">
+
+  <!-- Lista de enfermeras -->
+  <div *ngIf="enfermeras.length > 0; else noEnfermeras">
+    <div *ngFor="let enfermera of enfermeras" class="nurse-card">
       <img [src]="enfermera.imagen" alt="Enfermera">
       <span>{{ enfermera.nombre }}</span>
       <button class="assign-btn" (click)="seleccionarEnfermera(enfermera)">
         Ver asignación
-      </button>      
+      </button>
     </div>
-  
-    <button class="btn btn-seleccionar" routerLink="/registro-enfermeras">Agregar</button>
   </div>
-  
+
+  <!-- Mensaje si no hay enfermeras -->
+  <ng-template #noEnfermeras>
+    <p class="empty-message">No hay enfermeras disponibles.</p>
+  </ng-template>
+
+  <!-- Botón para agregar enfermera -->
+  <button class="btn btn-seleccionar" routerLink="/registro-enfermeras">
+    Agregar Enfermera
+  </button>
+</div>
