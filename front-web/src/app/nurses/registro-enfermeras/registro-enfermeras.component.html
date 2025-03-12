@@ -8,15 +8,15 @@
         <div class="section2" formGroupName="personalInfo">
           <div class="form-group">
             <label>Nombres</label>
-            <input formControlName="nombres" type="text" />
+            <input formControlName="name" type="text" />
           </div>
           <div class="form-group">
             <label>Apellidos</label>
-            <input formControlName="apellidos" type="text" />
+            <input formControlName="lastname" type="text" />
           </div>
           <div class="form-group">
             <label>Tipo de Documento</label>
-            <select formControlName="tipoDocumento">
+            <select formControlName="identificationType">
               <option>CC</option>
               <option>TI</option>
               <option>Pasaporte</option>
@@ -24,11 +24,20 @@
           </div>
           <div class="form-group">
             <label>N° de Documento</label>
-            <input formControlName="numeroDocumento" type="text" />
+            <input formControlName="identificationNumber" type="text" />
           </div>
           <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" formControlName="email" required />
+          </div>
+          
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" formControlName="password" required />
+          </div>          
+          <div class="form-group">
             <label>Dirección</label>
-            <input formControlName="direccion" type="text" />
+            <input formControlName="address" type="text" />
           </div>
           <div class="form-group">
             <label>Localidad</label>
@@ -40,7 +49,7 @@
           </div>
           <div class="form-group">
             <label>Turno</label>
-            <select formControlName="Turno asignado">
+            <select formControlName="turno">
               <option>Noche 19:00 a 7:00</option>
               <option>Mañana 7:00 a 13:00</option>
               <option>Tarde 13:00 a 19:00</option>
@@ -48,7 +57,7 @@
           </div>
           <div class="form-group">
             <label>Celular</label>
-            <input formControlName="celular" type="text" />
+            <input formControlName="phone" type="text" />
           </div>
           <div class="form-group">
             <label>Foto</label>
