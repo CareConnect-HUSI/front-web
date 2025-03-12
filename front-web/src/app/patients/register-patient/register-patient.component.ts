@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
   selector: 'app-register-patient',
@@ -14,12 +15,12 @@ export class RegisterPatientComponent implements OnInit {
     'Curación de Cateter',
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        nombres: ['Juan Pablo'],
+        name: ['Juan Pablo'],
         apellidos: ['Rodríguez Cruz'],
         tipoDocumento: ['CC'],
         numeroDocumento: ['1000200'],
@@ -29,6 +30,8 @@ export class RegisterPatientComponent implements OnInit {
         barrio: [''],
         nombreFamiliar: ['Mateo Lopez'],
         parentesco: ['Hermano'],
+        email: ['correo@gmail.com'],
+        password:['123456'],
         foto: [null]
       }),
       tratamiento: this.fb.array([]),
@@ -53,7 +56,8 @@ export class RegisterPatientComponent implements OnInit {
       frecuencia: [''],
       diasTratamiento: [''],
       fechaInicio: [''],
-      fechaFin: ['']
+      fechaFin: [''],
+      duracion: ['']
     });
 
     this.tratamiento.push(medicamentoForm);
@@ -65,7 +69,8 @@ export class RegisterPatientComponent implements OnInit {
       frecuencia: [''],
       diasTratamiento: [''],
       fechaInicio: [''],
-      fechaFin: ['']
+      fechaFin: [''],
+      duracion: ['']
     });
 
     this.procedimientos.push(procedimientoForm);
@@ -88,7 +93,10 @@ export class RegisterPatientComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('Datos del Paciente:', this.patientForm.value);
-    alert('Paciente registrado con éxito');
+    this.authService.registerPatient(this.patientForm.value).subscribe(
+      () => alert('Paciente registrado con éxito'),
+      () => alert('Error en el registro')
+    );
   }
+  
 }

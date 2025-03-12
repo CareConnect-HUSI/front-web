@@ -1,4 +1,20 @@
 <h1>Enfermeras</h1>
+
+<div class="titulo-paginacion">
+  <div class="titulo">
+    <h1>Lista de Enfermeras</h1>
+  </div>
+  <div class="paginacion">
+    <mat-paginator
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      (page)="handlePageEvent($event)"
+      [hidePageSize]="true">
+    </mat-paginator>
+  </div>
+</div>
+
 <div class="nurses-container">
   <div class="dropdown">
     <button class="dropdown-btn" (click)="toggleDropdown()">
@@ -9,16 +25,22 @@
       <a *ngFor="let tipo of tiposEnfermeras" (click)="cambiarTipo(tipo)">{{ tipo }}</a>
     </div>
   </div>
-  
-  
-    <div *ngFor="let enfermera of enfermeras" class="nurse-card" [class.selected]="enfermera === enfermeraSeleccionada">
-      <img [src]="enfermera.imagen" alt="Enfermera">
-      <span>{{ enfermera.nombre }}</span>
+
+  <div *ngIf="enfermeras.length > 0; else noEnfermeras">
+    <div *ngFor="let enfermera of enfermeras" class="nurse-card">
+      <img [src]="enfermera.imagen || 'assets/images/enfermera.png'" alt="Enfermera">
+      <span>{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
       <button class="assign-btn" (click)="seleccionarEnfermera(enfermera)">
         Ver asignación
-      </button>      
+      </button>
     </div>
-  
-    <button class="btn btn-seleccionar" routerLink="/registro-enfermeras">Agregar</button>
   </div>
-  
+
+  <ng-template #noEnfermeras>
+    <p class="empty-message">No hay enfermeras disponibles.</p>
+  </ng-template>
+
+  <button class="btn btn-seleccionar" routerLink="/registro-enfermeras">
+    Agregar Enfermera
+  </button>
+</div>

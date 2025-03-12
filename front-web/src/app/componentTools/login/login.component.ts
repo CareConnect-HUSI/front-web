@@ -1,5 +1,5 @@
+import { AuthService } from 'src/app/service/auth.service';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,26 +8,30 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  loginForm: FormGroup;
+  email: string = '';
+  password: string = '';
+  isLoading: boolean = false;
 
-  constructor(private fb: FormBuilder, private router: Router) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+  role: string  = '';
 
-      // Simulación de autenticación (conectar a backend si es necesario)
-      if (email === 'admin@demo.com' && password === '123456') {
-        localStorage.setItem('isLoggedIn', 'true'); // Guardar sesión
-        this.router.navigate(['/header']); // Redirige al dashboard
-      } else {
-        alert('Credenciales incorrectas');
+  onSubmit(): void {
+    this.isLoading = true;
+    console.log(this.email, this.password);
+    this.authService.login(this.email, this.password).subscribe(
+      (response) => {
+        localStorage.setItem('token', response);
+        this.router.navigate(['/cronograma']);
+        this.isLoading = false;
+      },
+      (error) => {
+        this.isLoading = false;
+        alert('Usuario o contraseña incorrectos');
       }
-    }
+    );
   }
 }

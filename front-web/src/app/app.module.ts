@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './componentTools/header/header.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 
@@ -24,6 +25,7 @@ import { RegistroInventarioComponent } from './inventario-general/registro-inven
 import { InfoMedicamentoComponent } from './inventario-general/info-medicamento/info-medicamento.component';
 import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
 import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -52,7 +54,9 @@ import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enferm
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule,
+    MatPaginatorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

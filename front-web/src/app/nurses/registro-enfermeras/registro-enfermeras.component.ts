@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/service/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 @Component({
@@ -9,26 +10,47 @@ export class RegistroEnfermerasComponent implements OnInit {
 
   nurseForm!: FormGroup;
 
-  constructor(private fb: FormBuilder){}
+  constructor(private fb: FormBuilder, private authService: AuthService){}
 
   ngOnInit() {
     this.nurseForm = this.fb.group({
       personalInfo: this.fb.group({
-        nombres: ['Isabel'],
-        apellidos: ['Rodriguez Trujillo'],
-        tipoDocumento: ['CC'],
-        numeroDocumento: ['1000974657'],
-        direccion: ['Calle 123 #0-23'],
-        celular: ['302875676'],
+        name: ['Isabel'],
+        lastname: ['Rodriguez Trujillo'],
+        identificationType: ['CC'],
+        identificationNumber: ['1000974657'],
+        address: ['Calle 123 #0-23'],
+        phone: ['302875676'],
         localidad: ['Suba'],
         turno: ['noche'],
+        email: ['correo@gmail.com'],
+        password:['123456'],
         foto: [null]
       })
     });
       
   }
-  onSubmit() {
-    console.log('Datos del enfermero o enfermera:', this.nurseForm.value);
-    alert('Paciente registrado con éxito');
-  }
+
+    onSubmit() {
+      const formData = this.nurseForm.value.personalInfo;
+      console.log("Datos enviados al servicio:", formData);
+    
+      if (!formData || typeof formData !== "object") {
+        console.error("Error: Datos inválidos antes de enviarlos al servicio", formData);
+        return;
+      }
+    
+      this.authService.registerNurse(formData).subscribe(
+        () => alert('Enfermera registrada con éxito'),
+        error => {
+          alert('Error en el registro');
+          console.error("Error del backend:", error);
+        }
+      );
+    }
+    
+    
+    
+    
+  
 }
