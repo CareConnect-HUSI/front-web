@@ -1,35 +1,79 @@
 <div class="cronograma-container">
-    <h2 class="title">Cronograma</h2>
+    <h3 class="text-center">Cronograma de Enfermeras</h3>
 
+    <!-- Selector de Turno y Fecha/Hora Actual -->
+    <div class="selector-container">
+        <label for="turno">Seleccionar Turno:</label>
+        <select id="turno" [(ngModel)]="turnoSeleccionado" (change)="cambiarTurno()">
+            <option value="mañana">Mañana (07:00 - 13:00)</option>
+            <option value="tarde">Tarde (13:00 - 19:00)</option>
+            <option value="noche">Noche (19:00 - 07:00)</option>
+        </select>
+        <span class="fecha-hora">{{ fechaHoraActual }}</span>
+    </div>
+    
     <div class="table-wrapper">
-        <table>
+        <table class="cronograma">
             <thead>
                 <tr>
-                    <th>AUXILIAR</th>
-                    <th *ngFor="let hora of horarios">{{ hora }}</th>
+                    <th>Enfermera</th>
+                    <th *ngFor="let hora of horasVisibles">{{ hora }}</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let auxiliar of auxiliares">
-                    <td class="auxiliar">
-                        {{ auxiliar.nombre }}
-                        <span *ngIf="auxiliar.cambios" class="cambios">{{ auxiliar.cambios }}</span>
-                    </td>
-
-                    <td *ngFor="let hora of horarios" class="tarea">
-                        <div *ngIf="getTarea(auxiliar, hora) as tarea">
-                            <span class="paciente">{{ tarea.paciente }}</span>
-                            <span class="medicamento">{{ tarea.medicamento }}</span>
-                            <span class="ubicacion">{{ tarea.ubicacion }}</span>
-                        </div>
-                    </td>
+                <tr *ngFor="let enfermera of enfermeras">
+                    <td>{{ enfermera.nombre }}</td>
+                    <ng-container *ngFor="let hora of horasVisibles; let i = index">
+                        <td *ngIf="debeMostrarCelda(enfermera, hora)" 
+                            [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
+                            [attr.data-hora]="hora" 
+                            [attr.data-enfermera]="enfermera.nombre" 
+                            (dragover)="permitirSoltar($event)" 
+                            (drop)="soltarPaciente($event, enfermera, hora)">
+                            
+                            <div *ngIf="asignaciones[enfermera.nombre]?.[hora]" 
+                                 class="paciente" 
+                                 draggable="true" 
+                                 (dragstart)="arrastrarPaciente($event, enfermera, hora)"
+                                 (mouseenter)="mostrarInfoPaciente(asignaciones[enfermera.nombre][hora])"
+                                 (mouseleave)="ocultarInfoPaciente()">
+                                {{ asignaciones[enfermera.nombre][hora].nombre }}
+                                ({{ asignaciones[enfermera.nombre][hora].duracion }} min)
+                            </div>
+                        </td>
+                    </ng-container>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <div class="buttons-container">
-        <button class="btn-modify">Modificar</button>
-        <button class="btn-download">Descargar</button>
+    <!-- Información del Paciente -->
+    <div *ngIf="pacienteHover" class="info-paciente">
+        <p><strong>Nombre:</strong> {{ pacienteHover.nombre }}</p>
+        <p><strong>Dirección:</strong> {{ pacienteHover.direccion }}</p>
+        <p><strong>Teléfono:</strong> {{ pacienteHover.telefono }}</p>
+    </div>
+
+    <!-- Agregar Urgencia -->
+    <div class="urgencias">
+        <h4>Agregar Urgencia</h4>
+        <input type="text" placeholder="Nombre del paciente" [(ngModel)]="nuevoPaciente.nombre">
+        <input type="text" placeholder="Dirección" [(ngModel)]="nuevoPaciente.direccion">
+        <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoPaciente.telefono">
+
+        <label>Medicamento:</label>
+        <select [(ngModel)]="nuevoPaciente.medicamento">
+            <option *ngFor="let medicamento of medicamentos" [value]="medicamento">{{ medicamento }}</option>
+        </select>
+
+        <label>Procedimiento:</label>
+        <select [(ngModel)]="nuevoPaciente.procedimiento">
+            <option *ngFor="let procedimiento of procedimientos" [value]="procedimiento">{{ procedimiento }}</option>
+        </select>
+
+        <label>Duración (minutos):</label>
+        <input type="number" min="30" step="30" [(ngModel)]="nuevoPaciente.duracion">
+
+        <button (click)="agregarUrgencia()">Agregar</button>
     </div>
 </div>

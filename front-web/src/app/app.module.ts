@@ -12,6 +12,8 @@ import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
 import { LoginComponent } from './componentTools/login/login.component';
 import { RegisterPatientComponent } from './patients/register-patient/register-patient.component';
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 import { PatientInfoComponent } from './patients/patient-info/patient-info.component';
 import { NursesAssignmentComponent } from './nurses/nurses-assignment/nurses-assignment.component';
 import { StockComponent } from './inventory/stock/stock.component';
@@ -51,6 +53,7 @@ import { HttpClientModule } from '@angular/common/http';
     ListaEnfermerasComponent
   ],
   imports: [
+    DragDropModule,
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
