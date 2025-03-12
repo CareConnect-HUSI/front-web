@@ -30,19 +30,13 @@ export class RegistroEnfermerasComponent implements OnInit {
     });
       
   }
-  /*onSubmit() {
-    this.authService.registerNurse(this.nurseForm.value).subscribe(
-      () => alert('Enfermera registrada con éxito'),
-      () => alert('Error en el registro')
-    );
-  }*/
 
     onSubmit() {
       const formData = this.nurseForm.value.personalInfo;
-      console.log("✅ Datos enviados al servicio:", formData);
+      console.log("Datos enviados al servicio:", formData);
     
       if (!formData || typeof formData !== "object") {
-        console.error("❌ Error: Datos inválidos antes de enviarlos al servicio", formData);
+        console.error("Error: Datos inválidos antes de enviarlos al servicio", formData);
         return;
       }
     
@@ -50,7 +44,7 @@ export class RegistroEnfermerasComponent implements OnInit {
         () => alert('Enfermera registrada con éxito'),
         error => {
           alert('Error en el registro');
-          console.error("❌ Error del backend:", error);
+          console.error("Error del backend:", error);
         }
       );
     }
