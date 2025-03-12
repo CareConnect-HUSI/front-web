@@ -21,11 +21,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let enfermera of enfermeras">
+                <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
                     <td>{{ enfermera.nombre }}</td>
-                    <ng-container *ngFor="let hora of horasVisibles; let i = index">
-                        <td *ngIf="debeMostrarCelda(enfermera, hora)" 
-                            [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
+                    <ng-container *ngFor="let hora of horasVisibles; trackBy: trackByHora">
+                        <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
                             [attr.data-hora]="hora" 
                             [attr.data-enfermera]="enfermera.nombre" 
                             (dragover)="permitirSoltar($event)" 
@@ -33,12 +32,13 @@
                             
                             <div *ngIf="asignaciones[enfermera.nombre]?.[hora]" 
                                  class="paciente" 
-                                 draggable="true" 
+                                 [draggable]="modoEdicion" 
                                  (dragstart)="arrastrarPaciente($event, enfermera, hora)"
                                  (mouseenter)="mostrarInfoPaciente(asignaciones[enfermera.nombre][hora])"
                                  (mouseleave)="ocultarInfoPaciente()">
                                 {{ asignaciones[enfermera.nombre][hora].nombre }}
                                 ({{ asignaciones[enfermera.nombre][hora].duracion }} min)
+                                <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, hora)" class="eliminar-paciente">-</button>
                             </div>
                         </td>
                     </ng-container>
@@ -46,7 +46,17 @@
             </tbody>
         </table>
     </div>
+    <!-- Botones Modificar - Descargar (solo en modo de solo lectura) -->
+    <div *ngIf="!modoEdicion" class="botones-acciones">
+        <button (click)="modificarCronograma()">Modificar</button>
+        <button (click)="descargarCronograma()">Descargar</button>
+    </div>
 
+    <!-- Botones de edición (solo en modo de edición) -->
+    <div *ngIf="modoEdicion" class="botones-acciones">
+        <button (click)="guardarCambios()">Guardar Modificación</button>
+    </div>
+    
     <!-- Información del Paciente -->
     <div *ngIf="pacienteHover" class="info-paciente">
         <p><strong>Nombre:</strong> {{ pacienteHover.nombre }}</p>
@@ -55,25 +65,33 @@
     </div>
 
     <!-- Agregar Urgencia -->
-    <div class="urgencias">
-        <h4>Agregar Urgencia</h4>
-        <input type="text" placeholder="Nombre del paciente" [(ngModel)]="nuevoPaciente.nombre">
-        <input type="text" placeholder="Dirección" [(ngModel)]="nuevoPaciente.direccion">
-        <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoPaciente.telefono">
+    <div *ngIf="modoEdicion" class="panel-urgencias">
+        
+            <h4>Agregar Urgencia</h4>
+            <div class="form-grid">
+            <input type="text" placeholder="Documento de identificacion" [(ngModel)]="nuevoPaciente.documento">
+            <input type="text" placeholder="Nombre del paciente" [(ngModel)]="nuevoPaciente.nombre">
+            <input type="text" placeholder="Dirección" [(ngModel)]="nuevoPaciente.direccion">
+            <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoPaciente.telefono">
 
-        <label>Medicamento:</label>
-        <select [(ngModel)]="nuevoPaciente.medicamento">
-            <option *ngFor="let medicamento of medicamentos" [value]="medicamento">{{ medicamento }}</option>
-        </select>
+            <label>Hora de Atención:</label>
+            <input type="time" [(ngModel)]="nuevoPaciente.horaAtencion">
 
-        <label>Procedimiento:</label>
-        <select [(ngModel)]="nuevoPaciente.procedimiento">
-            <option *ngFor="let procedimiento of procedimientos" [value]="procedimiento">{{ procedimiento }}</option>
-        </select>
+            <label>Medicamento:</label>
+            <select [(ngModel)]="nuevoPaciente.medicamento">
+                <option *ngFor="let medicamento of medicamentos" [value]="medicamento">{{ medicamento }}</option>
+            </select>
 
-        <label>Duración (minutos):</label>
-        <input type="number" min="30" step="30" [(ngModel)]="nuevoPaciente.duracion">
+            <label>Procedimiento:</label>
+            <select [(ngModel)]="nuevoPaciente.procedimiento">
+                <option *ngFor="let procedimiento of procedimientos" [value]="procedimiento">{{ procedimiento }}</option>
+            </select>
 
-        <button (click)="agregarUrgencia()">Agregar</button>
+            <label>Duración (minutos):</label>
+            <input type="number" min="30" step="30" [(ngModel)]="nuevoPaciente.duracion">
+        </div>
+            <button (click)="agregarUrgencia()">Agregar Urgencia</button>
+            <button (click)="cerrarPanelUrgencia()">Cerrar</button>
+        
     </div>
 </div>
