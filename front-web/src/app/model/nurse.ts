@@ -6,7 +6,6 @@ export interface Nurse {
     address: String,
     phone: String,
     localidad: String,
-    turno: String,
     email: String,
     password:String
 }

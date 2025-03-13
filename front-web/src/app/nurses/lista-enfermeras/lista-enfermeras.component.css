@@ -131,6 +131,14 @@ h1 {
   .btn-seleccionar:hover {
     background: #218838;
   }
+
+  .titulo {
+    font-size: 10px;
+    font-weight: bold;
+    color: #2c5697;
+    margin-bottom: 10px;
+    margin-top: 3%;
+  }
   
  
   
