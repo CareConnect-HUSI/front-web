@@ -19,7 +19,7 @@ export class AuthService {
     );
     const encryptedPassword = this.encrypt(password);
     console.log(encryptedPassword);
-    const body = JSON.stringify({ email, password: encryptedPassword });
+    const body = JSON.stringify({ email, password });
 
     return this.http.post(this.apiUrl + '/login', body, { headers, responseType: 'text' });
   }
