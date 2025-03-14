@@ -24,7 +24,6 @@ import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asigna
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
 import { InventarioTotalComponent } from './inventario-general/inventario-total/inventario-total.component';
 import { RegistroInventarioComponent } from './inventario-general/registro-inventario/registro-inventario.component';
-import { InfoMedicamentoComponent } from './inventario-general/info-medicamento/info-medicamento.component';
 import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
 import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -48,7 +47,6 @@ import { HttpClientModule } from '@angular/common/http';
     AsignarEnfermerasComponent,
     InventarioTotalComponent,
     RegistroInventarioComponent,
-    InfoMedicamentoComponent,
     RegistroEnfermerasComponent,
     ListaEnfermerasComponent
   ],

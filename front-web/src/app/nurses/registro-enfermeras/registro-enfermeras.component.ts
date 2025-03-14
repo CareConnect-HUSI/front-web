@@ -14,8 +14,7 @@ export class RegistroEnfermerasComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder, 
-    private authService: AuthService,
-    private nurseService: NurseService
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
