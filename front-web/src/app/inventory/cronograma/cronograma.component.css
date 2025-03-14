@@ -1,18 +1,47 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
 .cronograma-container {
     width: 100%;
-    max-width: 95%;
-    margin: auto;
-    background: white;
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #ffffff;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+h3.text-center {
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+
+/* Selector de Turno y Fecha/Hora Actual */
 .selector-container {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+}
+
+.selector-container label {
+    font-weight: bold;
+    color: #555;
+}
+
+.selector-container select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
 }
 
 .fecha-hora {
@@ -21,76 +50,211 @@
     color: #555;
 }
 
+/* Tabla de Cronograma */
 .table-wrapper {
     overflow-x: auto;
     max-width: 100%;
-    max-height: 400px; /* Ajusta según necesidad */
+    max-height: 500px;
     overflow-y: auto;
+    margin-bottom: 20px;
 }
 
-table {
+table.cronograma {
     width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
+table.cronograma th, table.cronograma td {
     border: 1px solid #ddd;
     text-align: center;
-    padding: 8px;
+    padding: 10px;
 }
 
-th {
-    background: #00bcd4;
+table.cronograma th {
+    background: #0056b3;
     color: white;
     font-size: 14px;
+}
+
+table.cronograma td {
+    background: #f9f9f9;
 }
 
 .paciente {
     font-weight: bold;
     color: #333;
     background: #e3f2fd;
-    padding: 5px;
+    padding: 8px;
     border-radius: 5px;
     cursor: grab;
     margin: 2px;
-    grid-column-start: span 2; /* Ajusta según la duración */
+    display: block;
 }
 
+.paciente:hover {
+    background: #bbdefb;
+}
+
+.eliminar-paciente {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.eliminar-paciente:hover {
+    background: #cc0000;
+}
+
+/* Información del Paciente */
 .info-paciente {
     position: absolute;
     background: white;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
 
-.urgencias {
+.info-paciente p {
+    margin: 5px 0;
+}
+
+/* Botones de Acción */
+.botones-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
     margin-top: 20px;
-    padding: 15px;
-    background: #f9f9f9;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.urgencias input, .urgencias select {
-    margin-right: 10px;
-    margin-bottom: 10px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-}
-
-.urgencias button {
-    padding: 5px 10px;
-    background: #00bcd4;
+.botones-acciones button {
+    padding: 10px 20px;
+    background: #007bff;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
 }
 
-.urgencias button:hover {
-    background: #0097a7;
+.botones-acciones button:hover {
+    background: #0056b3;
+}
+
+/* Panel de Urgencias */
+.panel-urgencias {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.panel-urgencias h4 {
+    margin-top: 0;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.panel-urgencias .form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Dos columnas */
+    gap: 10px; /* Espacio entre los campos */
+    margin-bottom: 15px;
+}
+
+.panel-urgencias .form-grid input,
+.panel-urgencias .form-grid select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.panel-urgencias .form-grid label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.panel-urgencias .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.panel-urgencias button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.panel-urgencias button:hover {
+    background-color: #0056b3;
+}
+/* Efectos de hover y focus */
+input:focus, select:focus, button:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .selector-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .fecha-hora {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .botones-acciones {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .panel-urgencias {
+        width: 100%;
+        height: auto;
+        position: relative;
+        box-shadow: none;
+    }
+}
+.cronograma {
+    width: 100%;
+    table-layout: fixed; /* Para que las celdas tengan un tamaño fijo */
+}
+
+.cronograma th, .cronograma td {
+    width: 100px; /* Ajusta el tamaño según sea necesario */
+    text-align: center;
+}
+
+.paciente {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px;
+    cursor: pointer;
 }
