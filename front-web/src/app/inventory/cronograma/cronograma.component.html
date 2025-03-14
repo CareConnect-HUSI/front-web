@@ -24,7 +24,7 @@
                 <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
                     <td>{{ enfermera.nombre }}</td>
                     <ng-container *ngFor="let hora of horasVisibles; trackBy: trackByHora">
-                        <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
+                        <td *ngIf="debeMostrarCelda(enfermera, hora)" [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
                             [attr.data-hora]="hora" 
                             [attr.data-enfermera]="enfermera.nombre" 
                             (dragover)="permitirSoltar($event)" 
@@ -46,6 +46,7 @@
             </tbody>
         </table>
     </div>
+
     <!-- Botones Modificar - Descargar (solo en modo de solo lectura) -->
     <div *ngIf="!modoEdicion" class="botones-acciones">
         <button (click)="modificarCronograma()">Modificar</button>
