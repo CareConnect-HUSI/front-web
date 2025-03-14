@@ -1,5 +1,6 @@
+import { PatientService } from './../../service/patient.service';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/service/auth.service';
 
 @Component({
@@ -15,23 +16,23 @@ export class RegisterPatientComponent implements OnInit {
     'Curación de Cateter',
   ];
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  constructor(private fb: FormBuilder, private patientService: PatientService) {}
 
   ngOnInit() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        name: ['Juan Pablo'],
-        apellidos: ['Rodríguez Cruz'],
-        tipoDocumento: ['CC'],
-        numeroDocumento: ['1000200'],
-        direccion: ['Calle 123 #0-23'],
-        celular: ['3088765987'],
-        localidad: ['Suba'],
-        barrio: [''],
-        nombreFamiliar: ['Mateo Lopez'],
-        parentesco: ['Hermano'],
-        email: ['correo@gmail.com'],
-        password:['123456'],
+        nombres: ['Juan Pablo', Validators.required],
+        apellidos: ['Rodríguez Cruz', Validators.required],
+        tipoDocumento: ['CC', Validators.required],
+        numeroDocumento: ['1000200',Validators.required],
+        direccion: ['Calle 123 #0-23', Validators.required],
+        celular: ['3088765987', Validators.required],
+        localidad: ['Suba', Validators.required],
+        barrio: ['', Validators.required],
+        nombreFamiliar: ['Mateo Lopez', Validators.required],
+        parentesco: ['Hermano', Validators.required],
+        celularFamiliar: ['3012345678', Validators.required],
+        email: ['correo@gmail.com',Validators.required],
         foto: [null]
       }),
       tratamiento: this.fb.array([]),
@@ -93,10 +94,28 @@ export class RegisterPatientComponent implements OnInit {
   }
 
   onSubmit() {
-    this.authService.registerPatient(this.patientForm.value).subscribe(
-      () => alert('Paciente registrado con éxito'),
-      () => alert('Error en el registro')
-    );
-  }
+    if (this.patientForm.invalid) {
+      alert('Todos los campos son obligatorios.');
+      return;
+    }
+  
+    const formData = this.patientForm.value.personalInfo;
+
+  //
+    this.patientService.registerPatient(formData).subscribe({
+      next: () => {
+        alert('Enfermera registrada con éxito');
+        this.patientForm.reset();
+      },
+      error: (error) => {
+        if (error.status === 400) {
+          alert('Error: ' + error.error.error);
+        } else {
+          alert('Ocurrió un error en el registro');
+        }
+        console.error("Error del backend:", error);
+      }
+    });
+  }  
   
 }

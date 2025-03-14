@@ -55,13 +55,13 @@
   }
   
   .btn-outline-primary {
-    border: 2px solid #2c4e94;
-    color: #2c4e94;
+    border: 2px solid #2c5697;
+    color: #2c5697;
     padding: 5px 15px;
   }
   
   .btn-outline-primary:hover {
-    background: #2c4e94;
+    background: #2c5697;
     color: white;
   }
   

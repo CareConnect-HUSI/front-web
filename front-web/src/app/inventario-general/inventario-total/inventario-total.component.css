@@ -26,8 +26,8 @@ h2 {
 
 .table-container {
   width: 100%;
-  max-height: 300px; /* Limita el tamaño de la tabla */
-  overflow-y: auto;  /* Permite desplazamiento vertical */
+  max-height: 300px;
+  overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
