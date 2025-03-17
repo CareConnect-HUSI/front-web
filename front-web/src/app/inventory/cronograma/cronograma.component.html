@@ -13,18 +13,21 @@
             <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
               <td>{{ enfermera.nombre }}</td>
               <ng-container *ngFor="let hora of horasVisibles; let i = index; trackBy: trackByHora">
-                <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][i])"
-                    cdkDropList
-                    (cdkDropListDropped)="soltarPaciente($event, enfermera, i)">
-                  <div *ngIf="asignaciones[enfermera.nombre][i]" 
-                       class="paciente" 
-                       cdkDrag
-                       (cdkDragStarted)="arrastrarPaciente($event, enfermera, i)">
-                    {{ asignaciones[enfermera.nombre][i].nombre }}
-                    ({{ asignaciones[enfermera.nombre][i].duracion }} min)
-                    <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, i)" class="eliminar-paciente">-</button>
-                  </div>
-                </td>
+                <!-- Solo renderiza la celda si es el inicio del bloque de tiempo del paciente -->
+                <ng-container *ngIf="debeMostrarCelda(enfermera, i)">
+                  <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][i])"
+                      cdkDropList
+                      (cdkDropListDropped)="soltarPaciente($event, enfermera, i)">
+                    <div *ngIf="asignaciones[enfermera.nombre][i]" 
+                         class="paciente" 
+                         cdkDrag
+                         (cdkDragStarted)="arrastrarPaciente($event, enfermera, i)">
+                      {{ asignaciones[enfermera.nombre][i].nombre }}
+                      ({{ asignaciones[enfermera.nombre][i].duracion }} min)
+                      <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, i)" class="eliminar-paciente">-</button>
+                    </div>
+                  </td>
+                </ng-container>
               </ng-container>
             </tr>
           </tbody>
@@ -80,5 +83,4 @@
         
     </div>
 </div>
-
  

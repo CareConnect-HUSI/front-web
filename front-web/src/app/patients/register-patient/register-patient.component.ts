@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/service/auth.service';
+
 
 @Component({
   selector: 'app-register-patient',
@@ -8,6 +9,19 @@ import { AuthService } from 'src/app/service/auth.service';
   styleUrls: ['./register-patient.component.css']
 })
 export class RegisterPatientComponent implements OnInit {
+  @Output() pacienteRegistrado = new EventEmitter<any>();
+
+  nuevoPaciente = { documento: '', nombre: '' };
+  guardarPaciente() {
+    // Validar que los campos no estén vacíos
+    if (this.nuevoPaciente.documento && this.nuevoPaciente.nombre) {
+      this.pacienteRegistrado.emit(this.nuevoPaciente);
+      this.nuevoPaciente = { documento: '', nombre: '' }; // Limpiar el formulario
+    } else {
+      alert('Por favor, complete todos los campos.');
+    }
+  }
+  
   patientForm!: FormGroup;
   listaProcedimientos: string[] = [
     'Curación',

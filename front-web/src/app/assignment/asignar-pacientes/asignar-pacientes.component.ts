@@ -17,6 +17,18 @@ export class AsignarPacientesComponent {
   pacientesDisponibles = [...this.pacientes];
   pacientesSeleccionados: any[] = [];
   filtro: string = '';
+  jornadaSeleccionada: string = 'Mañana';
+  mensajeJornada: string = '';
+  mostrarRegistro: boolean = false; // Controla la visibilidad del formulario de registro
+
+  constructor() {
+    this.actualizarMensaje();
+  }
+
+  actualizarMensaje() {
+    const fechaActual = new Date().toLocaleDateString();
+    this.mensajeJornada = `Seleccione los pacientes para visita domiciliaria del turno de ${this.jornadaSeleccionada} del día ${fechaActual}`;
+  }
 
   filtrarPacientes() {
     const filtroLower = this.filtro.toLowerCase();
@@ -26,12 +38,25 @@ export class AsignarPacientesComponent {
   }
 
   moverPaciente(paciente: any) {
-    this.pacientesDisponibles = this.pacientesDisponibles.filter(p => p.documento !== paciente.documento);
-    this.pacientesSeleccionados.push(paciente);
+    if (!this.pacientesSeleccionados.some(p => p.documento === paciente.documento)) {
+      this.pacientesDisponibles = this.pacientesDisponibles.filter(p => p.documento !== paciente.documento);
+      this.pacientesSeleccionados.push(paciente);
+    }
   }
 
   removerPaciente(paciente: any) {
     this.pacientesSeleccionados = this.pacientesSeleccionados.filter(p => p.documento !== paciente.documento);
     this.pacientesDisponibles.push(paciente);
+  }
+
+  mostrarFormularioRegistro() {
+    this.mostrarRegistro = true; // Muestra el formulario de registro
+  }
+
+  agregarPaciente(nuevoPaciente: any) {
+    // Agrega el nuevo paciente a la lista de pacientes disponibles
+    this.pacientes.push(nuevoPaciente);
+    this.pacientesDisponibles.push(nuevoPaciente);
+    this.mostrarRegistro = false; // Oculta el formulario de registro
   }
 }
