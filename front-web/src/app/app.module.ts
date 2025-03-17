@@ -30,6 +30,7 @@ import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enferm
 import { HttpClientModule } from '@angular/common/http';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,

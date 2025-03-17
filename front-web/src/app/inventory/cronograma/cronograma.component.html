@@ -1,52 +1,36 @@
 <div class="cronograma-container">
-    <h3 class="text-center">Cronograma de Enfermeras</h3>
-
-    <!-- Selector de Turno y Fecha/Hora Actual -->
-    <div class="selector-container">
-        <label for="turno">Seleccionar Turno:</label>
-        <select id="turno" [(ngModel)]="turnoSeleccionado" (change)="cambiarTurno()">
-            <option value="mañana">Mañana (07:00 - 13:00)</option>
-            <option value="tarde">Tarde (13:00 - 19:00)</option>
-            <option value="noche">Noche (19:00 - 07:00)</option>
-        </select>
-        <span class="fecha-hora">{{ fechaHoraActual }}</span>
-    </div>
-    
+    <h3 class="text-center">Cronograma de Enfermeras</h3>    
+    <!-- Tabla de Cronograma -->
     <div class="table-wrapper">
         <table class="cronograma">
-            <thead>
-                <tr>
-                    <th>Enfermera</th>
-                    <th *ngFor="let hora of horasVisibles">{{ hora }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
-                    <td>{{ enfermera.nombre }}</td>
-                    <ng-container *ngFor="let hora of horasVisibles; trackBy: trackByHora">
-                        <td *ngIf="debeMostrarCelda(enfermera, hora)" [attr.colspan]="getColspan(asignaciones[enfermera.nombre][hora])"
-                            [attr.data-hora]="hora" 
-                            [attr.data-enfermera]="enfermera.nombre" 
-                            (dragover)="permitirSoltar($event)" 
-                            (drop)="soltarPaciente($event, enfermera, hora)">
-                            
-                            <div *ngIf="asignaciones[enfermera.nombre]?.[hora]" 
-                                 class="paciente" 
-                                 [draggable]="modoEdicion" 
-                                 (dragstart)="arrastrarPaciente($event, enfermera, hora)"
-                                 (mouseenter)="mostrarInfoPaciente(asignaciones[enfermera.nombre][hora])"
-                                 (mouseleave)="ocultarInfoPaciente()">
-                                {{ asignaciones[enfermera.nombre][hora].nombre }}
-                                ({{ asignaciones[enfermera.nombre][hora].duracion }} min)
-                                <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, hora)" class="eliminar-paciente">-</button>
-                            </div>
-                        </td>
-                    </ng-container>
-                </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th>Enfermera</th>
+              <th *ngFor="let hora of horasVisibles">{{ hora }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
+              <td>{{ enfermera.nombre }}</td>
+              <ng-container *ngFor="let hora of horasVisibles; let i = index; trackBy: trackByHora">
+                <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][i])"
+                    cdkDropList
+                    (cdkDropListDropped)="soltarPaciente($event, enfermera, i)">
+                  <div *ngIf="asignaciones[enfermera.nombre][i]" 
+                       class="paciente" 
+                       cdkDrag
+                       (cdkDragStarted)="arrastrarPaciente($event, enfermera, i)">
+                    {{ asignaciones[enfermera.nombre][i].nombre }}
+                    ({{ asignaciones[enfermera.nombre][i].duracion }} min)
+                    <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, i)" class="eliminar-paciente">-</button>
+                  </div>
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
         </table>
-    </div>
-
+      </div>
+    
     <!-- Botones Modificar - Descargar (solo en modo de solo lectura) -->
     <div *ngIf="!modoEdicion" class="botones-acciones">
         <button (click)="modificarCronograma()">Modificar</button>
@@ -96,3 +80,5 @@
         
     </div>
 </div>
+
+ 
