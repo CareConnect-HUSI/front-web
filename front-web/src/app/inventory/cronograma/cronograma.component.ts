@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { CdkDragStart, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-cronograma',
   templateUrl: './cronograma.component.html',
-  styleUrls: ['./cronograma.component.css']
+  styleUrls: ['./cronograma.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CronogramaComponent implements OnInit {
-  turnoSeleccionado: string = "mañana";
-  fechaHoraActual: string = new Date().toLocaleString();
+  turnoSeleccionado: string = "mañana"; // Turno inicial
+  fechaHoraActual: string = new Date().toLocaleString(); // Fecha y hora actual
   modoEdicion: boolean = false;
 
   horas: { [key: string]: string[] } = {
@@ -17,7 +19,7 @@ export class CronogramaComponent implements OnInit {
               "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00", "04:30", "05:00", "05:30", "06:00", "06:30"]
   };
 
-  horasVisibles: string[] = this.horas["mañana"];
+  horasVisibles: string[] = this.horas["mañana"]; // Horas iniciales según turno
 
   enfermeras = [
     { nombre: "Enfermera 1" },
@@ -29,215 +31,337 @@ export class CronogramaComponent implements OnInit {
   medicamentos = ["Paracetamol", "Ibuprofeno", "Antibiótico", "Analgésico"];
   procedimientos = ["Curación", "Vacunación", "Sutura", "Terapia"];
 
-  asignaciones: { [key: string]: { [key: string]: any } } = {};
+  asignaciones: { [key: string]: any[] } = {}; 
   nuevoPaciente = { documento: "", nombre: "", direccion: "", telefono: "", horaAtencion:"", medicamento: "", procedimiento: "", duracion: 30 };
   pacienteHover: any = null;
 
-  constructor() {
+  
+  constructor(private cdr: ChangeDetectorRef) { 
     this.inicializarAsignaciones();
-  }
-
+}
+   
   ngOnInit() {
     setInterval(() => {
       this.fechaHoraActual = new Date().toLocaleString();
     }, 1000);
   }
+  
 
-  inicializarAsignaciones() {
-    this.enfermeras.forEach(enfermera => {
-      this.asignaciones[enfermera.nombre] = {};
-      this.horasVisibles.forEach(hora => {
-        this.asignaciones[enfermera.nombre][hora] = null;
-      });
-    });
+    // Método para agregar un paciente usando un índice numérico
+  // Método para agregar un paciente usando un índice numérico
+  agregarPaciente(enfermera: string, index: number, paciente: any) {
+    const duracionCeldas = paciente.duracion / 30;
 
-    // Datos de prueba
-    this.asignaciones["Enfermera 1"]["07:00"] = { nombre: "Paciente A", duracion: 60 };
-    this.asignaciones["Enfermera 1"]["08:00"] = { nombre: "Paciente B", duracion: 120 };
-    this.asignaciones["Enfermera 1"]["09:30"] = { nombre: "Paciente C", duracion: 150 };
-    this.asignaciones["Enfermera 1"]["11:30"] = { nombre: "Paciente D", duracion: 60 };
+    // Verificar si hay espacio disponible para el paciente
+    let espacioDisponible = true;
+    for (let i = 0; i < duracionCeldas; i++) {
+      if (index + i >= this.horasVisibles.length || this.asignaciones[enfermera][index + i]) {
+        espacioDisponible = false;
+        break;
+      }
+    }
 
-    this.asignaciones["Enfermera 2"]["07:00"] = { nombre: "Paciente E", duracion: 90 };
-    this.asignaciones["Enfermera 2"]["08:30"] = { nombre: "Paciente F", duracion: 60 };
-    this.asignaciones["Enfermera 2"]["10:00"] = { nombre: "Paciente G", duracion: 60 };
-    this.asignaciones["Enfermera 2"]["11:00"] = { nombre: "Paciente H", duracion: 30 };
-  }
-
-  trackByEnfermera(index: number, enfermera: any): string {
-    return enfermera.nombre;
-  }
-
-  trackByHora(index: number, hora: string): string {
-    return hora;
-  }
-
-  modificarCronograma() {
-    this.modoEdicion = true;
-  }
-
-  eliminarPaciente(enfermera: any, hora: string) {
-    if (confirm("¿Estás seguro de eliminar este paciente?")) {
-      this.asignaciones[enfermera.nombre][hora] = null;
+    if (espacioDisponible) {
+      // Asignar el paciente a las celdas correspondientes
+      for (let i = 0; i < duracionCeldas; i++) {
+        this.asignaciones[enfermera][index + i] = paciente;
+      }
+    } else {
+      console.error(`No hay espacio disponible para el paciente en la posición ${index}.`);
     }
   }
 
-  guardarCambios() {
-    this.modoEdicion = false;
-    alert("Cambios guardados correctamente.");
+  // Método para encontrar la próxima posición disponible
+  encontrarProximaPosicionDisponible(enfermera: string, duracion: number): number {
+    const duracionCeldas = duracion / 30;
+    for (let i = 0; i < this.horasVisibles.length; i++) {
+      let espacioDisponible = true;
+      for (let j = 0; j < duracionCeldas; j++) {
+        if (i + j >= this.horasVisibles.length || this.asignaciones[enfermera][i + j]) {
+          espacioDisponible = false;
+          break;
+        }
+      }
+      if (espacioDisponible) {
+        return i;
+      }
+    }
+    return -1; // No hay espacio disponible
+  }
+  getColspan(paciente: any): number {
+    if (!paciente) return 1; // Si no hay paciente, no se unen celdas
+    return Math.ceil(paciente.duracion / 30); // Calcula el colspan basado en la duración
   }
 
-  cerrarPanelUrgencia() {
-    this.modoEdicion = false;
+  // Inicializar asignaciones con datos de prueba
+  inicializarAsignaciones() {
+    this.enfermeras.forEach(enfermera => {
+      this.asignaciones[enfermera.nombre] = new Array(this.horasVisibles.length).fill(null);
+    });
+
+
+    // Datos de prueba usando índices numéricos
+    this.agregarPaciente("Enfermera 1", 0, { nombre: "Paciente A", direccion: "Calle 123", telefono: "123456789", duracion: 60 });
+    this.agregarPaciente("Enfermera 1", 2, { nombre: "Paciente B", direccion: "Carrera 789", telefono: "321654987", duracion: 90 });
+    this.agregarPaciente("Enfermera 1", 5, { nombre: "Paciente C", direccion: "Calle 321", telefono: "654987321", duracion: 60 });
+
+    this.agregarPaciente("Enfermera 2", 0, { nombre: "Paciente E", direccion: "Avenida 456", telefono: "987654321", duracion: 90 });
+    this.agregarPaciente("Enfermera 2", 3, { nombre: "Paciente F", direccion: "Avenida 987", telefono: "147258369", duracion: 60 });
+    this.agregarPaciente("Enfermera 2", 5, { nombre: "Paciente G", direccion: "Calle 654", telefono: "369852147", duracion: 60 });
+
+    this.agregarPaciente("Enfermera 3", 0, { nombre: "Paciente I", direccion: "Carrera 159", telefono: "258147369", duracion: 90 });
+    this.agregarPaciente("Enfermera 3", 3, { nombre: "Paciente J", direccion: "Avenida 753", telefono: "852369741", duracion: 90 });
+    this.agregarPaciente("Enfermera 3", 6, { nombre: "Paciente K", direccion: "Calle 951", telefono: "741852963", duracion: 60 });
+
+    this.agregarPaciente("Enfermera 4", 0, { nombre: "Paciente M", direccion: "Carrera 357", telefono: "963852741", duracion: 120 });
+    this.agregarPaciente("Enfermera 4", 4, { nombre: "Paciente N", direccion: "Avenida 258", telefono: "159753486", duracion: 60 });
   }
+
+  // Método para determinar si una celda debe mostrarse
+  debeMostrarCelda(enfermera: any, index: number): boolean {
+    const paciente = this.asignaciones[enfermera.nombre][index];
+    if (!paciente) return true;
+
+    const duracionCeldas = paciente.duracion / 30;
+
+    // Verificar si la celda debe mostrarse
+    return index % duracionCeldas === 0;
+  }
+      
+    // Método para convertir una hora en formato string a un índice numérico
+  convertirHoraAIndice(hora: string): number {
+    return this.horasVisibles.indexOf(hora);
+  }
+
+
+  trackByEnfermera(index: number, enfermera: any): string {
+    return enfermera.nombre; // Usar un identificador único para cada enfermera
+}
+
+trackByHora(index: number, hora: string): string {
+    return hora; // Usar la hora como identificador único
+}
+  modificarCronograma() {
+    this.modoEdicion = true; // Cambia al modo de edición
+}
+mostrarInfoPaciente(paciente: any) {
+  if(this.pacienteHover !== paciente){
+    this.pacienteHover = paciente;
+  }
+}
+
+ocultarInfoPaciente() {
+  if(this.pacienteHover){
+    this.pacienteHover = null;
+  }
+  
+}
+
+descargarCronograma() {
+  console.log("Descargando cronograma...");
+  // Lógica para descargar cronograma
+}
+arrastrarPaciente(event: CdkDragStart, enfermera: any, index: number) {
+  const paciente = this.asignaciones[enfermera.nombre][index];
+  if (paciente) {
+      event.source.data = { enfermera: enfermera.nombre, index, paciente };
+  }
+}
+
+eliminarPaciente(enfermera: any, index: number) {
+  if (confirm("¿Estás seguro de eliminar este paciente?")) {
+    const paciente = this.asignaciones[enfermera.nombre][index];
+    if (paciente) {
+      const duracionCeldas = paciente.duracion / 30;
+
+      // Preguntar si se desea dejar el espacio vacío o mover los pacientes
+      const dejarEspacio = confirm("¿Desea dejar el espacio vacío? (Cancelar para mover los pacientes)");
+
+      if (dejarEspacio) {
+        // Dejar el espacio vacío
+        for (let i = 0; i < duracionCeldas; i++) {
+          this.asignaciones[enfermera.nombre][index + i] = null;
+        }
+      } else {
+        // Mover los pacientes hacia la izquierda
+        for (let i = 0; i < duracionCeldas; i++) {
+          this.asignaciones[enfermera.nombre][index + i] = null;
+        }
+        this.reorganizarPacientes(enfermera.nombre);
+      }
+    }
+  }
+}
+
+reorganizarPacientes(enfermera: string) {
+  let i = 0;
+  while (i < this.horasVisibles.length) {
+    if (this.asignaciones[enfermera][i] === null) {
+      // Buscar el siguiente paciente para moverlo a la izquierda
+      let j = i + 1;
+      while (j < this.horasVisibles.length && this.asignaciones[enfermera][j] === null) {
+        j++;
+      }
+      if (j < this.horasVisibles.length) {
+        // Mover el paciente a la posición actual
+        this.asignaciones[enfermera][i] = this.asignaciones[enfermera][j];
+        this.asignaciones[enfermera][j] = null;
+      }
+    }
+    i++;
+  }
+}
+
+guardarCambios() {
+    this.modoEdicion = false; // Vuelve al modo de solo lectura
+    alert("Cambios guardados correctamente.");
+}
+
+
+cerrarPanelUrgencia() {
+  this.modoEdicion = false; // Vuelve al modo de solo lectura
+}
 
   cambiarTurno() {
     this.horasVisibles = this.horas[this.turnoSeleccionado];
   }
 
-  arrastrarPaciente(event: DragEvent, enfermera: any, hora: string) {
-    event.dataTransfer?.setData("text", JSON.stringify({ enfermera: enfermera.nombre, hora }));
-  }
-
   permitirSoltar(event: DragEvent) {
     event.preventDefault();
   }
-
-  soltarPaciente(event: DragEvent, nuevaEnfermera: any, nuevaHora: string) {
-    event.preventDefault();
-    const data = JSON.parse(event.dataTransfer?.getData("text") || "{}");
-    const { enfermera, hora } = data;
-
-    if (this.asignaciones[enfermera]?.[hora]) {
-      const paciente = this.asignaciones[enfermera][hora];
-      const duracion = paciente.duracion;
-      const celdasOcupadas = duracion / 30;
-
-      const nuevaHoraIndex = this.horasVisibles.indexOf(nuevaHora);
-
-      let espacioDisponible = true;
-      for (let i = 0; i < celdasOcupadas; i++) {
-        const horaActual = this.horasVisibles[nuevaHoraIndex + i];
-        if (!horaActual || this.asignaciones[nuevaEnfermera.nombre][horaActual]) {
-          espacioDisponible = false;
-          break;
+  correrPacientes(enfermera: string, inicio: number, duracion: number): boolean {
+    // Verificar si es posible correr a los pacientes
+    let espacioLibre = 0;
+    for (let i = inicio; i < this.horasVisibles.length; i++) {
+      if (!this.asignaciones[enfermera][i]) {
+        espacioLibre++;
+      } else {
+        // Si encontramos un paciente, verificar si podemos correrlo
+        const paciente = this.asignaciones[enfermera][i];
+        const duracionPaciente = paciente.duracion / 30;
+  
+        // Verificar si hay espacio suficiente para correr al paciente
+        if (i + duracionPaciente + duracion > this.horasVisibles.length) {
+          return false; // No hay espacio suficiente
         }
+  
+        // Intentar correr al paciente
+        const pacientesCorridos = this.correrPacientes(enfermera, i + duracionPaciente, duracion);
+        if (!pacientesCorridos) {
+          return false; // No se pudo correr al paciente
+        }
+  
+        // Mover al paciente
+        for (let j = 0; j < duracionPaciente; j++) {
+          this.asignaciones[enfermera][i + j + duracion] = paciente;
+          this.asignaciones[enfermera][i + j] = null;
+        }
+  
+        espacioLibre += duracion;
+        break;
       }
-
-      if (espacioDisponible) {
-        for (let i = 0; i < celdasOcupadas; i++) {
-          const horaActual = this.horasVisibles[nuevaHoraIndex + i];
-          this.asignaciones[nuevaEnfermera.nombre][horaActual] = paciente;
+    }
+  
+    return espacioLibre >= duracion;
+  }
+  
+  soltarPaciente(event: CdkDragDrop<any[]>, nuevaEnfermera: any, nuevaIndex: number) {
+    const data = event.item.data;
+    if (!data) return;
+  
+    const { enfermera, index, paciente } = data;
+  
+    if (enfermera === nuevaEnfermera.nombre && index === nuevaIndex) {
+      return; // No hacer nada si se suelta en la misma posición
+    }
+  
+    // Verificar si hay espacio disponible en la nueva ubicación
+    const duracion = paciente.duracion / 30;
+    let espacioDisponible = true;
+    for (let i = 0; i < duracion; i++) {
+      if (nuevaIndex + i >= this.horasVisibles.length || this.asignaciones[nuevaEnfermera.nombre][nuevaIndex + i]) {
+        espacioDisponible = false;
+        break;
+      }
+    }
+  
+    if (espacioDisponible) {
+      // Mover el paciente a la nueva ubicación
+      for (let i = 0; i < duracion; i++) {
+        this.asignaciones[nuevaEnfermera.nombre][nuevaIndex + i] = paciente;
+      }
+  
+      // Limpiar las celdas anteriores
+      for (let i = 0; i < duracion; i++) {
+        this.asignaciones[enfermera][index + i] = null;
+      }
+    } else {
+      // Intentar correr a los pacientes existentes para hacer espacio
+      const pacientesCorridos = this.correrPacientes(nuevaEnfermera.nombre, nuevaIndex, duracion);
+      if (pacientesCorridos) {
+        // Mover el paciente a la nueva ubicación
+        for (let i = 0; i < duracion; i++) {
+          this.asignaciones[nuevaEnfermera.nombre][nuevaIndex + i] = paciente;
         }
-
-        for (let i = 0; i < celdasOcupadas; i++) {
-          const horaIndex = this.horasVisibles.indexOf(hora);
-          const horaActual = this.horasVisibles[horaIndex + i];
-          this.asignaciones[enfermera][horaActual] = null;
+  
+        // Limpiar las celdas anteriores
+        for (let i = 0; i < duracion; i++) {
+          this.asignaciones[enfermera][index + i] = null;
         }
       } else {
         alert("No hay espacio disponible para mover al paciente.");
       }
     }
   }
-
+ 
+  eliminarPacienteUrgencia(enfermera: any, index: number) {
+    const paciente = this.asignaciones[enfermera.nombre][index];
+    if (!paciente) return;
+  
+    const duracionCeldas = paciente.duracion / 30;
+    for (let i = 0; i < duracionCeldas; i++) {
+      this.asignaciones[enfermera.nombre][index + i] = null; // Limpiar celdas anteriores
+    }
+  }  
+  
   agregarUrgencia() {
     if (!this.nuevoPaciente.nombre || !this.nuevoPaciente.direccion || !this.nuevoPaciente.duracion) {
       alert("Ingrese todos los datos del paciente.");
       return;
     }
-
+  
+    const horaAtencion = this.nuevoPaciente.horaAtencion;
+    const duracionUrgencia = this.nuevoPaciente.duracion / 30;
+    const horaIndex = this.horasVisibles.indexOf(horaAtencion);
+  
+    if (horaIndex === -1) {
+      alert("Hora de atención no válida.");
+      return;
+    }
+  
     for (let enfermera of this.enfermeras) {
-      for (let i = 0; i < this.horasVisibles.length; i++) {
-        let hora = this.horasVisibles[i];
-        let duracionUrgencia = this.nuevoPaciente.duracion / 30;
-        let espacioSuficiente = true;
-
-        for (let j = 0; j < duracionUrgencia; j++) {
-          if (i + j >= this.horasVisibles.length || this.asignaciones[enfermera.nombre][this.horasVisibles[i + j]]) {
-            espacioSuficiente = false;
-            break;
-          }
-        }
-
-        if (espacioSuficiente) {
-          for (let j = 0; j < duracionUrgencia; j++) {
-            this.asignaciones[enfermera.nombre][this.horasVisibles[i + j]] = this.nuevoPaciente;
-          }
-          this.nuevoPaciente = { documento: "", nombre: "", direccion: "", telefono: "", horaAtencion:"", medicamento: "", procedimiento: "", duracion: 30 };
-          return;
+      let espacioSuficiente = true;
+  
+      // Verificar si hay espacio suficiente para la urgencia
+      for (let i = 0; i < duracionUrgencia; i++) {
+        if (horaIndex + i >= this.horasVisibles.length || this.asignaciones[enfermera.nombre][horaIndex + i]) {
+          espacioSuficiente = false;
+          break;
         }
       }
+  
+      if (espacioSuficiente) {
+        // Asignar la urgencia
+        for (let i = 0; i < duracionUrgencia; i++) {
+          this.asignaciones[enfermera.nombre][horaIndex + i] = this.nuevoPaciente;
+        }
+  
+        // Limpiar el objeto nuevoPaciente
+        this.nuevoPaciente = { documento: "", nombre: "", direccion: "", telefono: "", horaAtencion: "", medicamento: "", procedimiento: "", duracion: 30 };
+        return;
+      }
     }
-
+  
     alert("No hay espacio disponible para la urgencia.");
-  }
-
-  correrPacientes(enfermera: any, inicio: number, duracionUrgencia: number): boolean {
-    let espacioLibre = 0;
-    for (let i = inicio; i < this.horasVisibles.length; i++) {
-      if (!this.asignaciones[enfermera.nombre][this.horasVisibles[i]]) {
-        espacioLibre++;
-      } else {
-        let paciente = this.asignaciones[enfermera.nombre][this.horasVisibles[i]];
-        let duracionPaciente = paciente.duracion / 30;
-
-        if (i + duracionPaciente + duracionUrgencia > this.horasVisibles.length) {
-          return false;
-        }
-
-        let pacientesCorridos = this.correrPacientes(enfermera, i + duracionPaciente, duracionUrgencia);
-        if (!pacientesCorridos) {
-          return false;
-        }
-
-        for (let j = 0; j < duracionPaciente; j++) {
-          this.asignaciones[enfermera.nombre][this.horasVisibles[i + j + duracionUrgencia]] = paciente;
-          this.asignaciones[enfermera.nombre][this.horasVisibles[i + j]] = null;
-        }
-
-        espacioLibre += duracionUrgencia;
-        break;
-      }
-    }
-
-    return espacioLibre >= duracionUrgencia;
-  }
-
-  mostrarInfoPaciente(paciente: any) {
-    if (this.pacienteHover !== paciente) {
-      this.pacienteHover = paciente;
-    }
-  }
-
-  ocultarInfoPaciente() {
-    if (this.pacienteHover) {
-      this.pacienteHover = null;
-    }
-  }
-
-  getColspan(paciente: any): number {
-    if (!paciente) return 1;
-    return Math.ceil(paciente.duracion / 30);
-  }
-
-  debeMostrarCelda(enfermera: any, hora: string): boolean {
-    const paciente = this.asignaciones[enfermera.nombre][hora];
-    if (!paciente) return true;
-
-    const index = this.horasVisibles.indexOf(hora);
-    const duracionCeldas = this.getColspan(paciente);
-
-    // Verificar si la celda actual es la primera de la cita
-    for (let i = 1; i < duracionCeldas; i++) {
-      if (this.asignaciones[enfermera.nombre][this.horasVisibles[index - i]]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  descargarCronograma() {
-    console.log("Descargando cronograma...");
   }
 }

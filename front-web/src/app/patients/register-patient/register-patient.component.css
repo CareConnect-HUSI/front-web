@@ -21,7 +21,7 @@
     gap: 15px;
     margin-bottom: 20px;
     margin-top: 20px;
-    margin-left: 40px;
+    margin-left: 30px;
 }
 
 h3 {
@@ -33,7 +33,7 @@ h3 {
 .form-group {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 80%;
 }
 
 input, select {

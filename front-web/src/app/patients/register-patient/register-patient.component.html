@@ -1,8 +1,8 @@
 <div class="register-container">
   <h2 class="title">Registrar Paciente</h2>
 
-  <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
-    <div class="section">
+  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()">
+    
       <h3>Datos personales</h3>
 
       <div class="section2" formGroupName="personalInfo">
@@ -68,7 +68,7 @@
           <input type="file" formControlName="foto" />
         </div>
       </div>
-    </div>
+    
 
     <!-- Sección Tratamiento -->
     <h3>Tratamiento</h3>

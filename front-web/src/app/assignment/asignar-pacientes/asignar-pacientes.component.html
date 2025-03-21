@@ -1,6 +1,22 @@
 <div class="asignar-container">
     <h3 class="text-center">Seleccione los pacientes a asignar hoy</h3>
 
+    <div class="jornada-selector">
+        <label for="jornada">Seleccione la jornada:</label>
+        <div class="custom-select">
+            <select id="jornada" [(ngModel)]="jornadaSeleccionada" (change)="actualizarMensaje()">
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noche">Noche</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+        </div>
+    </div>
+    <!-- Mensaje dinámico -->
+    <div class="mensaje-jornada">
+        <p>{{ mensajeJornada }}</p>
+    </div>
+
     <div class="seleccion-container">
         <div class="lista-pacientes">
             <h4>Pacientes</h4>
@@ -9,8 +25,9 @@
                 <i class="bx bx-search"></i>
             </div>
             <ul>
-                <li *ngFor="let paciente of pacientesDisponibles">
+                <li *ngFor="let paciente of pacientesDisponibles" [class.recien-agregado]="paciente.recienAgregado">
                     <span>{{ paciente.nombre }}</span>
+                    <span *ngIf="paciente.recienAgregado" class="nuevo-indicador"> (Nuevo)</span>
                     <input type="checkbox" (change)="moverPaciente(paciente)">
                 </li>
             </ul>
@@ -32,8 +49,16 @@
         </div>
     </div>
 
+    <!-- Botón para agregar nuevo paciente -->
     <div class="botones-container">
         <button class="btn btn-cancelar" routerLink="/cronograma">Cancelar</button>
+        <button class="btn btn-agregar" (click)="mostrarFormularioRegistro()">Agregar Nuevo Paciente</button>
         <button class="btn btn-seleccionar" routerLink="/asignar-enfermeras">Seleccionar Enfermeras</button>
     </div>
+
+    <!-- Formulario de registro de pacientes -->
+    <div class="formulario-registro" [class.desplegado]="mostrarRegistro">
+        <app-register-patient (pacienteRegistrado)="agregarPaciente($event)"></app-register-patient>
+    </div>
+    
 </div>
