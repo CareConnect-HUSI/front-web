@@ -1,19 +1,48 @@
 <header class="header">
-    <div class="logo">
-      <img src="assets/images/logoCareConnect.jpg" alt="CareConnect">
-    </div>
-    <nav class="nav">
-      <ul>
-        <li><a href="#" class="active">Inicio</a></li>
-        <li><a href="#">Pacientes</a></li>
-        <li><a href="#">Enfermeras</a></li>
-        <li><a href="#">Asignar</a></li>
-        <li><a href="#">Inventario</a></li>
-      </ul>
-    </nav>
-    <button class="logout-btn" (click)="logout()">
-        <i class='bx bx-log-out'></i>
-      </button>
-      
-  </header>
-  
+  <div class="logo">
+    <img src="assets/images/logo.png" alt="CareConnect">
+  </div>
+  <nav class="nav">
+    <ul>
+      <li (mouseenter)="showDropdown('inicio')" (mouseleave)="hideDropdown()">
+        <a href="#" class="active" routerLink="/cronograma">Inicio</a>
+      </li>
+
+      <li (mouseenter)="showDropdown('pacientes')" (mouseleave)="hideDropdown()">
+        <a routerLink="/pacientes" routerLinkActive="active">Pacientes</a>
+        <ul class="dropdown-menu" *ngIf="activeDropdown === 'pacientes'">
+          <li><a routerLink="/pacientes">Lista de Pacientes</a></li>
+          <li><a routerLink="/registro-pacientes">Registrar Pacientes</a></li>
+        </ul>
+      </li>
+
+      <li (mouseenter)="showDropdown('enfermeras')" (mouseleave)="hideDropdown()">
+        <a href="#" routerLink="/lista-enfermeras">Enfermeras</a>
+        <ul class="dropdown-menu" *ngIf="activeDropdown === 'enfermeras'">
+          <li><a routerLink="/lista-enfermeras">Lista de Enfermeras</a></li>
+          <li><a routerLink="/registro-enfermeras">Registrar Enfermeras</a></li>
+        </ul>
+      </li>
+
+      <li (mouseenter)="showDropdown('asignar')" (mouseleave)="hideDropdown()">
+        <a href="#" routerLink="/asignar-pacientes">Asignar</a>
+        <ul class="dropdown-menu" *ngIf="activeDropdown === 'asignar'">
+          <li><a routerLink="/asignar-pacientes">Pacientes</a></li>
+          <li><a routerLink="/asignar-enfermeras">Enfermeras</a></li>
+        </ul>
+      </li>
+
+      <li (mouseenter)="showDropdown('inventario')" (mouseleave)="hideDropdown()">
+        <a href="#" routerLink="/inventario">Inventario</a>
+        <ul class="dropdown-menu" *ngIf="activeDropdown === 'inventario'">
+          <li><a routerLink="/inventario-total">Inventario General</a></li>
+          <li><a routerLink="/registro-inventario">Registrar Inventario</a></li>
+          <li><a routerLink="/inventario">Inventario por pacientes</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+  <button class="logout-btn" (click)="logout()">
+    <i class='bx bx-log-out'></i>
+  </button>
+</header>

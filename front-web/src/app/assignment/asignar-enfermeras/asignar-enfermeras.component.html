@@ -1,0 +1,39 @@
+<div class="asignar-container">
+    <h3 class="text-center">Seleccione las enfermeras a asignar hoy</h3>
+
+    <div class="seleccion-container">
+        <div class="lista-enfermeras">
+            <h4>Enfermeras</h4>
+            <div class="search-box">
+                <input type="text" placeholder="Buscar por nombre" [(ngModel)]="filtro" (input)="filtrarEnfermeras()">
+                <i class="bx bx-search"></i>
+            </div>
+            <ul>
+                <li *ngFor="let enfermera of enfermerasDisponibles">
+                    <span>{{ enfermera.nombre }}</span>
+                    <input type="checkbox" (change)="moverEnfermera(enfermera)">
+                </li>
+            </ul>
+        </div>
+
+        <div class="acciones">
+            <button (click)="moverEnfermera(enfermerasDisponibles[0])" [disabled]="enfermerasDisponibles.length === 0">➡</button>
+            <button (click)="removerEnfermera(enfermerasSeleccionadas[0])" [disabled]="enfermerasSeleccionadas.length === 0">⬅</button>
+        </div>
+
+        <div class="lista-enfermeras">
+            <h4>Enfermeras Seleccionadas</h4>
+            <ul>
+                <li *ngFor="let enfermera of enfermerasSeleccionadas">
+                    <span>{{ enfermera.nombre }}</span>
+                    <input type="checkbox" (change)="removerEnfermera(enfermera)">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="botones-container">
+        <button class="btn btn-cancelar" routerLink="/cronograma">Cancelar</button>
+        <button class="btn btn-asignar" routerLink="/cronograma">Asignar</button>
+    </div>
+</div>

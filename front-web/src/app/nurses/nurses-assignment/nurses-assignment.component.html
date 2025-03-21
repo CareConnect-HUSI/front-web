@@ -1,0 +1,36 @@
+<div class="patient-container">
+    <div class="section">
+        <h2>Asignación de {{ enfermeraNombre }}</h2>
+      </div>
+
+      <div class="table-container">
+        <table id="myTable" class="tablita">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let asignacion of asignaciones">
+                  <td>{{ asignacion.hora }}</td>
+                  <td>{{ asignacion.paciente }}</td>
+                  <td>{{ asignacion.direccion }}</td>
+                  <td>{{ asignacion.estado }}</td>
+                </tr>
+              </tbody>
+        </table>
+    </div>  
+    <div class="addBtn-container">
+        <a [routerLink]="'/lista-enfermeras'">
+            <i class="bx bx-left-arrow-alt"></i>
+            Regresar
+        </a>
+        <a class="btn-save" id="saveBazar">
+            <i class="bx bxs-route"></i>
+            Ver ruta
+        </a>
+    </div>
+</div>

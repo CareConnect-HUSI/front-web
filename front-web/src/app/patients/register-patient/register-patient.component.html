@@ -1,0 +1,147 @@
+<div class="register-container">
+  <h2 class="title">Registrar Paciente</h2>
+
+  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()">
+    
+      <h3>Datos personales</h3>
+
+      <div class="section2" formGroupName="personalInfo">
+        <div class="form-group">
+          <label>Nombres</label>
+          <input formControlName="nombres" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input formControlName="apellidos" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Tipo de Documento</label>
+          <select formControlName="tipoDocumento">
+            <option>CC</option>
+            <option>TI</option>
+            <option>Pasaporte</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>N° de Documento</label>
+          <input formControlName="numeroDocumento" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input formControlName="direccion" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Localidad</label>
+          <select formControlName="localidad">
+            <option>Suba</option>
+            <option>Usaquén</option>
+            <option>Chapinero</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Barrio</label>
+          <input formControlName="barrio" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Celular</label>
+          <input formControlName="celular" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Nombre Familiar</label>
+          <input formControlName="nombreFamiliar" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Celular Familiar</label>
+          <input formControlName="celularFamiliar" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Parentesco</label>
+          <input formControlName="parentesco" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Correo</label>
+          <input formControlName="email" type="text" />
+        </div>
+
+        <div class="form-group">
+          <label>Foto</label>
+          <input type="file" formControlName="foto" />
+        </div>
+      </div>
+    
+
+    <!-- Sección Tratamiento -->
+    <h3>Tratamiento</h3>
+    <table>
+      <thead>
+        <tr class="enunciado">
+          <th>Nombre medicamento</th>
+          <th>Dosis</th>
+          <th>Frecuencia</th>
+          <th>Días de Tratamiento</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Duración Visita</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let med of tratamiento.controls; let i = index" [formGroup]="med">
+          <td><input type="text" formControlName="medicamento" placeholder="Medicamento" /></td>
+          <td><input type="number" formControlName="dosis" placeholder="Dosis" /></td>
+          <td><input type="number" formControlName="frecuencia" placeholder="Frecuencia" /></td>
+          <td><input type="text" formControlName="diasTratamiento" placeholder="Días de tratamiento" /></td>
+          <td><input type="date" formControlName="fechaInicio" /></td>
+          <td><input type="date" formControlName="fechaFin" /></td>
+          <td><input type="number" formControlName="duracion" placeholder="tiempo de visita" /></td>
+          <td>
+            <button type="button" (click)="eliminarMedicamento(i)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="button" (click)="agregarMedicamento()" class="add-btn">➕ Agregar Medicamento</button>
+
+    <!-- Sección Procedimientos -->
+    <h3 class="proc">Procedimientos</h3>
+    <table>
+      <thead>
+        <tr class="enunciado">
+          <th>Nombre Procedimiento</th>
+          <th>Frecuencia</th>
+          <th>Días de Tratamiento</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Duración Visita</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let proc of procedimientos.controls; let i = index" [formGroup]="proc">
+          <td>
+            <select formControlName="procedimiento">
+              <option value="" disabled selected>Seleccionar procedimiento</option>
+              <option *ngFor="let p of listaProcedimientos" [value]="p">{{ p }}</option>
+            </select>
+          </td>          
+          <td><input type="number" formControlName="frecuencia" placeholder="Frecuencia" /></td>
+          <td><input type="text" formControlName="diasTratamiento" placeholder="Días de tratamiento" /></td>
+          <td><input type="date" formControlName="fechaInicio" /></td>
+          <td><input type="date" formControlName="fechaFin" /></td>
+          <td><input type="number" formControlName="duracion" placeholder="tiempo de visita" /></td>
+          <td>
+            <button type="button" (click)="eliminarProcedimiento(i)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button type="button" (click)="agregarProcedimiento()" class="add-btn">➕ Agregar Procedimiento</button>
+
+    <!-- Botón de Guardar -->
+    <div class="buttons">
+      <button type="submit" class="save-btn">Guardar</button>
+    </div>
+  </form>
+</div>

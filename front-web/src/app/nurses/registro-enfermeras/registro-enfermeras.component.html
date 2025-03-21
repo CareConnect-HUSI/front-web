@@ -1,0 +1,68 @@
+<div class="register-container">
+    <h2 class="title">Registrar Enfermera</h2>
+  
+    <form [formGroup]="nurseForm" (ngSubmit)="onSubmit()">
+      <div class="section">
+        <h3>Datos personales</h3>
+  
+        <div class="section2" formGroupName="personalInfo">
+          <div class="form-group">
+            <label>Nombres</label>
+            <input formControlName="name" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input formControlName="lastname" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de Documento</label>
+            <select formControlName="identificationType">
+              <option>CC</option>
+              <option>TI</option>
+              <option>Pasaporte</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>N° de Documento</label>
+            <input formControlName="identificationNumber" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" formControlName="email" required />
+          </div>
+          
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" formControlName="password" required />
+          </div>          
+          <div class="form-group">
+            <label>Dirección</label>
+            <input formControlName="address" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Localidad</label>
+            <select formControlName="localidad">
+              <option>Suba</option>
+              <option>Usaquén</option>
+              <option>Chapinero</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Celular</label>
+            <input formControlName="phone" type="text" />
+          </div>
+          <div class="form-group">
+            <label>Foto</label>
+            <input type="file" formControlName="foto" />
+            <i class='bx bx-load'></i>
+          </div>
+        </div>
+      </div>
+  
+  
+      <div class="buttons">
+        <button type="submit" class="save-btn">Guardar</button>
+      </div>
+    </form>
+  </div>
+  

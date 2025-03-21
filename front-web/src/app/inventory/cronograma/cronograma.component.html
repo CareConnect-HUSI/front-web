@@ -1,0 +1,92 @@
+<div class="cronograma-container">
+    <h3 class="text-center">Cronograma de Enfermeras</h3>    
+    <!-- Tabla de Cronograma -->
+    <div class="table-wrapper">
+        <table class="cronograma">
+          <thead>
+            <tr>
+              <th>Enfermera</th>
+              <th *ngFor="let hora of horasVisibles">{{ hora }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enfermera of enfermeras; trackBy: trackByEnfermera">
+              <td>{{ enfermera.nombre }}</td>
+              <ng-container *ngFor="let hora of horasVisibles; let i = index; trackBy: trackByHora">
+                <!-- Solo renderiza la celda si es el inicio del bloque de tiempo del paciente -->
+                <ng-container *ngIf="debeMostrarCelda(enfermera, i)">
+                  <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][i])"
+                      cdkDropList
+                      [cdkDropListDisabled]="!modoEdicion" 
+                      (cdkDropListDropped)="soltarPaciente($event, enfermera, i)">
+                    <div *ngIf="asignaciones[enfermera.nombre][i]" 
+                         class="paciente" 
+                         cdkDrag
+                         [cdkDragDisabled]="!modoEdicion" 
+                         (cdkDragStarted)="arrastrarPaciente($event, enfermera, i)">
+                      {{ asignaciones[enfermera.nombre][i].nombre }}
+                      ({{ asignaciones[enfermera.nombre][i].duracion }} min)
+                      <button *ngIf="modoEdicion" 
+                              (click)="eliminarPaciente(enfermera, i)" 
+                              class="eliminar-paciente">
+                        -
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+    <!-- Botones Modificar - Descargar (solo en modo de solo lectura) -->
+    <div *ngIf="!modoEdicion" class="botones-acciones">
+        <button (click)="modificarCronograma()">Modificar</button>
+        <button (click)="descargarCronograma()">Descargar</button>
+    </div>
+
+    <!-- Botones de edición (solo en modo de edición) -->
+    <div *ngIf="modoEdicion" class="botones-acciones">
+        <button (click)="guardarCambios()">Guardar Modificación</button>
+    </div>
+    
+    <!-- Información del Paciente -->
+    <div *ngIf="pacienteHover" class="info-paciente">
+        <p><strong>Nombre:</strong> {{ pacienteHover.nombre }}</p>
+        <p><strong>Dirección:</strong> {{ pacienteHover.direccion }}</p>
+        <p><strong>Teléfono:</strong> {{ pacienteHover.telefono }}</p>
+    </div>
+
+    <!-- Agregar Urgencia -->
+    <div *ngIf="modoEdicion" class="panel-urgencias">
+        
+            <h4>Agregar Urgencia</h4>
+            <div class="form-grid">
+            <input type="text" placeholder="Documento de identificacion" [(ngModel)]="nuevoPaciente.documento">
+            <input type="text" placeholder="Nombre del paciente" [(ngModel)]="nuevoPaciente.nombre">
+            <input type="text" placeholder="Dirección" [(ngModel)]="nuevoPaciente.direccion">
+            <input type="text" placeholder="Teléfono" [(ngModel)]="nuevoPaciente.telefono">
+
+            <label>Hora de Atención:</label>
+            <input type="time" [(ngModel)]="nuevoPaciente.horaAtencion">
+
+            <label>Medicamento:</label>
+            <select [(ngModel)]="nuevoPaciente.medicamento">
+                <option *ngFor="let medicamento of medicamentos" [value]="medicamento">{{ medicamento }}</option>
+            </select>
+
+            <label>Procedimiento:</label>
+            <select [(ngModel)]="nuevoPaciente.procedimiento">
+                <option *ngFor="let procedimiento of procedimientos" [value]="procedimiento">{{ procedimiento }}</option>
+            </select>
+
+            <label>Duración (minutos):</label>
+            <input type="number" min="30" step="30" [(ngModel)]="nuevoPaciente.duracion">
+        </div>
+            <button (click)="agregarUrgencia()">Agregar Urgencia</button>
+            <button (click)="cerrarPanelUrgencia()">Cerrar</button>
+        
+    </div>
+</div>
+ 

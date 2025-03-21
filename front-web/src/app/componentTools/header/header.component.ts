@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -6,10 +7,20 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  isLoggedIn = true; // Simula si el usuario está autenticado
-  logout() {
-    console.log('Cerrando sesión...');
-    this.isLoggedIn = false;
+  activeDropdown: string | null = null;
+
+  constructor(private router: Router) {}
+
+  showDropdown(menu: string) {
+    this.activeDropdown = menu;
   }
 
+  hideDropdown() {
+    this.activeDropdown = null;
+  }
+
+  logout() {
+    console.log("Cerrar sesión");
+    this.router.navigate(['/login']);
+  }
 }

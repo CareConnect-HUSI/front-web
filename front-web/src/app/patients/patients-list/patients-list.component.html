@@ -1,0 +1,29 @@
+<div class="container">
+    <h2>Lista de Pacientes</h2>
+  
+    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por nombre o identificación" class="search-input">
+  
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Identificación</th>
+            <th>Paciente</th>
+            <th>Dirección</th>
+            <th>Tratamiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let paciente of pacientesFiltrados()">
+            <td>{{ paciente.id }}</td>
+            <td>{{ paciente.nombre }}</td>
+            <td>{{ paciente.direccion }}</td>
+            <td><a routerLink="/paciente/{{ paciente.id }}" class="ver-link">Ver</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <button class="btn-regresar" (click)="regresar()">Regresar</button>
+  </div>
+  

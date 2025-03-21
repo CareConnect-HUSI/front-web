@@ -1,0 +1,90 @@
+.container {
+  width: 90%;
+  margin: 40px auto;
+  text-align: center;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  font-size: 18px;
+  color: #666;
+  text-align: left;
+  padding-bottom: 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.table-container {
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #2c5697;
+  color: white;
+}
+
+.ver-link {
+  color: #2c5697;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.ver-link:hover {
+  text-decoration: underline;
+}
+
+.botones-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  border-radius: 5px;
+}
+
+.btn-seleccionar {
+  background: #28a745;
+}
+
+.btn-seleccionar:hover {
+  background: #218838;
+}
+
+.btn-cancelar {
+  background: #dc3545;
+}
+
+.btn-cancelar:hover {
+  background: #c82333;
+}
