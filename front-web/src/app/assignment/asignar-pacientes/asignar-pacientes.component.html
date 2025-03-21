@@ -25,8 +25,9 @@
                 <i class="bx bx-search"></i>
             </div>
             <ul>
-                <li *ngFor="let paciente of pacientesDisponibles">
+                <li *ngFor="let paciente of pacientesDisponibles" [class.recien-agregado]="paciente.recienAgregado">
                     <span>{{ paciente.nombre }}</span>
+                    <span *ngIf="paciente.recienAgregado" class="nuevo-indicador"> (Nuevo)</span>
                     <input type="checkbox" (change)="moverPaciente(paciente)">
                 </li>
             </ul>
@@ -56,7 +57,8 @@
     </div>
 
     <!-- Formulario de registro de pacientes -->
-    <div *ngIf="mostrarRegistro">
+    <div class="formulario-registro" [class.desplegado]="mostrarRegistro">
         <app-register-patient (pacienteRegistrado)="agregarPaciente($event)"></app-register-patient>
     </div>
+    
 </div>

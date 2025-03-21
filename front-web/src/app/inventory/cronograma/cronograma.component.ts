@@ -36,19 +36,16 @@ export class CronogramaComponent implements OnInit {
   pacienteHover: any = null;
 
   
-
+  constructor(private cdr: ChangeDetectorRef) { 
+    this.inicializarAsignaciones();
+}
+   
   ngOnInit() {
     setInterval(() => {
       this.fechaHoraActual = new Date().toLocaleString();
     }, 1000);
   }
-
   
-  constructor(private cdr: ChangeDetectorRef) { 
-    this.inicializarAsignaciones();
-}
-   
-    
 
     // Método para agregar un paciente usando un índice numérico
   // Método para agregar un paciente usando un índice numérico
@@ -164,6 +161,12 @@ descargarCronograma() {
   console.log("Descargando cronograma...");
   // Lógica para descargar cronograma
 }
+arrastrarPaciente(event: CdkDragStart, enfermera: any, index: number) {
+  const paciente = this.asignaciones[enfermera.nombre][index];
+  if (paciente) {
+      event.source.data = { enfermera: enfermera.nombre, index, paciente };
+  }
+}
 
 eliminarPaciente(enfermera: any, index: number) {
   if (confirm("¿Estás seguro de eliminar este paciente?")) {
@@ -226,12 +229,40 @@ cerrarPanelUrgencia() {
   permitirSoltar(event: DragEvent) {
     event.preventDefault();
   }
+  correrPacientes(enfermera: string, inicio: number, duracion: number): boolean {
+    // Verificar si es posible correr a los pacientes
+    let espacioLibre = 0;
+    for (let i = inicio; i < this.horasVisibles.length; i++) {
+      if (!this.asignaciones[enfermera][i]) {
+        espacioLibre++;
+      } else {
+        // Si encontramos un paciente, verificar si podemos correrlo
+        const paciente = this.asignaciones[enfermera][i];
+        const duracionPaciente = paciente.duracion / 30;
   
-  arrastrarPaciente(event: CdkDragStart, enfermera: any, index: number) {
-    const paciente = this.asignaciones[enfermera.nombre][index];
-    if (paciente) {
-      event.source.data = { enfermera: enfermera.nombre, index, paciente };
+        // Verificar si hay espacio suficiente para correr al paciente
+        if (i + duracionPaciente + duracion > this.horasVisibles.length) {
+          return false; // No hay espacio suficiente
+        }
+  
+        // Intentar correr al paciente
+        const pacientesCorridos = this.correrPacientes(enfermera, i + duracionPaciente, duracion);
+        if (!pacientesCorridos) {
+          return false; // No se pudo correr al paciente
+        }
+  
+        // Mover al paciente
+        for (let j = 0; j < duracionPaciente; j++) {
+          this.asignaciones[enfermera][i + j + duracion] = paciente;
+          this.asignaciones[enfermera][i + j] = null;
+        }
+  
+        espacioLibre += duracion;
+        break;
+      }
     }
+  
+    return espacioLibre >= duracion;
   }
   
   soltarPaciente(event: CdkDragDrop<any[]>, nuevaEnfermera: any, nuevaIndex: number) {
@@ -265,7 +296,21 @@ cerrarPanelUrgencia() {
         this.asignaciones[enfermera][index + i] = null;
       }
     } else {
-      alert("No hay espacio disponible para mover al paciente.");
+      // Intentar correr a los pacientes existentes para hacer espacio
+      const pacientesCorridos = this.correrPacientes(nuevaEnfermera.nombre, nuevaIndex, duracion);
+      if (pacientesCorridos) {
+        // Mover el paciente a la nueva ubicación
+        for (let i = 0; i < duracion; i++) {
+          this.asignaciones[nuevaEnfermera.nombre][nuevaIndex + i] = paciente;
+        }
+  
+        // Limpiar las celdas anteriores
+        for (let i = 0; i < duracion; i++) {
+          this.asignaciones[enfermera][index + i] = null;
+        }
+      } else {
+        alert("No hay espacio disponible para mover al paciente.");
+      }
     }
   }
  

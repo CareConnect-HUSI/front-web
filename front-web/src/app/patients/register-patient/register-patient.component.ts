@@ -13,10 +13,17 @@ export class RegisterPatientComponent implements OnInit {
 
   nuevoPaciente = { documento: '', nombre: '' };
   guardarPaciente() {
+    const personalInfo = this.patientForm.get('personalInfo')?.value;
+    const nuevoPaciente = {
+      documento: personalInfo.numeroDocumento,
+      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`, // Cambiado de 'name' a 'nombres'
+      recienAgregado: true // Asegurarse de que el paciente se marque como recién agregado
+    };
+  
     // Validar que los campos no estén vacíos
-    if (this.nuevoPaciente.documento && this.nuevoPaciente.nombre) {
-      this.pacienteRegistrado.emit(this.nuevoPaciente);
-      this.nuevoPaciente = { documento: '', nombre: '' }; // Limpiar el formulario
+    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
+      this.pacienteRegistrado.emit(nuevoPaciente);
+      this.patientForm.reset(); // Limpiar el formulario
     } else {
       alert('Por favor, complete todos los campos.');
     }
@@ -34,24 +41,24 @@ export class RegisterPatientComponent implements OnInit {
   ngOnInit() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        name: ['Juan Pablo'],
-        apellidos: ['Rodríguez Cruz'],
+        nombres: [''], // Cambiado de 'name' a 'nombres'
+        apellidos: [''],
         tipoDocumento: ['CC'],
-        numeroDocumento: ['1000200'],
-        direccion: ['Calle 123 #0-23'],
-        celular: ['3088765987'],
-        localidad: ['Suba'],
+        numeroDocumento: [''],
+        direccion: [''],
+        celular: [''],
+        localidad: [''],
         barrio: [''],
-        nombreFamiliar: ['Mateo Lopez'],
-        parentesco: ['Hermano'],
-        email: ['correo@gmail.com'],
-        password:['123456'],
+        nombreFamiliar: [''],
+        parentesco: [''],
+        email: [''],
+        password: [''],
         foto: [null]
       }),
       tratamiento: this.fb.array([]),
       procedimientos: this.fb.array([])
     });
-
+  
     this.agregarMedicamento();
   }
 

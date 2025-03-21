@@ -23,8 +23,16 @@ body {
   
   .paciente {
     background-color: #e3f2fd;
-    padding: 5px;
-    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: grab;
+    margin: 2px;
+    display: block;
+  }
+  
+  .paciente:hover {
+    background: #bbdefb;
   }
   
   .eliminar-paciente {
@@ -84,10 +92,7 @@ h3.text-center {
 /* Tabla de Cronograma */
 .table-wrapper {
     overflow-x: auto;
-    max-width: 100%;
-    max-height: 500px;
-    overflow-y: auto;
-    margin-bottom: 20px;
+   
 }
 
 table.cronograma {
@@ -111,20 +116,6 @@ table.cronograma td {
     background: #f9f9f9;
 }
 
-.paciente {
-    font-weight: bold;
-    color: #333;
-    background: #e3f2fd;
-    padding: 8px;
-    border-radius: 5px;
-    cursor: grab;
-    margin: 2px;
-    display: block;
-}
-
-.paciente:hover {
-    background: #bbdefb;
-}
 
 .eliminar-paciente {
     background: #ff4444;
@@ -283,10 +274,5 @@ input:focus, select:focus, button:focus {
     text-align: center;
 }
 
-.paciente {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 5px;
-    cursor: pointer;
-}
+
 

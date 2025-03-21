@@ -17,14 +17,20 @@
                 <ng-container *ngIf="debeMostrarCelda(enfermera, i)">
                   <td [attr.colspan]="getColspan(asignaciones[enfermera.nombre][i])"
                       cdkDropList
+                      [cdkDropListDisabled]="!modoEdicion" 
                       (cdkDropListDropped)="soltarPaciente($event, enfermera, i)">
                     <div *ngIf="asignaciones[enfermera.nombre][i]" 
                          class="paciente" 
                          cdkDrag
+                         [cdkDragDisabled]="!modoEdicion" 
                          (cdkDragStarted)="arrastrarPaciente($event, enfermera, i)">
                       {{ asignaciones[enfermera.nombre][i].nombre }}
                       ({{ asignaciones[enfermera.nombre][i].duracion }} min)
-                      <button *ngIf="modoEdicion" (click)="eliminarPaciente(enfermera, i)" class="eliminar-paciente">-</button>
+                      <button *ngIf="modoEdicion" 
+                              (click)="eliminarPaciente(enfermera, i)" 
+                              class="eliminar-paciente">
+                        -
+                      </button>
                     </div>
                   </td>
                 </ng-container>
