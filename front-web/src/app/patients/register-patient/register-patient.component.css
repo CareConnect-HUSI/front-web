@@ -12,7 +12,7 @@
 .title {
     text-align: center;
     font-size: 24px;
-    color: #2a4d69;
+    color: #2c5697;
 }
 
 .section2 {
@@ -25,7 +25,7 @@
 }
 
 h3 {
-    color: #2a4d69;
+    color: #2c5697;
     font-size: 18px;
     grid-column: span 2;
 }
@@ -57,7 +57,7 @@ th, td {
 }
 
 th {
-    background-color: #2a4d69;
+    background-color: #2c5697;
     color: white;
 }
 
@@ -76,7 +76,7 @@ td input {
     gap: 5px;
     margin-top: 10px;
     padding: 10px;
-    background-color: #2a4d69;
+    background-color: #2c5697;
     color: white;
     border: none;
     border-radius: 5px;
@@ -85,7 +85,7 @@ td input {
 }
 
 .add-btn:hover {
-    background-color: #1b344b;
+    background-color: #2c5697;
 }
 
 button {
@@ -107,7 +107,7 @@ button:hover {
 }
 
 .save-btn {
-    background-color: #2a4d69;
+    background-color: #2c5697;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -117,7 +117,7 @@ button:hover {
 }
 
 .save-btn:hover {
-    background-color: #1b344b;
+    background-color: #2c5697;
 }
 
 @media (max-width: 768px) {

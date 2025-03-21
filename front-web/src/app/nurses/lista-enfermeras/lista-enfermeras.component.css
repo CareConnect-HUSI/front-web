@@ -21,7 +21,7 @@ h1 {
 }
 
 .dropdown-btn {
-    background-color: #1d4ed8;
+    background-color: #2c5697;
     color: white;
     border: none;
     padding: 10px;
@@ -70,7 +70,7 @@ h1 {
 .assign-btn {
     background: none;
     border: none;
-    color: #1d4ed8;
+    color: #2c5697;
     cursor: pointer;
 }
 
@@ -130,6 +130,14 @@ h1 {
   
   .btn-seleccionar:hover {
     background: #218838;
+  }
+
+  .titulo {
+    font-size: 10px;
+    font-weight: bold;
+    color: #2c5697;
+    margin-bottom: 10px;
+    margin-top: 3%;
   }
   
  
