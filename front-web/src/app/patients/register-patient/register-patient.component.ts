@@ -1,9 +1,7 @@
 
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { PatientService } from './../../service/patient.service';
-import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { PatientService } from './../../service/patient.service';
 import { AuthService } from 'src/app/service/auth.service';
 
 
