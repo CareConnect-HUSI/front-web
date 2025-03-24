@@ -1,34 +1,70 @@
-<div class="container">
-  <h1>Inventario General</h1>
+<div class="medicamentos-container">
+  <h2>Lista de Medicamentos</h2>
 
-  <input type="text" [(ngModel)]="filtro" placeholder="Buscar por nombre o identificación" class="search-input">
-
-  <div class="table-wrapper">
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Disponible</th>
-            <th>Utilizado</th>
-            <th>Total</th>
-            <th>Información</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let inventario of mediFiltrados()">
-            <td>{{ inventario.codigo }}</td>
-            <td>{{ inventario.nombre }}</td>
-            <td>{{ inventario.disponibles }}</td>
-            <td>{{ inventario.utilizados }}</td>
-            <td>{{ inventario.total }}</td>
-            <td><a routerLink="/medicamento/{{ inventario.codigo }}" class="ver-link">Ver</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <!-- Filtro de búsqueda -->
+  <div class="filtro">
+    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por código, nombre o tipo" (input)="filtrarMedicamentos()">
   </div>
 
-  <button class="btn btn-seleccionar" routerLink="/registro-inventario">Agregar</button>
+  <!-- Tabla de medicamentos con scroll -->
+  <div class="tabla-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let medicamento of medicamentosFiltrados" (click)="seleccionarMedicamento(medicamento)">
+          <td>{{ medicamento.codigo }}</td>
+          <td>{{ medicamento.nombre }}</td>
+          <td>{{ medicamento.tipo }}</td>
+          <td>{{ medicamento.total }}</td>
+          <td>
+            <button (click)="eliminarMedicamento(medicamento)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cuadro de información del medicamento seleccionado -->
+  <div class="info-medicamento" *ngIf="medicamentoSeleccionado">
+    <h3>Información del Medicamento</h3>
+    <p><strong>Código:</strong> {{ medicamentoSeleccionado.codigo }}</p>
+    <p><strong>Nombre:</strong> {{ medicamentoSeleccionado.nombre }}</p>
+    <p><strong>Tipo:</strong> {{ medicamentoSeleccionado.tipo }}</p>
+    <p><strong>Total:</strong> {{ medicamentoSeleccionado.total }}</p>
+  </div>
+
+  <!-- Formulario para agregar medicamentos -->
+  <form (ngSubmit)="agregarMedicamento()" class="form-agregar">
+    <div class="form-group">
+      <label for="codigo">Código:</label>
+      <input type="text" id="codigo" [(ngModel)]="nuevoMedicamento.codigo" name="codigo" required>
+    </div>
+    <div class="form-group">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" [(ngModel)]="nuevoMedicamento.nombre" name="nombre" required>
+    </div>
+    <div class="form-group">
+      <label for="tipo">Tipo:</label>
+      <select id="tipo" [(ngModel)]="nuevoMedicamento.tipo" name="tipo" required>
+        <option value="Oral">Oral</option>
+        <option value="Inyectable">Inyectable</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="total">Total:</label>
+      <input type="number" id="total" [(ngModel)]="nuevoMedicamento.total" name="total" required>
+    </div>
+    <button type="submit">Agregar Medicamento</button>
+    <div *ngIf="mostrarError" class="error-message">
+      El medicamento ya existe.
+    </div>
+  </form>
 </div>

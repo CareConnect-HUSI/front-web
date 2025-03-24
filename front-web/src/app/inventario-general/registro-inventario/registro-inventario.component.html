@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="container">
   <h2 class="title">Registrar Inventario</h2>
     <div class="table-container">
@@ -52,5 +53,66 @@
   
       <button class="btn btn-seleccionar" routerLink="/inventario-total">Guardar</button>
     </div>
+=======
+<div class="procedimientos-container">
+  <h2>Lista de Procedimientos</h2>
+
+  <!-- Filtro de búsqueda -->
+  <div class="filtro">
+    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por código, abreviatura o descripción" (input)="filtrarProcedimientos()">
+>>>>>>> 94b6e45 (componentes asignacion y procedimiento)
   </div>
-  
+
+  <!-- Tabla de procedimientos con scroll -->
+  <div class="tabla-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Abreviatura</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let procedimiento of procedimientosFiltrados" (click)="seleccionarProcedimiento(procedimiento)">
+          <td>{{ procedimiento.codigo }}</td>
+          <td>{{ procedimiento.abreviatura }}</td>
+          <td>{{ procedimiento.descripcion }}</td>
+          <td>
+            <button (click)="eliminarProcedimiento(procedimiento)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cuadro de información del procedimiento seleccionado -->
+  <div class="info-procedimiento" *ngIf="procedimientoSeleccionado">
+    <h3>Información del Procedimiento</h3>
+    <p><strong>Código:</strong> {{ procedimientoSeleccionado.codigo }}</p>
+    <p><strong>Abreviatura:</strong> {{ procedimientoSeleccionado.abreviatura }}</p>
+    <p><strong>Descripción:</strong> {{ procedimientoSeleccionado.descripcion }}</p>
+  </div>
+
+  <!-- Formulario para agregar procedimientos -->
+   <h3>Agregar Procedimiento</h3>
+  <form (ngSubmit)="agregarProcedimiento()" class="form-agregar">
+    <div class="form-group">
+      <label for="codigo">Código:</label>
+      <input type="text" id="codigo" [(ngModel)]="nuevoProcedimiento.codigo" name="codigo" required>
+    </div>
+    <div class="form-group">
+      <label for="abreviatura">Abreviatura:</label>
+      <input type="text" id="abreviatura" [(ngModel)]="nuevoProcedimiento.abreviatura" name="abreviatura" required>
+    </div>
+    <div class="form-group">
+      <label for="descripcion">Descripción:</label>
+      <input type="text" id="descripcion" [(ngModel)]="nuevoProcedimiento.descripcion" name="descripcion" required>
+    </div>
+    <button type="submit">Agregar Procedimiento</button>
+    <div *ngIf="mostrarError" class="error-message">
+      El procedimiento ya existe.
+    </div>
+  </form>
+</div>

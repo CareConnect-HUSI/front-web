@@ -35,9 +35,9 @@
       <li (mouseenter)="showDropdown('inventario')" (mouseleave)="hideDropdown()">
         <a href="#" routerLink="/inventario">Inventario</a>
         <ul class="dropdown-menu" *ngIf="activeDropdown === 'inventario'">
-          <li><a routerLink="/inventario-total">Inventario General</a></li>
-          <li><a routerLink="/registro-inventario">Registrar Inventario</a></li>
           <li><a routerLink="/inventario">Inventario por pacientes</a></li>
+          <li><a routerLink="/inventario-total">Medicamentos</a></li>
+          <li><a routerLink="/registro-inventario">Procedimientos</a></li>
         </ul>
       </li>
     </ul>
