@@ -1,144 +1,334 @@
-.nurses-container {
-    background: white;
-    width: 50%;
-    margin: 40px auto;
+/* Estilos base */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .title-center {
     text-align: center;
-}
-h1 {
-    text-align: center; 
-    font-size: 50px; 
-    font-weight: bold; 
-    color: #2c5697; 
-    margin-bottom: 20px;
-}
-.dropdown {
+    width: 100%;
+    color: #2c5697;
+    font-size: 28px;
+    margin: 0 0 20px 0;
+  }
+  
+  .header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+  }
+  
+  .search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+  }
+  
+  .search-box {
+    flex-grow: 1;
+    position: relative;
+    max-width: 400px;
+  }
+  
+  .search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+  }
+  
+  .search-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  /* Dropdown */
+  .dropdown {
     position: relative;
     display: inline-block;
-    margin-bottom: 20px;
-}
-
-.dropdown-btn {
-    background-color: #2c5697;
-    color: white;
-    border: none;
-    padding: 10px;
+  }
+  
+  .dropdown-btn {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
-}
-
-.dropdown-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .dropdown-content {
     position: absolute;
     background-color: white;
-    min-width: 160px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 4px;
     z-index: 1;
-    border-radius: 5px;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 10px;
-    display: block;
+    margin-top: 5px;
+  }
+  
+  .dropdown-content a {
+    color: #333;
+    padding: 10px 15px;
     text-decoration: none;
+    display: block;
+    font-size: 14px;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Botones */
+  .add-btn {
+    background: #2c5697;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
     cursor: pointer;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.nurse-card {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    background: white;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .action-btn {
+    background: #f0f0f0;
+    color: #2c5697;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
     cursor: pointer;
-}
-
-.nurse-card img {
-    width: 40px;
-    height: 40px;
-}
-
-.assign-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-top: auto;
+  }
+  
+  .edit-btn {
+    background: #f0f0f0;
+    border: none;
+    color: #2c5697;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 8px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .edit-btn:hover {
+    background: #2c5697;
+    color: white;
+    transform: scale(1.1);
+  }
+  
+  /* Grid de enfermeras */
+  .nurses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .nurse-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+  }
+  
+  .nurse-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .nurse-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px;
+    border: 3px solid #e6f0ff;
+  }
+  
+  .nurse-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .nurse-details {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .nurse-details h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 16px;
+  }
+  
+  .nurse-details p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  /* Estado vacío */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .empty-image {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+  
+  .empty-state h3 {
+    color: #2c5697;
+    margin-bottom: 10px;
+  }
+  
+  .empty-state p {
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  /* Modal de edición */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: #2c5697;
+  }
+  
+  .close-btn {
     background: none;
     border: none;
-    color: #2c5697;
+    font-size: 20px;
     cursor: pointer;
-}
-
-.nurse-card.selected {
-    border: 2px solid #2c5697;
-}
-
-.back-btn {
-    background-color: #2c5697;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-}
-.dropdown-btn {
-    background-color: #2c5697;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
+    color: #777;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .modal-footer {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 16px;
-}
-
-.dropdown-btn span {
-    transition: transform 0.3s ease;
-}
-
-.dropdown-btn span.rotate {
-    transform: rotate(180deg);
-}
-
-.botones-container {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    gap: 10px;
   }
   
-  .btn {
-    padding: 10px 20px;
+  .cancel-btn {
+    background: #f0f0f0;
+    color: #333;
     border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
+  }
+  
+  .save-btn {
+    background: #2c5697;
     color: white;
-    border-radius: 5px;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
   }
-  
-  .btn-seleccionar {
-    background: #28a745;
-  }
-  
-  .btn-seleccionar:hover {
-    background: #218838;
-  }
-
-  .titulo {
-    font-size: 10px;
-    font-weight: bold;
-    color: #2c5697;
-    margin-bottom: 10px;
-    margin-top: 3%;
-  }
-  
- 
-  
