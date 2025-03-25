@@ -1,112 +1,368 @@
-.asignar-container {
-    max-width: 800px;
-    margin: auto;
-    background: white;
+/* Estilos base consistentes con los componentes anteriores */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.text-center {
+  }
+  
+  .title-center {
     text-align: center;
-    font-size: 22px;
-    margin-bottom: 15px;
-}
-
-.seleccion-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.lista-enfermeras {
-    width: 40%;
-    background: #f5f5f5;
-    padding: 15px;
-    border-radius: 8px;
-}
-
-.lista-enfermeras h4 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-}
-
-.search-box input {
-    border: none;
-    outline: none;
     width: 100%;
-    padding: 5px;
-}
-
-.search-box i {
-    color: gray;
-    margin-left: 5px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-li {
-    background: white;
-    margin: 5px 0;
-    padding: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.acciones {
+    color: #2c5697;
+    font-size: 28px;
+    margin: 0 0 20px 0;
+  }
+  
+  .header {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-}
-
-.acciones button {
-    margin: 5px;
-    padding: 10px;
-    font-size: 18px;
+    margin-bottom: 30px;
+  }
+  
+  .info-jornada {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+  
+  /* Sección de búsqueda y filtros */
+  .search-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .search-box {
+    position: relative;
+    margin-bottom: 15px;
+  }
+  
+  .search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+  }
+  
+  .search-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .turno-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .turno-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f5f5f5;
+    color: #555;
     cursor: pointer;
-    border: none;
-    background: #007bff;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+  
+  .turno-filter-btn.active {
+    background: #2c5697;
     color: white;
-    border-radius: 5px;
-}
-
-.botones-container {
-    margin-top: 20px;
+    border-color: #2c5697;
+  }
+  
+  .turno-filter-btn.clear {
+    background: transparent;
+    border: 1px dashed #aaa;
+    margin-left: auto;
+  }
+  
+  .turno-filter-btn:hover:not(.active) {
+    background: #e6f0ff;
+  }
+  
+  /* Sección de enfermeras */
+  .enfermeras-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    color: #2c5697;
+    font-size: 18px;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e6f0ff;
+  }
+  
+  .enfermeras-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .enfermera-card {
+    background: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
-}
-
-.btn {
-    padding: 10px 20px;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-left: 4px solid #2c5697;
+  }
+  
+  .enfermera-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .enfermera-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  
+  .enfermera-nombre {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .enfermera-documento, .enfermera-telefono {
+    font-size: 13px;
+    color: #666;
+  }
+  
+  .enfermera-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .turno-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  /* Botones de acción */
+  .action-btn {
+    background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+  }
+  
+  .action-btn.remove {
+    color: #e74c3c;
+    background-color: #ffebee;
+  }
+  
+  .action-btn.remove:hover {
+    background-color: #e74c3c;
     color: white;
-    border-radius: 5px;
-}
+  }
+  
+  /* Modal de confirmación */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: #2c5697;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .modal-body textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  .btn-danger {
+    background: #e74c3c;
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background: #c0392b;
+  }
+  
+  /* Estado vacío */
+  .empty-state {
+    text-align: center;
+    padding: 30px 20px;
+  }
+  
+  .empty-image {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 15px;
+    opacity: 0.7;
+  }
+  
+  .empty-state h4 {
+    color: #666;
+    margin: 0;
+  }
+  
+  /* Botones del footer */
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  .btn {
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .btn-secondary {
+    background: #f0f0f0;
+    color: #555;
+  }
+  
+  .btn-secondary:hover {
+    background: #e0e0e0;
+  }
+  
+  .btn-primary {
+    background: #2c5697;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #1d3d6d;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .enfermera-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .enfermera-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+    
+    .footer-actions {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  /* ... (otros estilos permanecen igual) ... */
 
-.btn-cancelar {
-    background: #dc3545;
-}
-
-.btn-asignar {
+.btn-success {
     background: #28a745;
-}
+    color: white;
+  }
+  
+  .btn-success:hover:not([disabled]) {
+    background: #218838;
+  }
+  
+  .btn-success[disabled] {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* Asegurar que los botones del footer tengan espacio */
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  @media (max-width: 768px) {
+    .footer-actions {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }

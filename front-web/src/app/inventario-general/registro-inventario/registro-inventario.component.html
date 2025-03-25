@@ -1,14 +1,21 @@
-<div class="procedimientos-container">
-  <h2>Lista de Procedimientos</h2>
-
-  <!-- Filtro de búsqueda -->
-  <div class="filtro">
-    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por código, abreviatura o descripción" (input)="filtrarProcedimientos()">
+<div class="container">
+  <div class="header">
+    <h2 class="title-center">Lista de Procedimientos</h2>
+    <div class="search-filter-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtro" 
+               (input)="filtrarProcedimientos()" 
+               placeholder="Buscar por código, abreviatura o descripción">
+      </div>
+      <button class="add-btn" (click)="toggleFormulario()">
+        <i class="fas fa-plus"></i> Agregar Procedimiento
+      </button>
+    </div>
   </div>
 
-  <!-- Tabla de procedimientos con scroll -->
-  <div class="tabla-container">
-    <table>
+  <div class="table-container">
+    <table class="procedimientos-table">
       <thead>
         <tr>
           <th>Código</th>
@@ -18,44 +25,89 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let procedimiento of procedimientosFiltrados" (click)="seleccionarProcedimiento(procedimiento)">
+        <tr *ngFor="let procedimiento of procedimientosFiltrados" 
+            [class.selected]="procedimientoSeleccionado?.codigo === procedimiento.codigo"
+            (click)="seleccionarProcedimiento(procedimiento)">
           <td>{{ procedimiento.codigo }}</td>
           <td>{{ procedimiento.abreviatura }}</td>
           <td>{{ procedimiento.descripcion }}</td>
           <td>
-            <button (click)="eliminarProcedimiento(procedimiento)">Eliminar</button>
+            <button class="action-btn delete" (click)="eliminarProcedimiento($event, procedimiento)">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="procedimientosFiltrados.length === 0" class="empty-state">
+      <img src="assets/images/no-procedures.png" alt="No hay procedimientos" class="empty-image">
+      <h3>No se encontraron procedimientos</h3>
+      <p>No hay procedimientos que coincidan con los criterios de búsqueda</p>
+    </div>
   </div>
 
-  <!-- Cuadro de información del procedimiento seleccionado -->
-  <div class="info-procedimiento" *ngIf="procedimientoSeleccionado">
-    <h3>Información del Procedimiento</h3>
-    <p><strong>Código:</strong> {{ procedimientoSeleccionado.codigo }}</p>
-    <p><strong>Abreviatura:</strong> {{ procedimientoSeleccionado.abreviatura }}</p>
-    <p><strong>Descripción:</strong> {{ procedimientoSeleccionado.descripcion }}</p>
+  <div class="details-container" *ngIf="procedimientoSeleccionado">
+    <div class="details-card">
+      <div class="details-header">
+        <h3>Información del Procedimiento</h3>
+        <button class="close-btn" (click)="procedimientoSeleccionado = null">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="details-body">
+        <div class="detail-item">
+          <label>Código:</label>
+          <span>{{ procedimientoSeleccionado.codigo }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Abreviatura:</label>
+          <span>{{ procedimientoSeleccionado.abreviatura }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Descripción:</label>
+          <span>{{ procedimientoSeleccionado.descripcion }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Formulario para agregar procedimientos -->
-   <h3>Agregar Procedimiento</h3>
-  <form (ngSubmit)="agregarProcedimiento()" class="form-agregar">
-    <div class="form-group">
-      <label for="codigo">Código:</label>
-      <input type="text" id="codigo" [(ngModel)]="nuevoProcedimiento.codigo" name="codigo" required>
+  <div class="form-container" *ngIf="mostrarFormulario">
+    <div class="form-header">
+      <h3>Agregar Nuevo Procedimiento</h3>
+      <button class="close-btn" (click)="toggleFormulario()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    <div class="form-group">
-      <label for="abreviatura">Abreviatura:</label>
-      <input type="text" id="abreviatura" [(ngModel)]="nuevoProcedimiento.abreviatura" name="abreviatura" required>
-    </div>
-    <div class="form-group">
-      <label for="descripcion">Descripción:</label>
-      <input type="text" id="descripcion" [(ngModel)]="nuevoProcedimiento.descripcion" name="descripcion" required>
-    </div>
-    <button type="submit">Agregar Procedimiento</button>
-    <div *ngIf="mostrarError" class="error-message">
-      El procedimiento ya existe.
-    </div>
-  </form>
+    
+    <form (ngSubmit)="agregarProcedimiento()" class="form-content">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="codigo">Código:</label>
+          <input type="text" id="codigo" [(ngModel)]="nuevoProcedimiento.codigo" name="codigo" required>
+        </div>
+        <div class="form-group">
+          <label for="abreviatura">Abreviatura:</label>
+          <input type="text" id="abreviatura" [(ngModel)]="nuevoProcedimiento.abreviatura" name="abreviatura" required>
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción:</label>
+          <input type="text" id="descripcion" [(ngModel)]="nuevoProcedimiento.descripcion" name="descripcion" required>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="toggleFormulario()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="save-btn">
+          <i class="fas fa-save"></i> Guardar Procedimiento
+        </button>
+      </div>
+
+      <div *ngIf="mostrarError" class="error-message">
+        <i class="fas fa-exclamation-circle"></i> El procedimiento ya existe.
+      </div>
+    </form>
+  </div>
 </div>

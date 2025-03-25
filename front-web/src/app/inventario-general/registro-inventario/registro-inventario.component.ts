@@ -11,13 +11,20 @@ interface Procedimiento {
   styleUrls: ['./registro-inventario.component.css']
 })
 export class RegistroInventarioComponent {
-  procedimientos: Procedimiento[] = [
-    { codigo: 'P001', abreviatura: 'PROC1', descripcion: 'Procedimiento 1' },
-    { codigo: 'P002', abreviatura: 'PROC2', descripcion: 'Procedimiento 2' }
-  ];
+  filtro: string = '';
+  mostrarFormulario: boolean = false;
+  mostrarError: boolean = false;
+  procedimientoSeleccionado: any = null;
 
+  procedimientos = [
+    { codigo: 'PROC001', abreviatura: 'HEMO', descripcion: 'Hemograma completo' },
+    { codigo: 'PROC002', abreviatura: 'GLIC', descripcion: 'Prueba de glicemia' },
+    { codigo: 'PROC003', abreviatura: 'RADI', descripcion: 'Radiografía de tórax' },
+    { codigo: 'PROC004', abreviatura: 'ECG', descripcion: 'Electrocardiograma' },
+    { codigo: 'PROC005', abreviatura: 'URAN', descripcion: 'Análisis de orina' }
+  ];
   // Lista filtrada de procedimientos
-  procedimientosFiltrados: Procedimiento[] = this.procedimientos;
+  procedimientosFiltrados: any[] = [];
 
   // Nuevo procedimiento
   nuevoProcedimiento: Procedimiento = {
@@ -26,17 +33,19 @@ export class RegistroInventarioComponent {
     descripcion: ''
   };
 
-  // Filtro de búsqueda
-  filtro: string = '';
+  constructor() { }
 
-  // Procedimiento seleccionado
-  procedimientoSeleccionado: Procedimiento | null = null;
-
-  // Control de errores
-  mostrarError: boolean = false;
+  ngOnInit(): void {
+    this.filtrarProcedimientos();
+  }
 
   // Método para filtrar procedimientos
-  filtrarProcedimientos() {
+  filtrarProcedimientos(): void {
+    if (!this.filtro) {
+      this.procedimientosFiltrados = [...this.procedimientos];
+      return;
+    }
+    const busqueda = this.filtro.toLowerCase();
     this.procedimientosFiltrados = this.procedimientos.filter(procedimiento =>
       procedimiento.codigo.toLowerCase().includes(this.filtro.toLowerCase()) ||
       procedimiento.abreviatura.toLowerCase().includes(this.filtro.toLowerCase()) ||
@@ -44,13 +53,26 @@ export class RegistroInventarioComponent {
     );
   }
 
-  // Método para seleccionar un procedimiento
-  seleccionarProcedimiento(procedimiento: Procedimiento) {
+  seleccionarProcedimiento(procedimiento: any): void {
     this.procedimientoSeleccionado = procedimiento;
   }
 
+  toggleFormulario(): void {
+    this.mostrarFormulario = !this.mostrarFormulario;
+    this.mostrarError = false;
+    if (!this.mostrarFormulario) {
+      this.resetFormulario();
+    }
+  }
+  resetFormulario(): void {
+    this.nuevoProcedimiento = {
+      codigo: '',
+      abreviatura: '',
+      descripcion: ''
+    };
+  }
   // Método para agregar un nuevo procedimiento
-  agregarProcedimiento() {
+  agregarProcedimiento(): void {
     const existe = this.procedimientos.some(procedimiento =>
       procedimiento.codigo === this.nuevoProcedimiento.codigo ||
       procedimiento.abreviatura === this.nuevoProcedimiento.abreviatura
@@ -67,11 +89,21 @@ export class RegistroInventarioComponent {
   }
 
   // Método para eliminar un procedimiento
-  eliminarProcedimiento(procedimiento: Procedimiento) {
-    this.procedimientos = this.procedimientos.filter(p => p !== procedimiento);
-    this.procedimientosFiltrados = this.procedimientos; // Actualizar lista filtrada
-    if (this.procedimientoSeleccionado === procedimiento) {
-      this.procedimientoSeleccionado = null; // Deseleccionar si se elimina el procedimiento seleccionado
+  eliminarProcedimiento(event: Event, procedimiento: any): void {
+    event.stopPropagation(); // Evitar que se active el click en la fila
+    
+    // Confirmar eliminación (puedes usar un modal de confirmación en lugar de confirm)
+    if (confirm(`¿Está seguro que desea eliminar el procedimiento ${procedimiento.codigo}?`)) {
+      const index = this.procedimientos.findIndex(p => p.codigo === procedimiento.codigo);
+      if (index !== -1) {
+        this.procedimientos.splice(index, 1);
+        this.filtrarProcedimientos();
+        
+        // Si el procedimiento eliminado era el seleccionado, limpiar la selección
+        if (this.procedimientoSeleccionado?.codigo === procedimiento.codigo) {
+          this.procedimientoSeleccionado = null;
+        }
+      }
     }
   }
 }
