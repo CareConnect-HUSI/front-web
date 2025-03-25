@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { PatientService } from './../../service/patient.service';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { PatientService } from './../../service/patient.service';
 import { AuthService } from 'src/app/service/auth.service';
 
 interface Medicamento {
