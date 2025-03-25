@@ -18,10 +18,18 @@ export class PatientsListComponent {
 
   constructor(private router: Router) {}
 
-  pacientesFiltrados() {
-    return this.pacientes.filter(paciente =>
-      paciente.id.includes(this.filtro) || 
-      paciente.nombre.toLowerCase().includes(this.filtro.toLowerCase())
+  pacientesFiltrados = [...this.pacientes];
+
+  filtrarPacientes() {
+    if (!this.filtro) {
+      this.pacientesFiltrados = [...this.pacientes];
+      return;
+    }
+    
+    const busqueda = this.filtro.toLowerCase();
+    this.pacientesFiltrados = this.pacientes.filter(paciente => 
+      paciente.nombre.toLowerCase().includes(busqueda) || 
+      paciente.id.toString().includes(busqueda)
     );
   }
 

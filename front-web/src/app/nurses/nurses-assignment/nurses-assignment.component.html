@@ -1,36 +1,84 @@
-<div class="patient-container">
-    <div class="section">
-        <h2>Asignación de {{ enfermeraNombre }}</h2>
+<div class="container">
+    <div class="header">
+      <h2 class="title-center">Asignaciones de {{ enfermeraNombre }}</h2>
+      <div class="search-filter-container">
+        <!-- Filtro por nombre/documento de paciente -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" [(ngModel)]="filtroPaciente" 
+                 (input)="aplicarFiltros()" 
+                 placeholder="Buscar por paciente">
+        </div>
+        
+        <!-- Filtro por mes/año -->
+        <div class="date-filter">
+          <select [(ngModel)]="mesSeleccionado" (change)="aplicarFiltros()">
+            <option value="">Todos los meses</option>
+            <option *ngFor="let mes of meses" [value]="mes.value">{{ mes.nombre }}</option>
+          </select>
+          <select [(ngModel)]="anioSeleccionado" (change)="aplicarFiltros()">
+            <option value="">Todos los años</option>
+            <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+          </select>
+        </div>
+        
+        <!-- Filtro por fecha específica -->
+        <div class="specific-date">
+          <input type="date" [(ngModel)]="fechaEspecifica" 
+                 (change)="aplicarFiltros()" 
+                 placeholder="Fecha específica">
+        </div>
       </div>
-
-      <div class="table-container">
-        <table id="myTable" class="tablita">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    <th>Paciente</th>
-                    <th>Dirección</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let asignacion of asignaciones">
-                  <td>{{ asignacion.hora }}</td>
-                  <td>{{ asignacion.paciente }}</td>
-                  <td>{{ asignacion.direccion }}</td>
-                  <td>{{ asignacion.estado }}</td>
-                </tr>
-              </tbody>
-        </table>
-    </div>  
-    <div class="addBtn-container">
-        <a [routerLink]="'/lista-enfermeras'">
-            <i class="bx bx-left-arrow-alt"></i>
-            Regresar
-        </a>
-        <a class="btn-save" id="saveBazar">
-            <i class="bx bxs-route"></i>
-            Ver ruta
-        </a>
     </div>
-</div>
+  
+    <div class="table-container">
+      <table class="asignaciones-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Documento</th>
+            <th>Dirección</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let asignacion of asignacionesFiltradas" 
+              [class.completado]="asignacion.estado === 'Completado'"
+              [class.en-proceso]="asignacion.estado === 'En proceso'"
+              [class.pendiente]="asignacion.estado === 'Pendiente'">
+            <td>{{ asignacion.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>{{ asignacion.hora }}</td>
+            <td>{{ asignacion.paciente }}</td>
+            <td>{{ asignacion.documento }}</td>
+            <td>{{ asignacion.direccion }}</td>
+            <td>
+              <span class="estado-badge">{{ asignacion.estado }}</span>
+            </td>
+            <td>
+              <button class="details-btn" (click)="verDetalles(asignacion)">
+                <i class="fas fa-eye"></i> Ver
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div *ngIf="asignacionesFiltradas.length === 0" class="empty-state">
+        <img src="assets/images/no-data.png" alt="No hay asignaciones" class="empty-image">
+        <h3>No se encontraron asignaciones</h3>
+        <p>No hay asignaciones que coincidan con los criterios de búsqueda</p>
+      </div>
+    </div>
+  
+    <div class="footer-actions">
+      <button class="back-btn" routerLink="/lista-enfermeras">
+        <i class="fas fa-arrow-left"></i> Regresar
+      </button>
+      <button class="route-btn">
+        <i class="fas fa-route"></i> Ver ruta de hoy
+      </button>
+    </div>
+  </div>

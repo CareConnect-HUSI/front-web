@@ -1,68 +1,104 @@
-<div class="register-container">
-    <h2 class="title">Registrar Enfermera</h2>
-  
-    <form [formGroup]="nurseForm" (ngSubmit)="onSubmit()">
-      <div class="section">
-        <h3>Datos personales</h3>
-  
-        <div class="section2" formGroupName="personalInfo">
-          <div class="form-group">
-            <label>Nombres</label>
-            <input formControlName="name" type="text" />
+<div class="container">
+  <div class="header">
+    <h2 class="title-center">Registrar Enfermera</h2>
+  </div>
+
+  <form [formGroup]="nurseForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-section">
+      <h3 class="section-title">Datos personales</h3>
+
+      <div class="form-grid" formGroupName="personalInfo">
+        <div class="form-group">
+          <label>Nombres</label>
+          <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
+        </div>
+        
+        <div class="form-group">
+          <label>Apellidos</label>
+          <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
+        </div>
+        
+        <div class="form-group">
+          <label>Tipo de Documento</label>
+          <select formControlName="identificationType">
+            <option value="" disabled selected>Seleccione un tipo</option>
+            <option value="CC">Cédula de Ciudadanía (CC)</option>
+            <option value="TI">Tarjeta de Identidad (TI)</option>
+            <option value="Pasaporte">Pasaporte</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>N° de Documento</label>
+          <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
+        </div>
+        
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Contraseña</label>
+          <div class="password-input">
+            <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
+            <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
           </div>
-          <div class="form-group">
-            <label>Apellidos</label>
-            <input formControlName="lastname" type="text" />
+        </div>
+        
+        <div class="form-group">
+          <label>Dirección</label>
+          <input formControlName="address" type="text" placeholder="Ingrese dirección completa" />
+        </div>
+        
+        <div class="form-group">
+          <label>Localidad</label>
+          <select formControlName="localidad">
+            <option value="" disabled selected>Seleccione localidad</option>
+            <option value="Suba">Suba</option>
+            <option value="Usaquén">Usaquén</option>
+            <option value="Chapinero">Chapinero</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Celular</label>
+          <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
+        </div>
+        
+        <div class="form-group">
+          <label>Turno</label>
+          <select formControlName="turno">
+            <option value="" disabled selected>Seleccione turno</option>
+            <option value="Mañana">Mañana 7:00 a 13:00</option>
+            <option value="Tarde">Tarde 13:00 a 19:00</option>
+            <option value="Noche">Noche 19:00 a 7:00</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Foto</label>
+          <div class="file-upload">
+            <label for="foto" class="upload-btn">
+              <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
+            </label>
+            <input id="foto" type="file" formControlName="foto" (change)="onFileChange($event)" />
+            <span class="file-name">{{ nurseForm.get('personalInfo.foto')?.value?.name || 'Ningún archivo seleccionado' }}</span>
           </div>
-          <div class="form-group">
-            <label>Tipo de Documento</label>
-            <select formControlName="identificationType">
-              <option>CC</option>
-              <option>TI</option>
-              <option>Pasaporte</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>N° de Documento</label>
-            <input formControlName="identificationNumber" type="text" />
-          </div>
-          <div class="form-group">
-            <label>Correo Electrónico</label>
-            <input type="email" formControlName="email" required />
-          </div>
-          
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input type="password" formControlName="password" required />
-          </div>          
-          <div class="form-group">
-            <label>Dirección</label>
-            <input formControlName="address" type="text" />
-          </div>
-          <div class="form-group">
-            <label>Localidad</label>
-            <select formControlName="localidad">
-              <option>Suba</option>
-              <option>Usaquén</option>
-              <option>Chapinero</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Celular</label>
-            <input formControlName="phone" type="text" />
-          </div>
-          <div class="form-group">
-            <label>Foto</label>
-            <input type="file" formControlName="foto" />
-            <i class='bx bx-load'></i>
+          <div *ngIf="imagePreview" class="image-preview">
+            <img [src]="imagePreview" alt="Vista previa de la foto" />
           </div>
         </div>
       </div>
-  
-  
-      <div class="buttons">
-        <button type="submit" class="save-btn">Guardar</button>
-      </div>
-    </form>
-  </div>
-  
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" routerLink="/lista-enfermeras">
+        <i class="fas fa-times"></i> Cancelar
+      </button>
+      <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
+        <i class="fas fa-save"></i> Registrar Enfermera
+      </button>
+    </div>
+  </form>
+</div>

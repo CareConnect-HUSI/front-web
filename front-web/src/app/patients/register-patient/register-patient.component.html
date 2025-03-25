@@ -1,147 +1,207 @@
-<div class="register-container">
-  <h2 class="title">Registrar Paciente</h2>
+<div class="container">
+  <div class="header">
+    <h2 class="title-center">Registrar Paciente</h2>
+  </div>
 
-  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()">
+  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()" class="form-container">
     
-      <h3>Datos personales</h3>
+    <div class="form-section">
+      <h3 class="section-title">Datos personales</h3>
 
-      <div class="section2" formGroupName="personalInfo">
+      <div class="form-grid" formGroupName="personalInfo">
         <div class="form-group">
           <label>Nombres</label>
-          <input formControlName="nombres" type="text" />
+          <input formControlName="nombres" type="text" placeholder="Ej: María José" />
         </div>
         <div class="form-group">
           <label>Apellidos</label>
-          <input formControlName="apellidos" type="text" />
+          <input formControlName="apellidos" type="text" placeholder="Ej: González Pérez" />
         </div>
         <div class="form-group">
           <label>Tipo de Documento</label>
           <select formControlName="tipoDocumento">
-            <option>CC</option>
-            <option>TI</option>
-            <option>Pasaporte</option>
+            <option value="" disabled selected>Seleccione un tipo de documento</option>
+            <option value="CC">Cédula de Ciudadanía (CC)</option>
+            <option value="TI">Tarjeta de Identidad (TI)</option>
+            <option value="Pasaporte">Pasaporte</option>
           </select>
         </div>
         <div class="form-group">
           <label>N° de Documento</label>
-          <input formControlName="numeroDocumento" type="text" />
+          <input formControlName="numeroDocumento" type="text" placeholder="Ej: 123456789" />
         </div>
         <div class="form-group">
           <label>Dirección</label>
-          <input formControlName="direccion" type="text" />
+          <input formControlName="direccion" type="text" placeholder="Ej: Calle 123 #45-67" />
         </div>
         <div class="form-group">
           <label>Localidad</label>
           <select formControlName="localidad">
-            <option>Suba</option>
-            <option>Usaquén</option>
-            <option>Chapinero</option>
+            <option value="" disabled selected>Seleccione una localidad</option>
+            <option value="Suba">Suba</option>
+            <option value="Usaquén">Usaquén</option>
+            <option value="Chapinero">Chapinero</option>
           </select>
         </div>
         <div class="form-group">
           <label>Barrio</label>
-          <input formControlName="barrio" type="text" />
+          <input formControlName="barrio" type="text" placeholder="Ej: El Prado" />
         </div>
         <div class="form-group">
           <label>Celular</label>
-          <input formControlName="celular" type="text" />
+          <input formControlName="celular" type="text" placeholder="Ej: 3001234567" />
         </div>
         <div class="form-group">
           <label>Nombre Familiar</label>
-          <input formControlName="nombreFamiliar" type="text" />
+          <input formControlName="nombreFamiliar" type="text" placeholder="Ej: Carlos López" />
         </div>
         <div class="form-group">
           <label>Celular Familiar</label>
-          <input formControlName="celularFamiliar" type="text" />
+          <input formControlName="celularFamiliar" type="text" placeholder="Ej: 3109876543" />
         </div>
         <div class="form-group">
           <label>Parentesco</label>
-          <input formControlName="parentesco" type="text" />
+          <input formControlName="parentesco" type="text" placeholder="Ej: Padre" />
         </div>
         <div class="form-group">
           <label>Correo</label>
-          <input formControlName="email" type="text" />
+          <input formControlName="email" type="text" placeholder="Ej: correo@ejemplo.com" />
         </div>
-
         <div class="form-group">
           <label>Foto</label>
-          <input type="file" formControlName="foto" />
+          <div class="file-upload">
+            <label for="foto" class="upload-btn">
+              <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
+            </label>
+            <input id="foto" type="file" formControlName="foto" />
+            <span class="file-name">{{ patientForm.get('personalInfo.foto')?.value?.name || 'Ningún archivo seleccionado' }}</span>
+          </div>
         </div>
       </div>
-    
+    </div>
 
     <!-- Sección Tratamiento -->
-    <h3>Tratamiento</h3>
-    <table>
-      <thead>
-        <tr class="enunciado">
-          <th>Nombre medicamento</th>
-          <th>Dosis</th>
-          <th>Frecuencia</th>
-          <th>Días de Tratamiento</th>
-          <th>Inicio</th>
-          <th>Fin</th>
-          <th>Duración Visita</th>
-          <th>Eliminar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let med of tratamiento.controls; let i = index" [formGroup]="med">
-          <td><input type="text" formControlName="medicamento" placeholder="Medicamento" /></td>
-          <td><input type="number" formControlName="dosis" placeholder="Dosis" /></td>
-          <td><input type="number" formControlName="frecuencia" placeholder="Frecuencia" /></td>
-          <td><input type="text" formControlName="diasTratamiento" placeholder="Días de tratamiento" /></td>
-          <td><input type="date" formControlName="fechaInicio" /></td>
-          <td><input type="date" formControlName="fechaFin" /></td>
-          <td><input type="number" formControlName="duracion" placeholder="tiempo de visita" /></td>
-          <td>
-            <button type="button" (click)="eliminarMedicamento(i)">🗑️</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="form-section">
+      <h3 class="section-title">Tratamiento</h3>
+      <div class="table-responsive">
+        <table class="form-table">
+          <thead>
+            <tr>
+              <th>Nombre medicamento</th>
+              <th>Dosis</th>
+              <th>Frecuencia</th>
+              <th>Días</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Fin</th>
+              <th>Hora</th>
+              <th>Duración</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of tratamiento.controls; let i = index" [formGroup]="med">
+              <td>
+                <select formControlName="medicamento">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let m of listaMedicamentos" [value]="m.codigo">{{ m.nombre }}</option>
+                </select>
+              </td>
+              <td><input type="number" formControlName="dosis" placeholder="Dosis" /></td>
+              <td>
+                <select formControlName="frecuencia">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
+                </select>
+              </td>
+              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+              <td><input type="date" formControlName="fechaInicio" /></td>
+              <td><input type="date" formControlName="fechaFin" /></td>
+              <td><input type="time" formControlName="horaInicio" /></td>
+              <td>
+                <select formControlName="duracion">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let d of duraciones" [value]="d">{{ d }}min</option>
+                </select>
+              </td>
+              <td>
+                <button type="button" (click)="eliminarMedicamento(i)" class="action-btn delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <button type="button" (click)="agregarMedicamento()" class="add-btn">➕ Agregar Medicamento</button>
+      <button type="button" (click)="agregarMedicamento()" class="add-btn">
+        <i class="fas fa-plus"></i> Agregar Medicamento
+      </button>
+    </div>
 
     <!-- Sección Procedimientos -->
-    <h3 class="proc">Procedimientos</h3>
-    <table>
-      <thead>
-        <tr class="enunciado">
-          <th>Nombre Procedimiento</th>
-          <th>Frecuencia</th>
-          <th>Días de Tratamiento</th>
-          <th>Inicio</th>
-          <th>Fin</th>
-          <th>Duración Visita</th>
-          <th>Eliminar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let proc of procedimientos.controls; let i = index" [formGroup]="proc">
-          <td>
-            <select formControlName="procedimiento">
-              <option value="" disabled selected>Seleccionar procedimiento</option>
-              <option *ngFor="let p of listaProcedimientos" [value]="p">{{ p }}</option>
-            </select>
-          </td>          
-          <td><input type="number" formControlName="frecuencia" placeholder="Frecuencia" /></td>
-          <td><input type="text" formControlName="diasTratamiento" placeholder="Días de tratamiento" /></td>
-          <td><input type="date" formControlName="fechaInicio" /></td>
-          <td><input type="date" formControlName="fechaFin" /></td>
-          <td><input type="number" formControlName="duracion" placeholder="tiempo de visita" /></td>
-          <td>
-            <button type="button" (click)="eliminarProcedimiento(i)">🗑️</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="form-section">
+      <h3 class="section-title">Procedimientos</h3>
+      <div class="table-responsive">
+        <table class="form-table">
+          <thead>
+            <tr>
+              <th>Procedimiento</th>
+              <th>Frecuencia</th>
+              <th>Días</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Fin</th>
+              <th>Hora</th>
+              <th>Duración</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let proc of procedimientos.controls; let i = index" [formGroup]="proc">
+              <td>
+                <select formControlName="procedimiento">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let p of listaProcedimientos" [value]="p.codigo">{{ p.descripcion }}</option>
+                </select>
+              </td>
+              <td>
+                <select formControlName="frecuencia">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
+                </select>
+              </td>
+              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+              <td><input type="date" formControlName="fechaInicio" /></td>
+              <td><input type="date" formControlName="fechaFin" /></td>
+              <td><input type="time" formControlName="horaInicio" /></td>
+              <td>
+                <select formControlName="duracion">
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option *ngFor="let d of duraciones" [value]="d">{{ d }}min</option>
+                </select>
+              </td>
+              <td>
+                <button type="button" (click)="eliminarProcedimiento(i)" class="action-btn delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <button type="button" (click)="agregarProcedimiento()" class="add-btn">➕ Agregar Procedimiento</button>
+      <button type="button" (click)="agregarProcedimiento()" class="add-btn">
+        <i class="fas fa-plus"></i> Agregar Procedimiento
+      </button>
+    </div>
 
-    <!-- Botón de Guardar -->
-    <div class="buttons">
-      <button type="submit" class="save-btn">Guardar</button>
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" routerLink="/lista-pacientes">
+        <i class="fas fa-times"></i> Cancelar
+      </button>
+      <button type="submit" class="save-btn">
+        <i class="fas fa-save"></i> Guardar Paciente
+      </button>
     </div>
   </form>
 </div>

@@ -1,29 +1,50 @@
 <div class="container">
-    <h2>Lista de Pacientes</h2>
-  
-    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por nombre o identificación" class="search-input">
-  
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Identificación</th>
-            <th>Paciente</th>
-            <th>Dirección</th>
-            <th>Tratamiento</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let paciente of pacientesFiltrados()">
-            <td>{{ paciente.id }}</td>
-            <td>{{ paciente.nombre }}</td>
-            <td>{{ paciente.direccion }}</td>
-            <td><a routerLink="/paciente/{{ paciente.id }}" class="ver-link">Ver</a></td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="header">
+    <h2 class="title-center">Lista de Pacientes</h2>
+    <div class="search-filter-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtro" 
+               (input)="filtrarPacientes()" 
+               placeholder="Buscar por nombre o identificación">
+      </div>
     </div>
-    
-    <button class="btn-regresar" (click)="regresar()">Regresar</button>
   </div>
-  
+
+  <div class="table-container">
+    <table class="pacientes-table">
+      <thead>
+        <tr>
+          <th>Identificación</th>
+          <th>Paciente</th>
+          <th>Dirección</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let paciente of pacientesFiltrados">
+          <td>{{ paciente.id }}</td>
+          <td>{{ paciente.nombre }}</td>
+          <td>{{ paciente.direccion }}</td>
+          <td>
+            <a routerLink="/paciente/{{ paciente.id }}" class="details-btn">
+              <i class="fas fa-eye"></i> Ver
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="pacientesFiltrados.length === 0" class="empty-state">
+      <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
+      <h3>No se encontraron pacientes</h3>
+      <p>No hay pacientes que coincidan con los criterios de búsqueda</p>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="back-btn" (click)="regresar()">
+      <i class="fas fa-arrow-left"></i> Regresar
+    </button>
+  </div>
+</div>

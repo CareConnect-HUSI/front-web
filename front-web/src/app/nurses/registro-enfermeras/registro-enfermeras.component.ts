@@ -11,6 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class RegistroEnfermerasComponent implements OnInit {
 
   nurseForm!: FormGroup;
+  imagePreview: string | ArrayBuffer | null = null;
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -27,8 +29,9 @@ export class RegistroEnfermerasComponent implements OnInit {
         address: ['', Validators.required],
         phone: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
         localidad: ['', Validators.required],
+        turno: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
-        password: [''],
+        password:  ['', [Validators.required, Validators.minLength(6)]],
         foto: [null]
       })
     });
@@ -58,4 +61,26 @@ export class RegistroEnfermerasComponent implements OnInit {
       }
     });
   }  
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.nurseForm.get('personalInfo.foto')?.setValue(file);
+      
+      // Vista previa de la imagen
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+    const passwordField = document.querySelector('[formControlName="password"]') as HTMLInputElement;
+    if (passwordField) {
+      passwordField.type = this.showPassword ? 'text' : 'password';
+    }
+  }
 }

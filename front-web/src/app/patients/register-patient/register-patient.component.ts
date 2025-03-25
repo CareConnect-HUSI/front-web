@@ -1,11 +1,20 @@
-
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { PatientService } from './../../service/patient.service';
-import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { PatientService } from './../../service/patient.service';
 import { AuthService } from 'src/app/service/auth.service';
 
+interface Medicamento {
+  codigo: string;
+  nombre: string;
+  tipo: string; // Oral o Inyectable
+  total: number;
+}
+
+interface Procedimiento {
+  codigo: string;
+  abreviatura: string;
+  descripcion: string;
+}
 
 @Component({
   selector: 'app-register-patient',
@@ -15,48 +24,39 @@ import { AuthService } from 'src/app/service/auth.service';
 export class RegisterPatientComponent implements OnInit {
   @Output() pacienteRegistrado = new EventEmitter<any>();
 
-  nuevoPaciente = { documento: '', nombre: '' };
-  guardarPaciente() {
-    const personalInfo = this.patientForm.get('personalInfo')?.value;
-    const nuevoPaciente = {
-      documento: personalInfo.numeroDocumento,
-      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`, // Cambiado de 'name' a 'nombres'
-      recienAgregado: true // Asegurarse de que el paciente se marque como recién agregado
-    };
-  
-    // Validar que los campos no estén vacíos
-    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
-      this.pacienteRegistrado.emit(nuevoPaciente);
-      this.patientForm.reset(); // Limpiar el formulario
-    } else {
-      alert('Por favor, complete todos los campos.');
-    }
-  }
-  
   patientForm!: FormGroup;
-  listaProcedimientos: string[] = [
-    'Curación',
-    'Hemocultivo',
-    'Curación de Cateter',
+  listaProcedimientos: Procedimiento[] = [
+    { codigo: '1', abreviatura: 'CUR', descripcion: 'Curación' },
+    { codigo: '2', abreviatura: 'HEM', descripcion: 'Hemocultivo' },
+    { codigo: '3', abreviatura: 'CAT', descripcion: 'Curación de Cateter' },
   ];
+
+  listaMedicamentos: Medicamento[] = [
+    { codigo: '1', nombre: 'Paracetamol', tipo: 'Oral', total: 100 },
+    { codigo: '2', nombre: 'Ibuprofeno', tipo: 'Oral', total: 50 },
+    { codigo: '3', nombre: 'Amoxicilina', tipo: 'Inyectable', total: 30 },
+  ];
+
+  frecuencias: number[] = [72, 48, 24, 12, 8, 6];
+  duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
 
   constructor(private fb: FormBuilder, private patientService: PatientService) {}
 
   ngOnInit() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        nombres: ['Juan Pablo', Validators.required],
-        apellidos: ['Rodríguez Cruz', Validators.required],
-        tipoDocumento: ['CC', Validators.required],
-        numeroDocumento: ['1000200',Validators.required],
-        direccion: ['Calle 123 #0-23', Validators.required],
-        celular: ['3088765987', Validators.required],
-        localidad: ['Suba', Validators.required],
-        barrio: ['', Validators.required],
-        nombreFamiliar: ['Mateo Lopez', Validators.required],
-        parentesco: ['Hermano', Validators.required],
-        celularFamiliar: ['3012345678', Validators.required],
-        email: ['correo@gmail.com',Validators.required],
+        nombres: ['', Validators.required], // Inicializado vacío
+        apellidos: ['', Validators.required], // Inicializado vacío
+        tipoDocumento: ['', Validators.required], // Inicializado vacío
+        numeroDocumento: ['', Validators.required], // Inicializado vacío
+        direccion: ['', Validators.required], // Inicializado vacío
+        celular: ['', Validators.required], // Inicializado vacío
+        localidad: ['', Validators.required], // Inicializado vacío
+        barrio: ['', Validators.required], // Inicializado vacío
+        nombreFamiliar: ['', Validators.required], // Inicializado vacío
+        parentesco: ['', Validators.required], // Inicializado vacío
+        celularFamiliar: ['', Validators.required], // Inicializado vacío
+        email: ['', [Validators.required, Validators.email]], // Inicializado vacío
         foto: [null]
       }),
       tratamiento: this.fb.array([]),
@@ -65,24 +65,24 @@ export class RegisterPatientComponent implements OnInit {
   
     this.agregarMedicamento();
   }
-
-  get tratamiento(): FormArray <FormGroup> {
+  get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;
   }
 
-  get procedimientos(): FormArray <FormGroup> {
-    return this.patientForm.get('procedimientos') as FormArray <FormGroup>;
+  get procedimientos(): FormArray<FormGroup> {
+    return this.patientForm.get('procedimientos') as FormArray<FormGroup>;
   }
 
   agregarMedicamento() {
     const medicamentoForm = this.fb.group({
-      medicamento: [''],
-      dosis: [''],
-      frecuencia: [''],
-      diasTratamiento: [''],
-      fechaInicio: [''],
-      fechaFin: [''],
-      duracion: ['']
+      medicamento: ['', Validators.required],
+      dosis: ['', Validators.required],
+      frecuencia: ['', Validators.required],
+      diasTratamiento: ['', Validators.required],
+      fechaInicio: ['', Validators.required],
+      fechaFin: ['', Validators.required],
+      horaInicio: ['', Validators.required],
+      duracion: ['', Validators.required]
     });
 
     this.tratamiento.push(medicamentoForm);
@@ -90,12 +90,13 @@ export class RegisterPatientComponent implements OnInit {
 
   agregarProcedimiento() {
     const procedimientoForm = this.fb.group({
-      procedimiento: [''],
-      frecuencia: [''],
-      diasTratamiento: [''],
-      fechaInicio: [''],
-      fechaFin: [''],
-      duracion: ['']
+      procedimiento: ['', Validators.required],
+      frecuencia: ['', Validators.required],
+      diasTratamiento: ['', Validators.required],
+      fechaInicio: ['', Validators.required],
+      fechaFin: ['', Validators.required],
+      horaInicio: ['', Validators.required],
+      duracion: ['', Validators.required]
     });
 
     this.procedimientos.push(procedimientoForm);
@@ -117,29 +118,19 @@ export class RegisterPatientComponent implements OnInit {
     }
   }
 
-  onSubmit() {
-    if (this.patientForm.invalid) {
-      alert('Todos los campos son obligatorios.');
-      return;
-    }
-  
-    const formData = this.patientForm.value.personalInfo;
+  guardarPaciente() {
+    const personalInfo = this.patientForm.get('personalInfo')?.value;
+    const nuevoPaciente = {
+      documento: personalInfo.numeroDocumento,
+      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`,
+      recienAgregado: true
+    };
 
-  //
-    this.patientService.registerPatient(formData).subscribe({
-      next: () => {
-        alert('Enfermera registrada con éxito');
-        this.patientForm.reset();
-      },
-      error: (error) => {
-        if (error.status === 400) {
-          alert('Error: ' + error.error.error);
-        } else {
-          alert('Ocurrió un error en el registro');
-        }
-        console.error("Error del backend:", error);
-      }
-    });
-  }  
-  
+    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
+      this.pacienteRegistrado.emit(nuevoPaciente);
+      this.patientForm.reset();
+    } else {
+      alert('Por favor, complete todos los campos.');
+    }
+  }
 }

@@ -36,6 +36,7 @@ const routes: Routes = [
   { path: 'registro-inventario', component: RegistroInventarioComponent },
   { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
   { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
+  { path: 'stock', component: StockComponent },
   { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' }
 
 ];
