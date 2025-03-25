@@ -1,14 +1,21 @@
-<div class="medicamentos-container">
-  <h2>Lista de Medicamentos</h2>
-
-  <!-- Filtro de búsqueda -->
-  <div class="filtro">
-    <input type="text" [(ngModel)]="filtro" placeholder="Buscar por código, nombre o tipo" (input)="filtrarMedicamentos()">
+<div class="container">
+  <div class="header">
+    <h2 class="title-center">Lista de Medicamentos</h2>
+    <div class="search-filter-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtro" 
+               (input)="filtrarMedicamentos()" 
+               placeholder="Buscar por código, nombre o tipo">
+      </div>
+      <button class="add-btn" (click)="toggleFormulario()">
+        <i class="fas fa-plus"></i> Agregar Medicamento
+      </button>
+    </div>
   </div>
 
-  <!-- Tabla de medicamentos con scroll -->
-  <div class="tabla-container">
-    <table>
+  <div class="table-container">
+    <table class="medicamentos-table">
       <thead>
         <tr>
           <th>Código</th>
@@ -19,52 +26,110 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let medicamento of medicamentosFiltrados" (click)="seleccionarMedicamento(medicamento)">
+        <tr *ngFor="let medicamento of medicamentosFiltrados" 
+            [class.selected]="medicamentoSeleccionado?.codigo === medicamento.codigo"
+            (click)="seleccionarMedicamento(medicamento)">
           <td>{{ medicamento.codigo }}</td>
           <td>{{ medicamento.nombre }}</td>
-          <td>{{ medicamento.tipo }}</td>
+          <td>
+            <span class="badge" [class.oral]="medicamento.tipo === 'Oral'" 
+                  [class.inyectable]="medicamento.tipo === 'Inyectable'">
+              {{ medicamento.tipo }}
+            </span>
+          </td>
           <td>{{ medicamento.total }}</td>
           <td>
-            <button (click)="eliminarMedicamento(medicamento)">Eliminar</button>
+            <button class="action-btn delete" (click)="eliminarMedicamento($event, medicamento)">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="medicamentosFiltrados.length === 0" class="empty-state">
+      <img src="assets/images/no-medicines.png" alt="No hay medicamentos" class="empty-image">
+      <h3>No se encontraron medicamentos</h3>
+      <p>No hay medicamentos que coincidan con los criterios de búsqueda</p>
+    </div>
   </div>
 
-  <!-- Cuadro de información del medicamento seleccionado -->
-  <div class="info-medicamento" *ngIf="medicamentoSeleccionado">
-    <h3>Información del Medicamento</h3>
-    <p><strong>Código:</strong> {{ medicamentoSeleccionado.codigo }}</p>
-    <p><strong>Nombre:</strong> {{ medicamentoSeleccionado.nombre }}</p>
-    <p><strong>Tipo:</strong> {{ medicamentoSeleccionado.tipo }}</p>
-    <p><strong>Total:</strong> {{ medicamentoSeleccionado.total }}</p>
+  <div class="details-container" *ngIf="medicamentoSeleccionado">
+    <div class="details-card">
+      <div class="details-header">
+        <h3>Información del Medicamento</h3>
+        <button class="close-btn" (click)="medicamentoSeleccionado = null">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="details-body">
+        <div class="detail-item">
+          <label>Código:</label>
+          <span>{{ medicamentoSeleccionado.codigo }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Nombre:</label>
+          <span>{{ medicamentoSeleccionado.nombre }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Tipo:</label>
+          <span class="badge" [class.oral]="medicamentoSeleccionado.tipo === 'Oral'" 
+                [class.inyectable]="medicamentoSeleccionado.tipo === 'Inyectable'">
+            {{ medicamentoSeleccionado.tipo }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Total:</label>
+          <span>{{ medicamentoSeleccionado.total }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Formulario para agregar medicamentos -->
-  <form (ngSubmit)="agregarMedicamento()" class="form-agregar">
-    <div class="form-group">
-      <label for="codigo">Código:</label>
-      <input type="text" id="codigo" [(ngModel)]="nuevoMedicamento.codigo" name="codigo" required>
+  <div class="form-container" *ngIf="mostrarFormulario">
+    <div class="form-header">
+      <h3>Agregar Nuevo Medicamento</h3>
+      <button class="close-btn" (click)="toggleFormulario()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    <div class="form-group">
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" [(ngModel)]="nuevoMedicamento.nombre" name="nombre" required>
-    </div>
-    <div class="form-group">
-      <label for="tipo">Tipo:</label>
-      <select id="tipo" [(ngModel)]="nuevoMedicamento.tipo" name="tipo" required>
-        <option value="Oral">Oral</option>
-        <option value="Inyectable">Inyectable</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="total">Total:</label>
-      <input type="number" id="total" [(ngModel)]="nuevoMedicamento.total" name="total" required>
-    </div>
-    <button type="submit">Agregar Medicamento</button>
-    <div *ngIf="mostrarError" class="error-message">
-      El medicamento ya existe.
-    </div>
-  </form>
+    
+    <form (ngSubmit)="agregarMedicamento()" class="form-content">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="codigo">Código:</label>
+          <input type="text" id="codigo" [(ngModel)]="nuevoMedicamento.codigo" name="codigo" required>
+        </div>
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" [(ngModel)]="nuevoMedicamento.nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="tipo">Tipo:</label>
+          <select id="tipo" [(ngModel)]="nuevoMedicamento.tipo" name="tipo" required>
+            <option value="" disabled selected>Seleccione tipo</option>
+            <option value="Oral">Oral</option>
+            <option value="Inyectable">Inyectable</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="total">Total:</label>
+          <input type="number" id="total" [(ngModel)]="nuevoMedicamento.total" name="total" required>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="toggleFormulario()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="submit" class="save-btn" [disabled]="!camposLlenos()">
+          <i class="fas fa-save"></i> Guardar Medicamento
+        </button>
+      </div>
+
+      <div *ngIf="mostrarError" class="error-message">
+        <i class="fas fa-exclamation-circle"></i> El medicamento ya existe.
+      </div>
+    </form>
+  </div>
 </div>

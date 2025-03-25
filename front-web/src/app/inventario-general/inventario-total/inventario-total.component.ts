@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 
 interface Medicamento {
   codigo: string;
@@ -20,7 +19,7 @@ export class InventarioTotalComponent {
   ];
 
   // Lista filtrada de medicamentos
-  medicamentosFiltrados: Medicamento[] = this.medicamentos;
+  medicamentosFiltrados: Medicamento[] = [...this.medicamentos];
 
   // Nuevo medicamento
   nuevoMedicamento: Medicamento = {
@@ -38,13 +37,18 @@ export class InventarioTotalComponent {
 
   // Control de errores
   mostrarError: boolean = false;
+  mensajeError: string = '';
+
+  // Mostrar formulario de agregar medicamento
+  mostrarFormulario: boolean = false;
 
   // Método para filtrar medicamentos
   filtrarMedicamentos() {
+    const filtroLower = this.filtro.toLowerCase();
     this.medicamentosFiltrados = this.medicamentos.filter(medicamento =>
-      medicamento.codigo.toLowerCase().includes(this.filtro.toLowerCase()) ||
-      medicamento.nombre.toLowerCase().includes(this.filtro.toLowerCase()) ||
-      medicamento.tipo.toLowerCase().includes(this.filtro.toLowerCase())
+      medicamento.codigo.toLowerCase().includes(filtroLower) ||
+      medicamento.nombre.toLowerCase().includes(filtroLower) ||
+      medicamento.tipo.toLowerCase().includes(filtroLower)
     );
   }
 
@@ -53,26 +57,51 @@ export class InventarioTotalComponent {
     this.medicamentoSeleccionado = medicamento;
   }
 
-  // Método para agregar un nuevo medicamento
+  // Método para alternar el formulario de agregar medicamento
+  toggleFormulario() {
+    this.mostrarFormulario = !this.mostrarFormulario;
+    this.mostrarError = false;
+    this.mensajeError = '';
+    if (!this.mostrarFormulario) {
+      this.nuevoMedicamento = { codigo: '', nombre: '', tipo: 'Oral', total: 0 };
+    }
+  }
+
+  camposLlenos(): boolean {
+    return this.nuevoMedicamento.codigo.trim() !== '' &&
+           this.nuevoMedicamento.nombre.trim() !== '' &&
+           this.nuevoMedicamento.tipo.trim() !== '' &&
+           this.nuevoMedicamento.total > 0;
+  }
+  // Método para agregar un nuevo medicamento con validación
   agregarMedicamento() {
+    if (!this.camposLlenos()) {
+      this.mostrarError = true;
+      this.mensajeError  = 'Por favor llenar todos los campos';
+      return;
+    }
+
     const existe = this.medicamentos.some(medicamento =>
       medicamento.codigo === this.nuevoMedicamento.codigo
     );
 
     if (existe) {
       this.mostrarError = true;
-      setTimeout(() => this.mostrarError = false, 3000); // Ocultar mensaje después de 3 segundos
-    } else {
-      this.medicamentos.push({ ...this.nuevoMedicamento });
-      this.medicamentosFiltrados = this.medicamentos; // Actualizar lista filtrada
-      this.nuevoMedicamento = { codigo: '', nombre: '', tipo: 'Oral', total: 0 }; // Resetear formulario
+      this.mensajeError = 'El código del medicamento ya existe';
+      return;
     }
+
+    this.medicamentos.push({ ...this.nuevoMedicamento });
+    this.filtrarMedicamentos(); // Actualizar lista filtrada
+    this.toggleFormulario(); // Cerrar formulario después de agregar
   }
 
   // Método para eliminar un medicamento
-  eliminarMedicamento(medicamento: Medicamento) {
+  eliminarMedicamento(event: Event, medicamento: Medicamento) {
+    event.stopPropagation(); // Evita que se active la selección de la fila
+
     this.medicamentos = this.medicamentos.filter(m => m !== medicamento);
-    this.medicamentosFiltrados = this.medicamentos; // Actualizar lista filtrada
+    this.filtrarMedicamentos(); // Actualizar lista filtrada
     if (this.medicamentoSeleccionado === medicamento) {
       this.medicamentoSeleccionado = null; // Deseleccionar si se elimina el medicamento seleccionado
     }
