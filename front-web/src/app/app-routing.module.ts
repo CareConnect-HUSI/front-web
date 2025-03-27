@@ -18,6 +18,7 @@ import { PatientsListComponent } from './patients/patients-list/patients-list.co
 import { CronogramaComponent } from './inventory/cronograma/cronograma.component';
 import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asignar-pacientes.component';
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
+import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-asignacion.component';
 
 const routes: Routes = [
   { path: 'cronograma', component: CronogramaComponent },
@@ -37,7 +38,8 @@ const routes: Routes = [
   { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
   { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
   { path: 'stock', component: StockComponent },
-  { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' }
+  { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' },
+  { path: 'detalle-asignacion', component: DetalleAsignacionComponent },
 
 ];
 

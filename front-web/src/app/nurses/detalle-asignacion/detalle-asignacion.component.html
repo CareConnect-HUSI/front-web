@@ -1,0 +1,210 @@
+<div class="container">
+    <div class="header">
+      <h2 class="title-center">Registro de Visita Domiciliaria</h2>
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Atrás
+      </button>
+    </div>
+  
+    <div class="profile-container">
+      <!-- Sección de información del paciente -->
+      <div class="profile-section">
+        <div class="profile-icon">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <h3 class="patient-name">{{ paciente.nombres }} {{ paciente.apellidos }}</h3>
+        <p class="patient-id">ID: {{ paciente.documento }}</p>
+        <p class="visit-date">Fecha de visita: {{ fechaVisita | date: 'dd/MM/yyyy' }}</p>
+      </div>
+  
+      <!-- Sección de información -->
+      <div class="info-sections">
+        <!-- Sección Horarios -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Horarios</h3>
+            <button class="edit-btn" (click)="editTime()">
+              <i class="fas fa-edit"></i> Modificar
+            </button>
+          </div>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Hora de ingreso:</label>
+              <span>{{ registro.horaIngreso }}</span>
+            </div>
+            <div class="info-item">
+              <label>Hora de salida:</label>
+              <span>{{ registro.horaSalida }}</span>
+            </div>
+            <div class="info-item">
+              <label>Tiempo total de visita:</label>
+              <span>{{ calcularTiempoVisita() }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Sección Procedimientos -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Procedimientos realizados</h3>
+            <button class="edit-btn" (click)="editProcedures()">
+              <i class="fas fa-edit"></i> Modificar
+            </button>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Procedimiento</th>
+                  <th>Descripción</th>
+                  <th>Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let proc of registro.procedimientos">
+                  <td>{{ proc.nombre }}</td>
+                  <td>{{ proc.descripcion }}</td>
+                  <td>{{ proc.observaciones }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <!-- Sección Medicamentos -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Medicamentos administrados</h3>
+            <button class="edit-btn" (click)="editMedications()">
+              <i class="fas fa-edit"></i> Modificar
+            </button>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Medicamento</th>
+                  <th>Dosis</th>
+                  <th>Vía de administración</th>
+                  <th>Hora</th>
+                  <th>Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let med of registro.medicamentos">
+                  <td>{{ med.nombre }}</td>
+                  <td>{{ med.dosis }}</td>
+                  <td>{{ med.via }}</td>
+                  <td>{{ med.hora }}</td>
+                  <td>{{ med.observaciones }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <!-- Sección Insumos -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Insumos utilizados</h3>
+            <button class="edit-btn" (click)="editSupplies()">
+              <i class="fas fa-edit"></i> Modificar
+            </button>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Insumo</th>
+                  <th>Cantidad</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let insumo of registro.insumos">
+                  <td>{{ insumo.nombre }}</td>
+                  <td>{{ insumo.cantidad }}</td>
+                  <td>{{ insumo.descripcion }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <!-- Sección Incidentes/Urgencias -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Incidentes o urgencias</h3>
+            <button class="edit-btn" (click)="editIncidents()">
+              <i class="fas fa-edit"></i> Modificar
+            </button>
+          </div>
+          
+          <div class="incident-container">
+            <div class="incident-content">
+              <textarea class="incident-textarea" [(ngModel)]="registro.incidentes" placeholder="Describa cualquier incidente o urgencia ocurrida durante la visita..."></textarea>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Sección Firma -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-title">Registro completo</h3>
+          </div>
+          
+          <div class="signature-section">
+            <div class="signature-box">
+              <p class="signature-label">Firma de la enfermera:</p>
+              <div class="signature-line"></div>
+            </div>
+            <button class="save-btn" (click)="saveRecord()">
+              <i class="fas fa-save"></i> Guardar Registro
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal para editar horarios -->
+    <div *ngIf="showTimeModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Horarios</h3>
+          <button class="close-btn" (click)="closeTimeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <form class="modal-form">
+          <div class="form-columns">
+            <div class="form-column">
+              <div class="form-group">
+                <label>Hora de ingreso:</label>
+                <input type="time" [(ngModel)]="registro.horaIngreso" name="horaIngreso" class="form-input" />
+              </div>
+            </div>
+            <div class="form-column">
+              <div class="form-group">
+                <label>Hora de salida:</label>
+                <input type="time" [(ngModel)]="registro.horaSalida" name="horaSalida" class="form-input" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="closeTimeModal()">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="button" class="save-btn" (click)="updateTimes()">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
