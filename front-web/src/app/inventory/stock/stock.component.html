@@ -1,95 +1,202 @@
-<div class="patient-container">
-    <div class="section">
-      <h4 id="titulo">N° de Documento:</h4>
-      <h4>{{ documentoPaciente }}</h4>
-      <h4 id="titulo">Nombre:</h4>
-      <h4>{{ nombrePaciente }}</h4>
+<div class="container">
+  <div class="header">
+    <h2 class="title-center">Seguimiento de Medicamentos</h2>
+  </div>
+
+  <div class="profile-container">
+    <!-- Información del paciente -->
+    <div class="info-section patient-info">
+      <p>{{ documentoPaciente }}</p>
+      <p>{{ nombrePaciente }}</p>
     </div>
-  
-    <div class="table-container">
-      <table id="myTable" class="tablita">
-        <thead>
-          <tr>
-            <th>Medicamento</th>
-            <th>Dosis</th>
-            <th>Vía</th>
-            <th>Frecuencia</th>
-            <th>Cantidad</th>
-            <th colspan="3">Lunes</th>
-            <th colspan="3">Martes</th>
-            <th colspan="3">Miércoles</th>
-            <th colspan="3">Jueves</th>
-            <th colspan="3">Viernes</th>
-            <th colspan="3">Sábado</th>
-            <th colspan="3">Domingo</th>
-            <th>Total</th>
-            <th>Inventario Total</th>
-          </tr>
-          <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th>M</th>
-            <th>T</th>
-            <th>N</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of inventario">
-            <td>{{ item.nombre }}</td>
-            <td>{{ item.dosis }}</td>
-            <td>{{ item.via }}</td>
-            <td>{{ item.frecuencia }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td *ngFor="let dia of item.calendario">
-              <span *ngIf="dia.M">{{ dia.M }}</span>
-              <span *ngIf="!dia.M">-</span>
-            </td>
-            <td *ngFor="let dia of item.calendario">
-              <span *ngIf="dia.T">{{ dia.T }}</span>
-              <span *ngIf="!dia.T">-</span>
-            </td>
-            <td *ngFor="let dia of item.calendario">
-              <span *ngIf="dia.N">{{ dia.N }}</span>
-              <span *ngIf="!dia.N">-</span>
-            </td>
-            <td>{{ item.cantidad - item.usado }}</td>
-            <td>{{ item.cantidad }}</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Tabla de seguimiento -->
+    <div class="info-section">
+      <div class="section-header">
+        <h3 class="section-title">Registro de Administración</h3>
+        <div class="section-actions">
+          <button class="action-btn" (click)="addMedication()">
+            <i class="fas fa-plus"></i> Agregar Medicamento
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="info-table medication-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Medicamento</th>
+              <th rowspan="2">Dosis</th>
+              <th rowspan="2">Vía</th>
+              <th rowspan="2">Frecuencia</th>
+              <th rowspan="2">Cantidad</th>
+              <th colspan="21">Administración por Día y Turno</th>
+              <th rowspan="2">Disponible</th>
+              <th rowspan="2">Total</th>
+            </tr>
+            <tr>
+              <th colspan="3">Lunes</th>
+              <th colspan="3">Martes</th>
+              <th colspan="3">Miércoles</th>
+              <th colspan="3">Jueves</th>
+              <th colspan="3">Viernes</th>
+              <th colspan="3">Sábado</th>
+              <th colspan="3">Domingo</th>
+            </tr>
+            <tr class="shift-header">
+              <th *ngFor="let header of ['','','','','','M','T','N','M','T','N','M','T','N','M','T','N','M','T','N','M','T','N','M','T','N','','']">
+                {{ header }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of inventario; let i = index">
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.dosis }}</td>
+              <td>{{ item.via }}</td>
+              <td>{{ item.frecuencia }}</td>
+              <td>{{ item.cantidad }}</td>
+              
+              <!-- Celdas de administración - semana completa -->
+              <td [class.administered]="item.calendario[0].M">{{ item.calendario[0].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[0].T">{{ item.calendario[0].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[0].N">{{ item.calendario[0].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[1].M">{{ item.calendario[1].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[1].T">{{ item.calendario[1].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[1].N">{{ item.calendario[1].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[2].M">{{ item.calendario[2].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[2].T">{{ item.calendario[2].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[2].N">{{ item.calendario[2].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[3].M">{{ item.calendario[3].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[3].T">{{ item.calendario[3].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[3].N">{{ item.calendario[3].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[4].M">{{ item.calendario[4].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[4].T">{{ item.calendario[4].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[4].N">{{ item.calendario[4].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[5].M">{{ item.calendario[5].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[5].T">{{ item.calendario[5].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[5].N">{{ item.calendario[5].N ? '✓' : '-' }}</td>
+              
+              <td [class.administered]="item.calendario[6].M">{{ item.calendario[6].M ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[6].T">{{ item.calendario[6].T ? '✓' : '-' }}</td>
+              <td [class.administered]="item.calendario[6].N">{{ item.calendario[6].N ? '✓' : '-' }}</td>
+              
+              <td [class.low-stock]="isLowStock(item)">{{ item.cantidad - item.usado }}</td>
+              <td>{{ item.cantidad }}</td>
+              <td>
+                <button class="action-btn small" (click)="openEditModal(item, i)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn small delete" (click)="confirmDelete(i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  
-    <div class="addBtn-container">
-      <a class="btn-save" id="modify">
-        <i class="bx bxs-edit" routerLink="/inventario"></i>
-        Modificar
-      </a>
-      <a class="btn-save" id="add">
-        <i class="bx bx-plus" routerLink="/inventario"></i>
-        Guardar
-      </a>
+
+    <!-- Notificación por modificación -->
+    <div *ngIf="showMedicationWarning" class="notification warning">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ medicationMessage }}</span>
+      <button class="close-notification" (click)="showMedicationWarning = false">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
   </div>
+
+  <!-- Modal para editar medicamento -->
+  <div *ngIf="showEditModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Modificar Medicamento</h3>
+        <button class="close-btn" (click)="closeEditModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <form class="modal-form" (ngSubmit)="updateMedication()">
+        <div class="form-columns">
+          <div class="form-column">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input type="text" [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Dosis:</label>
+              <input type="text" [(ngModel)]="currentMedication.dosis" name="dosis" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Vía de administración:</label>
+              <select [(ngModel)]="currentMedication.via" name="via" required class="form-input">
+                <option value="Oral">Oral</option>
+                <option value="Intravenosa">Intravenosa</option>
+                <option value="Subcutánea">Subcutánea</option>
+                <option value="Tópica">Tópica</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-column">
+            <div class="form-group">
+              <label>Frecuencia:</label>
+              <select [(ngModel)]="currentMedication.frecuencia" name="frecuencia" required class="form-input">
+                <option value="Cada 6h">Cada 6 horas</option>
+                <option value="Cada 8h">Cada 8 horas</option>
+                <option value="Cada 12h">Cada 12 horas</option>
+                <option value="Cada 24h">Cada 24 horas</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Hora de inicio:</label>
+              <input type="time" [(ngModel)]="currentMedication.horaInicio" name="horaInicio" required class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Extender por (días):</label>
+              <input type="number" [(ngModel)]="extensionDays" name="extensionDays" min="1" class="form-input">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeEditModal()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button type="submit" class="save-btn">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación para eliminar -->
+  <div *ngIf="showDeleteModal" class="modal-overlay">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h3>Confirmar Eliminación</h3>
+        <button class="close-btn" (click)="showDeleteModal = false">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar este medicamento del tratamiento?</p>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="showDeleteModal = false">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="save-btn delete" (click)="deleteMedication()">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

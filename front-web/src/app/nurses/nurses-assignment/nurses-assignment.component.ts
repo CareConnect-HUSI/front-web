@@ -178,6 +178,6 @@ export class NursesAssignmentComponent implements OnInit {
   }
   
   verDetalles(asignacion: any) {
-    this.router.navigate(['/detalle-asignacion', asignacion.id]);
+    this.router.navigate(['/detalle-asignacion']);
   }
 }
