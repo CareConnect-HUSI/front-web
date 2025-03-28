@@ -27,6 +27,7 @@ import { RegistroInventarioComponent } from './inventario-general/registro-inven
 import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/registro-enfermeras.component';
 import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
 import { HttpClientModule } from '@angular/common/http';
+import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-asignacion.component';
 
 
 
@@ -49,7 +50,8 @@ import { HttpClientModule } from '@angular/common/http';
     InventarioTotalComponent,
     RegistroInventarioComponent,
     RegistroEnfermerasComponent,
-    ListaEnfermerasComponent
+    ListaEnfermerasComponent,
+    DetalleAsignacionComponent
   ],
   imports: [
     DragDropModule,
