@@ -120,17 +120,54 @@ export class RegisterPatientComponent implements OnInit {
 
   guardarPaciente() {
     const personalInfo = this.patientForm.get('personalInfo')?.value;
+    const tratamientos = this.tratamiento.value.map((t: any) => ({
+      nombre: t.medicamento,
+      dosis: t.dosis,
+      frecuencia: t.frecuencia,
+      diasTratamiento: t.diasTratamiento,
+      fechaInicio: t.fechaInicio,
+      fechaFin: t.fechaFin,
+      horaInicioTratamiento: t.horaInicio,
+      duracionVisita: t.duracion,
+      descripcion: '', // si es requerido por el backend
+    }));
+  
+    const procedimientos = this.procedimientos.value.map((p: any) => ({
+      nombre: p.procedimiento,
+      dosis: '', // si aplica
+      frecuencia: p.frecuencia,
+      diasTratamiento: p.diasTratamiento,
+      fechaInicio: p.fechaInicio,
+      fechaFin: p.fechaFin,
+      duracionVisita: p.duracion,
+      horaMedicamento: p.horaInicio,
+    }));
+  
     const nuevoPaciente = {
+      nombre: personalInfo.nombres,
+      apellido: personalInfo.apellidos,
       documento: personalInfo.numeroDocumento,
-      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`,
-      recienAgregado: true
+      tipoDocumento: personalInfo.tipoDocumento,
+      direccion: personalInfo.direccion,
+      telefono: personalInfo.celular,
+      nombreFamiliar: personalInfo.nombreFamiliar,
+      telefonoFamiliar: personalInfo.celularFamiliar,
+      parentescoFamiliar: personalInfo.parentesco,
+      barrio: personalInfo.barrio,
+      conjunto: personalInfo.localidad,
+      latitud: '0',
+      longitud: '-0',
+      tratamientos,
+      procedimientos
     };
-
-    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
-      this.pacienteRegistrado.emit(nuevoPaciente);
-      this.patientForm.reset();
-    } else {
-      alert('Por favor, complete todos los campos.');
-    }
+  
+    this.patientService.registerPatient(nuevoPaciente).subscribe({
+      next: () => {
+        alert('Paciente registrado con éxito');
+        this.patientForm.reset();
+      },
+      error: err => alert('Error al registrar paciente: ' + err)
+    });
   }
+  
 }
