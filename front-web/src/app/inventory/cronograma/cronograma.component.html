@@ -55,7 +55,8 @@
                    [style.width.%]="getVisitWidth(getVisitInCell(nurse, time))"
                    [style.background-color]="getVisitColor(getVisitInCell(nurse, time))"
                    draggable="true"
-                   (dragstart)="drag($event, getVisitInCell(nurse, time))">
+                   (dragstart)="drag($event, getVisitInCell(nurse, time))"
+                   [title]="getVisitTooltip(getVisitInCell(nurse, time))">
                 <div class="visit-info">
                   <strong>{{ getVisitInCell(nurse, time).patientName }}</strong>
                   <div>{{ getVisitInCell(nurse, time).procedure }}</div>
@@ -85,7 +86,8 @@
                    [style.width.%]="getVisitWidth(getVisitInCell(nurse, time))"
                    [style.background-color]="getVisitColor(getVisitInCell(nurse, time))"
                    draggable="true"
-                   (dragstart)="drag($event, getVisitInCell(nurse, time))">
+                   (dragstart)="drag($event, getVisitInCell(nurse, time))"
+                   [title]="getVisitTooltip(getVisitInCell(nurse, time))">
                 <div class="visit-info">
                   <strong>{{ getVisitInCell(nurse, time).patientName }}</strong>
                   <div>{{ getVisitInCell(nurse, time).procedure }}</div>
@@ -115,7 +117,8 @@
                    [style.width.%]="getVisitWidth(getVisitInCell(nurse, time))"
                    [style.background-color]="getVisitColor(getVisitInCell(nurse, time))"
                    draggable="true"
-                   (dragstart)="drag($event, getVisitInCell(nurse, time))">
+                   (dragstart)="drag($event, getVisitInCell(nurse, time))"
+                   [title]="getVisitTooltip(getVisitInCell(nurse, time))">
                 <div class="visit-info">
                   <strong>{{ getVisitInCell(nurse, time).patientName }}</strong>
                   <div>{{ getVisitInCell(nurse, time).procedure }}</div>
@@ -142,30 +145,30 @@
     
     <form class="modal-form" (ngSubmit)="addEmergencyVisit()">
       <div class="form-group">
-        <label>Paciente:</label>
+        <label>Paciente: <span class="required">*</span></label>
         <select [(ngModel)]="emergencyVisit.patientId" name="patient" required class="form-input">
           <option *ngFor="let patient of patients" [value]="patient.id">{{ patient.name }}</option>
         </select>
       </div>
       
       <div class="form-group">
-        <label>Procedimiento:</label>
-        <input type="text" [(ngModel)]="emergencyVisit.procedure" name="procedure" required class="form-input">
+        <label>Procedimiento: <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="emergencyVisit.procedure" name="procedure" required class="form-input" placeholder="Ej: URGENCIA">
       </div>
       
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
-            <label>Hora:</label>
+            <label>Hora: <span class="required">*</span></label>
             <input type="time" [(ngModel)]="emergencyVisit.time" name="time" required class="form-input">
           </div>
         </div>
         <div class="form-column">
           <div class="form-group">
-            <label>Duración (minutos):</label>
+            <label>Duración (minutos): <span class="required">*</span></label>
             <select [(ngModel)]="emergencyVisit.duration" name="duration" required class="form-input">
               <option value="15">15 min</option>
-              <option value="30">30 min</option>
+              <option value="30" selected>30 min</option>
               <option value="45">45 min</option>
               <option value="60">60 min</option>
               <option value="75">75 min</option>
@@ -178,9 +181,11 @@
       </div>
       
       <div class="form-group">
-        <label>Enfermera:</label>
+        <label>Enfermera: <span class="required">*</span></label>
         <select [(ngModel)]="emergencyVisit.nurseId" name="nurse" required class="form-input">
-          <option *ngFor="let nurse of allNurses" [value]="nurse.id">{{ nurse.name }} ({{ getShiftName(nurse.shift) }})</option>
+          <option *ngFor="let nurse of allNurses" [value]="nurse.id">
+            {{ nurse.name }} ({{ getShiftName(nurse.shift) }})
+          </option>
         </select>
       </div>
       

@@ -15,6 +15,10 @@ interface Procedimiento {
   abreviatura: string;
   descripcion: string;
 }
+interface Localidad {
+  codigo: string;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-register-patient',
@@ -23,6 +27,8 @@ interface Procedimiento {
 })
 export class RegisterPatientComponent implements OnInit {
   @Output() pacienteRegistrado = new EventEmitter<any>();
+  showAddressModal = false;
+  addressForm!: FormGroup;
 
   patientForm!: FormGroup;
   listaProcedimientos: Procedimiento[] = [
@@ -36,6 +42,37 @@ export class RegisterPatientComponent implements OnInit {
     { codigo: '2', nombre: 'Ibuprofeno', tipo: 'Oral', total: 50 },
     { codigo: '3', nombre: 'Amoxicilina', tipo: 'Inyectable', total: 30 },
   ];
+  // Datos DIVIPOLA para Bogotá
+  localidades: Localidad[] = [
+    { codigo: '1', nombre: 'Usaquén' },
+    { codigo: '2', nombre: 'Chapinero' },
+    { codigo: '3', nombre: 'Santa Fe' },
+    { codigo: '4', nombre: 'San Cristóbal' },
+    { codigo: '5', nombre: 'Usme' },
+    { codigo: '6', nombre: 'Tunjuelito' },
+    { codigo: '7', nombre: 'Bosa' },
+    { codigo: '8', nombre: 'Kennedy' },
+    { codigo: '9', nombre: 'Fontibón' },
+    { codigo: '10', nombre: 'Engativá' },
+    { codigo: '11', nombre: 'Suba' },
+    { codigo: '12', nombre: 'Barrios Unidos' },
+    { codigo: '13', nombre: 'Teusaquillo' },
+    { codigo: '14', nombre: 'Los Mártires' },
+    { codigo: '15', nombre: 'Antonio Nariño' },
+    { codigo: '16', nombre: 'Puente Aranda' },
+    { codigo: '17', nombre: 'La Candelaria' },
+    { codigo: '18', nombre: 'Rafael Uribe Uribe' },
+    { codigo: '19', nombre: 'Ciudad Bolívar' },
+    { codigo: '20', nombre: 'Sumapaz' }
+  ];
+
+  barriosPorLocalidad: {[key: string]: string[]} = {
+    '1': ['Santa Bárbara', 'Cedritos', 'Toberín', 'Usaquén', 'Calle 170'],
+    '2': ['Chapinero', 'El Lago', 'La Salle', 'Rosales', 'Quinta Camacho'],
+    // Agrega los barrios para cada localidad
+  };
+
+  barriosFiltrados: string[] = [];
 
   frecuencias: number[] = [72, 48, 24, 12, 8, 6];
   duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
@@ -43,6 +80,7 @@ export class RegisterPatientComponent implements OnInit {
   constructor(private fb: FormBuilder, private patientService: PatientService) {}
 
   ngOnInit() {
+    
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
         nombres: ['', Validators.required], // Inicializado vacío
@@ -64,6 +102,61 @@ export class RegisterPatientComponent implements OnInit {
     });
   
     this.agregarMedicamento();
+    this.initAddressForm();
+  }
+  initAddressForm() {
+    this.addressForm = this.fb.group({
+      tipoVia: ['', Validators.required],
+      numeroVia: ['', Validators.required],
+      letraVia: [''],
+      bis: [''],
+      complemento: [''],
+      numeroPlaca: ['', Validators.required],
+      localidad: ['', Validators.required],
+      barrio: ['', Validators.required],
+      complementoDireccion: ['']
+    });
+  }
+  openAddressModal() {
+    this.showAddressModal = true;
+  }
+
+  closeAddressModal() {
+    this.showAddressModal = false;
+  }
+
+  onLocalidadChange() {
+    const localidadCod = this.addressForm.get('localidad')?.value;
+    this.barriosFiltrados = this.barriosPorLocalidad[localidadCod] || [];
+    this.addressForm.get('barrio')?.reset();
+  }
+
+  saveAddress() {
+    if (this.addressForm.valid) {
+      const address = this.addressForm.value;
+      
+      // Construir dirección en formato estándar colombiano
+      let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
+      
+      if (address.letraVia) direccionCompleta += ` ${address.letraVia}`;
+      if (address.bis) direccionCompleta += ` ${address.bis}`;
+      if (address.complemento) direccionCompleta += ` ${address.complemento}`;
+      
+      direccionCompleta += ` # ${address.numeroPlaca}`;
+      
+      if (address.complementoDireccion) {
+        direccionCompleta += `, ${address.complementoDireccion}`;
+      }
+      
+      // Actualizar el formulario principal
+      this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
+      this.patientForm.get('personalInfo.localidad')?.setValue(
+        this.localidades.find(l => l.codigo === address.localidad)?.nombre
+      );
+      this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
+      
+      this.closeAddressModal();
+    }
   }
   get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;

@@ -32,7 +32,12 @@
         </div>
         <div class="form-group">
           <label>Dirección</label>
-          <input formControlName="direccion" type="text" placeholder="Ej: Calle 123 #45-67" />
+          <div class="address-input">
+            <input formControlName="direccion" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
+            <button type="button" class="edit-btn" (click)="openAddressModal()">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label>Localidad</label>
@@ -204,4 +209,95 @@
       </button>
     </div>
   </form>
+</div>
+<!-- Modal para Dirección -->
+<div *ngIf="showAddressModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dirección Completa</h3>
+      <button class="close-btn" (click)="closeAddressModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <form class="modal-form" [formGroup]="addressForm">
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label>Tipo de Vía</label>
+            <select formControlName="tipoVia" required>
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Calle">Calle</option>
+              <option value="Carrera">Carrera</option>
+              <option value="Avenida">Avenida</option>
+              <option value="Diagonal">Diagonal</option>
+              <option value="Transversal">Transversal</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Número Vía</label>
+            <input type="text" formControlName="numeroVia" placeholder="Ej: 12" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Letra Vía (Opcional)</label>
+            <input type="text" formControlName="letraVia" placeholder="Ej: B">
+          </div>
+        </div>
+        
+        <div class="form-column">
+          <div class="form-group">
+            <label>Bis</label>
+            <select formControlName="bis">
+              <option value="">No</option>
+              <option value="Bis">Bis</option>
+              <option value="Bis A">Bis A</option>
+              <option value="Bis B">Bis B</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Complemento</label>
+            <input type="text" formControlName="complemento" placeholder="Ej: Este, Oeste">
+          </div>
+          
+          <div class="form-group">
+            <label>Número Placa</label>
+            <input type="text" formControlName="numeroPlaca" placeholder="Ej: 45-67" required>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Localidad</label>
+        <select formControlName="localidad" required (change)="onLocalidadChange()">
+          <option value="" disabled selected>Seleccionar localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Barrio</label>
+        <select formControlName="barrio" required>
+          <option value="" disabled selected>Seleccionar barrio</option>
+          <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Complemento Dirección</label>
+        <textarea formControlName="complementoDireccion" placeholder="Ej: Torre 2, Apartamento 301"></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="closeAddressModal()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="save-btn" (click)="saveAddress()">
+          <i class="fas fa-save"></i> Guardar Dirección
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
