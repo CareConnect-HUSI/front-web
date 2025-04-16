@@ -204,3 +204,89 @@
       justify-content: center;
     }
   }
+  /* Estilos para el modal de dirección y campos relacionados */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c5697;
+}
+
+.modal-form {
+  padding: 20px;
+}
+
+.modal-form .form-columns {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.modal-form .form-column {
+  flex: 1;
+}
+
+.modal-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.address-input {
+  display: flex;
+  gap: 10px;
+}
+
+.address-input input {
+  flex: 1;
+}
+
+.edit-btn {
+  background: #e6f0ff;
+  color: #2c5697;
+  border: none;
+  padding: 0 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+  background: #d0e0ff;
+}
