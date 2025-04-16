@@ -39,7 +39,7 @@ export class RegistroEnfermerasComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder, 
-    private authService: AuthService
+    private nurseService: NurseService
   ) {}
 
   ngOnInit() {
@@ -144,18 +144,33 @@ export class RegistroEnfermerasComponent implements OnInit {
       alert('Por favor complete todos los campos requeridos.');
       return;
     }
-  
-    const formData = this.nurseForm.value.personalInfo;
-    
-    // Crear objeto con los datos completos
-    const nurseData = {
-      ...formData,
-      // Asegúrate de incluir todos los campos necesarios para el backend
-      localidad: this.localidades.find(l => l.nombre === formData.localidad)?.codigo,
-      barrio: formData.barrio
+    const formValues = this.nurseForm.get('personalInfo')?.value;
+
+    const userData = {
+      nombre: formValues.name,
+      apellido: formValues.lastname,
+      numeroIdentificacion: formValues.identificationNumber,
+      direccion: formValues.address,
+      telefono: formValues.phone,
+      barrio: formValues.barrio,
+      conjunto: "",
+      email: formValues.email,
+      password: formValues.password,
+      latitud: "",
+      longitud: "",
+      tipoIdentificacion: {
+        name: formValues.identificationType
+      },
+      turnoEntity: {  
+        name: formValues.turno
+      }
+      
     };
   
-    this.authService.registerNurse(nurseData).subscribe({
+
+    
+  
+    this.nurseService.registrarEnfermera(userData).subscribe({
       next: () => {
         alert('Enfermera registrada con éxito');
         this.nurseForm.reset();
