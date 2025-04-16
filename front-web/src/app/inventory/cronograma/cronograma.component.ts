@@ -178,9 +178,19 @@ export class CronogramaComponent implements OnInit {
   }
   
   getVisitColor(visit: any): string {
-    // Puedes personalizar los colores según el tipo de procedimiento
-    const colors = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
-    return colors[visit.patientId % colors.length];
+    // Urgencias - color salmón claro
+    if (visit.isEmergency) {
+      return '#FFA07A';
+    }
+    
+    // Instalaciones - color lila claro
+    if (visit.procedure.toLowerCase().includes('instalación') || 
+        visit.procedure.toLowerCase().includes('instalacion')) {
+      return '#B19CD9';
+    }
+    
+    // Visitas normales - color azul estándar
+    return '#4e79a7';
   }
   
   // Funciones para arrastrar y soltar
@@ -262,13 +272,32 @@ export class CronogramaComponent implements OnInit {
   }
   
   // Funciones para manejar modales
+  
   openEmergencyModal() {
+    // Obtener hora actual redondeada a los 15 minutos más cercanos
+    const now = new Date();
+    const minutes = Math.ceil(now.getMinutes() / 15) * 15;
+    now.setMinutes(minutes);
+    now.setSeconds(0);
+    
+    // Seleccionar enfermera del turno actual por defecto
+    const currentHour = now.getHours();
+    let defaultNurse;
+    
+    if (currentHour >= 7 && currentHour < 13) {
+      defaultNurse = this.morningNurses[0]?.id;
+    } else if (currentHour >= 13 && currentHour < 19) {
+      defaultNurse = this.afternoonNurses[0]?.id;
+    } else {
+      defaultNurse = this.nightNurses[0]?.id;
+    }
+    
     this.emergencyVisit = {
-      patientId: null,
-      procedure: '',
-      time: '',
+      patientId: this.patients[0]?.id || null,
+      procedure: 'URGENCIA',
+      time: this.formatTime(now),
       duration: '30',
-      nurseId: null
+      nurseId: defaultNurse
     };
     this.showEmergencyModal = true;
   }
@@ -278,23 +307,69 @@ export class CronogramaComponent implements OnInit {
   }
   
   addEmergencyVisit() {
+    // Validar campos obligatorios
+    if (!this.emergencyVisit.patientId || !this.emergencyVisit.procedure || 
+        !this.emergencyVisit.time || !this.emergencyVisit.nurseId) {
+      alert('Por favor complete todos los campos requeridos');
+      return;
+    }
+  
+    // Obtener datos del paciente y enfermera
     const patient = this.patients.find(p => p.id === this.emergencyVisit.patientId);
-    if (!patient) return;
+    const nurse = this.allNurses.find(n => n.id === this.emergencyVisit.nurseId);
     
-    const newVisit = {
-      id: Math.max(...this.visits.map(v => v.id)) + 1,
+    if (!patient || !nurse) {
+      alert('Datos inválidos de paciente o enfermera');
+      return;
+    }
+  
+    // Validar que la enfermera esté en turno a esa hora
+    const timeParts = this.emergencyVisit.time.split(':');
+    const visitTime = new Date();
+    visitTime.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+    
+    if (!this.isNurseInShift(nurse, visitTime)) {
+      alert(`La enfermera ${nurse.name} no está en turno a esa hora`);
+      return;
+    }
+  
+    // Validar que no haya superposición con otras visitas
+    const duration = parseInt(this.emergencyVisit.duration);
+    const endTime = this.addMinutesToTime(this.emergencyVisit.time, duration);
+    
+    const hasConflict = this.visits.some(visit => {
+      if (visit.nurseId === nurse.id && 
+          visit.date.toDateString() === this.currentDate.toDateString()) {
+        
+        const existingStart = visit.startTime;
+        const existingEnd = this.addMinutesToTime(visit.startTime, visit.duration);
+        
+        return this.isTimeOverlap(this.emergencyVisit.time, endTime, existingStart, existingEnd);
+      }
+      return false;
+    });
+  
+    if (hasConflict) {
+      alert('La enfermera seleccionada ya tiene una visita programada en ese horario');
+      return;
+    }
+  
+    // Crear y agregar la nueva urgencia
+    const newVisit: Visit = {
+      id: Math.max(0, ...this.visits.map(v => v.id)) + 1,
       patientId: patient.id,
       patientName: patient.name,
-      nurseId: this.emergencyVisit.nurseId,
+      nurseId: nurse.id,
       procedure: this.emergencyVisit.procedure,
       startTime: this.emergencyVisit.time,
-      duration: parseInt(this.emergencyVisit.duration),
+      duration: duration,
       date: new Date(this.currentDate),
       isEmergency: true
     };
-    
+  
     this.visits.push(newVisit);
     this.closeEmergencyModal();
+    alert('Urgencia agregada correctamente');
   }
   
   openNewPatientModal() {
@@ -413,5 +488,24 @@ export class CronogramaComponent implements OnInit {
     
     return s1 < e2 && e1 > s2;
   }
-  
+  getVisitTooltip(visit: any): string {
+    if (!visit) return '';
+    
+    const patient = this.patients.find(p => p.id === visit.patientId);
+    let tooltip = `Paciente: ${visit.patientName}\n`;
+    tooltip += `Procedimiento: ${visit.procedure}\n`;
+    tooltip += `Hora: ${visit.startTime}\n`;
+    tooltip += `Duración: ${visit.duration} minutos\n`;
+    
+    if (patient) {
+      tooltip += `Documento: ${patient.document}\n`;
+      tooltip += `Dirección: ${patient.address}\n`;
+    }
+    
+    if (visit.isEmergency) {
+      tooltip += `\n(URGENCIA)`;
+    }
+    
+    return tooltip;
+  }
 }
