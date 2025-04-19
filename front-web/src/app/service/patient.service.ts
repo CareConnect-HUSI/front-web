@@ -7,19 +7,74 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = environment.baseApiUrl;
+  private apiUrl = 'http://localhost:8081/pacientes';
 
   constructor(private http: HttpClient) { }
 
-  registerPatient(userData: any): Observable<any> {
-        console.log("🔍 Revisando userData antes de enviarlo al backend:", userData);
-      
-        if (!userData || typeof userData !== 'object' || !userData.name) {
-          return new Observable(observer => observer.error("Datos inválidos"));
-        }
-      
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-      
-        return this.http.post(`${this.apiUrl}/register-patient`, JSON.stringify(userData), { headers, responseType: 'text' });
-      }
+  registrarPaciente(userData: any): Observable<any> {
+    if (!userData || typeof userData !== 'object' || !userData.nombre) {
+      return new Observable(observer => {
+        observer.error({ error: { error: 'Datos inválidos: falta el campo nombre' } });
+      });
+    }
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
+  }
 }
+
+
+/*
+
+  findAll(page: number, limit: number): Observable<any> {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No hay token disponible.');
+      return new Observable();
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, { headers });
+  }
+
+  registrarEnfermera(userData: any): Observable<any> {
+    
+    if (!userData || typeof userData !== 'object' || !userData.nombre) {
+      return new Observable(observer => {
+        observer.error({ error: { error: 'Datos inválidos: falta el campo nombre' } });
+      });
+    }
+  
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  
+    return this.http.post(`${this.apiUrl}/registrar-enfermera`, JSON.stringify(userData), { headers, responseType: 'text' });
+  }
+  
+  updateEnfermera(id: number, enfermeraData: any): Observable<any> {
+    const token = localStorage.getItem('token');
+  
+    if (!token) {
+      console.error('No hay token disponible.');
+      return new Observable(observer => {
+        observer.error('Token no disponible');
+      });
+    }
+  
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  
+    return this.http.put(`${this.apiUrl}/${id}`, enfermeraData, { headers });
+  }
+  
+
+}
+
+*/

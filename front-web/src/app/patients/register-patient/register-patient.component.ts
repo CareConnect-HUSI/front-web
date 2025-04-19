@@ -212,18 +212,43 @@ export class RegisterPatientComponent implements OnInit {
   }
 
   guardarPaciente() {
-    const personalInfo = this.patientForm.get('personalInfo')?.value;
-    const nuevoPaciente = {
-      documento: personalInfo.numeroDocumento,
-      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`,
-      recienAgregado: true
-    };
-
-    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
-      this.pacienteRegistrado.emit(nuevoPaciente);
-      this.patientForm.reset();
-    } else {
-      alert('Por favor, complete todos los campos.');
+    if (this.patientForm.invalid) {
+      alert('Por favor complete todos los campos obligatorios.');
+      return;
     }
+  
+    const personalInfo = this.patientForm.get('personalInfo')?.value;
+  
+    const pacienteData = {
+      nombre: personalInfo.nombres,
+      apellido: personalInfo.apellidos,
+      numero_identificacion: personalInfo.numeroDocumento,
+      direccion: personalInfo.direccion,
+      telefono: personalInfo.celular,
+      barrio: personalInfo.barrio,
+      conjunto: null,
+      localidad: personalInfo.localidad,
+      latitud: null,
+      longitud: null,
+      nombre_acudiente: personalInfo.nombreFamiliar,
+      parentezco_acudiente: personalInfo.parentesco,
+      telefono_acudiente: personalInfo.celularFamiliar,
+      tipoIdentificacion: {
+        name: personalInfo.tipoDocumento
+      }
+    };
+  
+    this.patientService.registrarPaciente(pacienteData).subscribe({
+      next: (res) => {
+        console.log('Paciente registrado con éxito:', res);
+        alert('Paciente registrado con éxito');
+        this.patientForm.reset();
+      },
+      error: (err) => {
+        console.error('Error al registrar paciente:', err);
+        alert('Error al registrar paciente');
+      }
+    });
   }
+  
 }
