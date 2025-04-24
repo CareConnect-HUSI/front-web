@@ -26,11 +26,13 @@ interface Localidad {
   styleUrls: ['./register-patient.component.css']
 })
 export class RegisterPatientComponent implements OnInit {
+
+  
   @Output() pacienteRegistrado = new EventEmitter<any>();
   showAddressModal = false;
   addressForm!: FormGroup;
-
   patientForm!: FormGroup;
+
   listaProcedimientos: Procedimiento[] = [
     { codigo: '1', abreviatura: 'CUR', descripcion: 'Curación' },
     { codigo: '2', abreviatura: 'HEM', descripcion: 'Hemocultivo' },
@@ -79,30 +81,33 @@ export class RegisterPatientComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private patientService: PatientService) {}
 
+
   ngOnInit() {
-    
+    this.initPatientForm();
+    this.initAddressForm();
+    this.agregarMedicamento();
+  }
+  initPatientForm() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        nombres: ['', Validators.required], // Inicializado vacío
-        apellidos: ['', Validators.required], // Inicializado vacío
-        tipoDocumento: ['', Validators.required], // Inicializado vacío
-        numeroDocumento: ['', Validators.required], // Inicializado vacío
-        direccion: ['', Validators.required], // Inicializado vacío
-        celular: ['', Validators.required], // Inicializado vacío
-        localidad: ['', Validators.required], // Inicializado vacío
-        barrio: ['', Validators.required], // Inicializado vacío
-        nombreFamiliar: ['', Validators.required], // Inicializado vacío
-        parentesco: ['', Validators.required], // Inicializado vacío
-        celularFamiliar: ['', Validators.required], // Inicializado vacío
-        email: ['', [Validators.required, Validators.email]], // Inicializado vacío
+        nombres: ['', Validators.required],
+        apellidos: ['', Validators.required],
+        tipoDocumento: ['', Validators.required],
+        numeroDocumento: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        direccion: ['', Validators.required],
+        celular: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        localidad: ['', Validators.required],
+        barrio: ['', Validators.required],
+        conjunto: [''],
+        nombreFamiliar: ['', Validators.required],
+        parentesco: ['', Validators.required],
+        celularFamiliar: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        email: ['', [Validators.required, Validators.email]],
         foto: [null]
       }),
       tratamiento: this.fb.array([]),
       procedimientos: this.fb.array([])
     });
-  
-    this.agregarMedicamento();
-    this.initAddressForm();
   }
   initAddressForm() {
     this.addressForm = this.fb.group({
@@ -114,7 +119,8 @@ export class RegisterPatientComponent implements OnInit {
       numeroPlaca: ['', Validators.required],
       localidad: ['', Validators.required],
       barrio: ['', Validators.required],
-      complementoDireccion: ['']
+      complementoDireccion: [''],
+      conjunto: ['']
     });
   }
   openAddressModal() {
@@ -226,7 +232,7 @@ export class RegisterPatientComponent implements OnInit {
       direccion: personalInfo.direccion,
       telefono: personalInfo.celular,
       barrio: personalInfo.barrio,
-      conjunto: null,
+      conjunto: personalInfo.conjunto || null,
       localidad: personalInfo.localidad,
       latitud: null,
       longitud: null,
@@ -237,7 +243,7 @@ export class RegisterPatientComponent implements OnInit {
         name: personalInfo.tipoDocumento
       }
     };
-  
+    console.log('Datos a enviar:', pacienteData); // Para depuración
     this.patientService.registrarPaciente(pacienteData).subscribe({
       next: (res) => {
         console.log('Paciente registrado con éxito:', res);
@@ -246,7 +252,15 @@ export class RegisterPatientComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al registrar paciente:', err);
-        alert('Error al registrar paciente');
+        let errorMessage = 'Error al registrar paciente';
+        if (err.error) {
+          if (err.error.message) {
+            errorMessage += `: ${err.error.message}`;
+          } else if (typeof err.error === 'string') {
+            errorMessage += `: ${err.error}`;
+          }
+        }
+        alert(errorMessage);
       }
     });
   }
