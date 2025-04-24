@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { NurseService } from 'src/app/service/nurse.service';
 @Component({
   selector: 'app-patients-list',
   templateUrl: './patients-list.component.html',

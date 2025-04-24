@@ -11,6 +11,21 @@ export class PatientService {
 
   constructor(private http: HttpClient) { }
 
+  findAll(page: number, limit: number): Observable<any> {
+      const token = localStorage.getItem('token');
+  
+      if (!token) {
+        console.error('No hay token disponible.');
+        return new Observable();
+      }
+  
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      });
+  
+      return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, { headers });
+    }
   registrarPaciente(userData: any): Observable<any> {
     if (!userData || typeof userData !== 'object' || !userData.nombre) {
       return new Observable(observer => {
@@ -21,6 +36,10 @@ export class PatientService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
+  }
+
+  obtenerPacientePorId(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 }
 
