@@ -23,7 +23,7 @@ import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-
 const routes: Routes = [
   { path: 'cronograma', component: CronogramaComponent },
   { path: 'registro-pacientes', component: RegisterPatientComponent },
-  { path: 'paciente/:documento', component: PatientInfoComponent},
+  { path: 'pacientes/:id', component: PatientInfoComponent},
   { path: 'nurses-assignment/:id', component: NursesAssignmentComponent},
   { path: 'inventario-paciente/:documento', component: StockComponent},
   { path: 'login', component: LoginComponent },

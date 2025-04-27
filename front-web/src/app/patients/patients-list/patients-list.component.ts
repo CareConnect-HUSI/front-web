@@ -1,24 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NurseService } from 'src/app/service/nurse.service';
+import { PatientService } from 'src/app/service/patient.service';
 @Component({
   selector: 'app-patients-list',
   templateUrl: './patients-list.component.html',
   styleUrls: ['./patients-list.component.css']
 })
-export class PatientsListComponent {
+export class PatientsListComponent implements OnInit {
   filtro: string = '';
+  pacientes: any[] = [];
+  pacientesFiltrados: any[] = [];
+  page: number = 0;
+  size: number = 10;
 
-  pacientes = [
-    { id: '1005462695', nombre: 'Luis Pérez', direccion: 'Calle 25 #15-2' },
-    { id: '20514891', nombre: 'Andrés Durán', direccion: 'Carrera 27 #12-23' },
-    { id: '5641658', nombre: 'Carlos Ramírez', direccion: 'Calle 15 #70-10' },
-    { id: '85411645', nombre: 'Alejannnnndro', direccion: 'Carrera 15 #12-10' }
-  ];
+  constructor(
+    private router: Router,
+    private patientService: PatientService
+  ) {}
 
-  constructor(private router: Router) {}
+  ngOnInit(): void {
+    this.loadPacientes();
+  }
 
-  pacientesFiltrados = [...this.pacientes];
+  loadPacientes() {
+        this.patientService.findAll(this.page, this.size).subscribe(
+      (data: any) => {
+        console.log('Pacientes cargados:', data);
+        this.pacientes = data.content;
+        this.pacientesFiltrados = [...this.pacientes];
+      },
+      error => {
+        console.error('Error al cargar pacientes:', error);
+      }
+    );
+  }
 
   filtrarPacientes() {
     if (!this.filtro) {

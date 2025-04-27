@@ -27,7 +27,7 @@
           <td>{{ paciente.nombre }}</td>
           <td>{{ paciente.direccion }}</td>
           <td>
-            <a routerLink="/paciente/{{ paciente.id }}" class="details-btn">
+            <a routerLink="/pacientes/{{ paciente.id }}" class="details-btn">
               <i class="fas fa-eye"></i> Ver
             </a>
           </td>
@@ -36,7 +36,7 @@
     </table>
 
     <div *ngIf="pacientesFiltrados.length === 0" class="empty-state">
-      <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
+      <img src="assets/images/avatar.png" alt="No hay pacientes" class="empty-image">
       <h3>No se encontraron pacientes</h3>
       <p>No hay pacientes que coincidan con los criterios de búsqueda</p>
     </div>

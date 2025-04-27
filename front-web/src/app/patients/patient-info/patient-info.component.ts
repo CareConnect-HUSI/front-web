@@ -1,38 +1,77 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
   selector: 'app-patient-info',
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.css']
 })
-export class PatientInfoComponent {
+export class PatientInfoComponent implements OnInit {
   showEditModal = false;
+  paciente: any = {}; 
+  treatment: any[] = [];
+  historial: any[] = [];
 
-  paciente = {
-    nombres: 'María José ',
-    apellidos: 'López',
-    documento: '123456789',
-    direccion: 'Calle 123 #45-67',
-    localidad: 'Suba',
-    barrio: 'El Prado',
-    celular: '3001234567',
-    email: 'maria@ejemplo.com',
-    nombreFamiliar: 'Carlos Lopéz',
-    celularFamiliar: '3109876543',
-    parentesco: 'Padre'
+  constructor(
+    private patientService: PatientService,
+    private route: ActivatedRoute
+  ) {}
 
-  };
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) {
+      this.loadPatient(id);
+    }
+  }
 
-  treatment = [
-    { nombre: 'Paracetamol', cantidad: '500mg', dias: 5, posologia: 'Cada 8 horas', fechaInicio: new Date() },
-    { nombre: 'Ibuprofeno', cantidad: '200mg', dias: 7, posologia: 'Cada 12 horas', fechaInicio: new Date() }
-  ];
-
-  historial = [
-    { tratamiento: 'Paracetamol', dias: 5, completado: true },
-    { tratamiento: 'Ibuprofeno', dias: 7, completado: false }
-  ];
+  loadPatient(id: number) {
+    this.patientService.obtenerPacientePorId(id).subscribe({
+      next: (data) => {
+        console.log('Paciente cargado:', data);
+  
+        if (!data) {
+          console.error('Paciente no encontrado');
+          return;
+        }
+  
+        this.paciente = {
+          nombres: data.nombre,
+          apellidos: data.apellido,
+          documento: data.numero_identificacion,
+          direccion: data.direccion,
+          localidad: data.localidad,
+          barrio: data.barrio,
+          celular: data.telefono,
+          nombreFamiliar: data.nombre_acudiente,
+          celularFamiliar: data.telefono_acudiente,
+          parentesco: data.parentezco_acudiente
+        };
+  
+        if (data.actividades) {
+          this.treatment = data.actividades.map((actividad: any) => ({
+            nombre: actividad.nombreActividad,
+            cantidad: actividad.dosis + ' mg',
+            dias: actividad.diasTratamiento,
+            posologia: actividad.frecuencia + ' veces al día',
+            fechaInicio: actividad.fechaInicio
+          }));
+          
+  
+          this.historial = this.treatment.map((t: any) => ({
+            tratamiento: t.nombre,
+            dias: t.dias,
+            completado: false
+          }));
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar paciente', err);
+      }
+    });
+  }
+  
+  
 
   openEditModal() {
     this.showEditModal = true;
