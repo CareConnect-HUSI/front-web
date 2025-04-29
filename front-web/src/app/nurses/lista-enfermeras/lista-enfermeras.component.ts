@@ -9,7 +9,7 @@ import { NurseService } from 'src/app/service/nurse.service';
 })
 export class ListaEnfermerasComponent implements OnInit {
   length = 0;
-  pageSize = 4;
+  pageSize = 10;
   pageIndex = 0;
 
   tiposEnfermeras = ["Todas", "Turno mañana", "Turno tarde", "Turno noche"];

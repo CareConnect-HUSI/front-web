@@ -38,16 +38,16 @@ export class PatientInfoComponent implements OnInit {
         this.paciente = {
           nombres: data.nombre,
           apellidos: data.apellido,
-          documento: data.numero_identificacion,
+          documento: data.numeroIdentificacion,
           direccion: data.direccion,
           localidad: data.localidad,
           barrio: data.barrio,
           celular: data.telefono,
-          nombreFamiliar: data.nombre_acudiente,
-          celularFamiliar: data.telefono_acudiente,
-          parentesco: data.parentezco_acudiente
+          nombreFamiliar: data.nombreAcudiente,
+          celularFamiliar: data.telefonoAcudiente,
+          parentesco: data.parentezcoAcudiente
         };
-  
+
         if (data.actividades) {
           this.treatment = data.actividades.map((actividad: any) => ({
             nombre: actividad.nombreActividad,
