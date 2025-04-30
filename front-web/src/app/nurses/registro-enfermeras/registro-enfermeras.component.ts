@@ -16,7 +16,6 @@ interface Localidad {
 export class RegistroEnfermerasComponent implements OnInit {
 
   nurseForm!: FormGroup;
-  imagePreview: string | ArrayBuffer | null = null;
   showPassword = false;
   showAddressModal = false;
   addressForm!: FormGroup;
@@ -37,6 +36,15 @@ export class RegistroEnfermerasComponent implements OnInit {
 
   barriosFiltrados: string[] = [];
 
+  // Nuevas propiedades para la lista
+  showForm = false;
+  isEditMode = false;
+  currentNurseId: number | null = null;
+  nurses: any[] = [];
+  currentPage = 0;
+  itemsPerPage = 10;
+  totalItems = 0;
+
   constructor(
     private fb: FormBuilder, 
     private nurseService: NurseService
@@ -45,6 +53,56 @@ export class RegistroEnfermerasComponent implements OnInit {
   ngOnInit() {
     this.initNurseForm();
     this.initAddressForm();
+    this.loadNurses();
+  }
+
+  loadNurses() {
+    this.nurseService.findAll(this.currentPage, this.itemsPerPage).subscribe({
+      next: (response: any) => {
+        this.nurses = response.content || response; // Adapta según la estructura de tu API
+        this.totalItems = response.totalElements || response.length;
+      },
+      error: (error) => {
+        console.error('Error al cargar enfermeras:', error);
+      }
+    });
+  }
+
+
+  loadNurseForEdit(nurse: any) {
+    this.isEditMode = true;
+    this.currentNurseId = nurse.id;
+    this.showForm = true;
+    
+    this.nurseForm.patchValue({
+      personalInfo: {
+        name: nurse.nombre,
+        lastname: nurse.apellido,
+        identificationType: nurse.tipoIdentificacion?.name || 'CC',
+        identificationNumber: nurse.numeroIdentificacion,
+        address: nurse.direccion,
+        phone: nurse.telefono,
+        localidad: nurse.localidad,
+        barrio: nurse.barrio,
+        turno: nurse.turnoEntity?.name || '',
+        email: nurse.email,
+        password: '********' // Placeholder para edición
+      }
+    });
+  }
+
+  toggleStatus(nurse: any) {
+    const newStatus = !nurse.activo;
+    const updateData = { ...nurse, activo: newStatus };
+    
+    this.nurseService.updateEnfermera(nurse.id, updateData).subscribe({
+      next: () => {
+        nurse.activo = newStatus;
+      },
+      error: (error) => {
+        console.error('Error al cambiar estado:', error);
+      }
+    });
   }
 
   initNurseForm() {
@@ -144,8 +202,8 @@ export class RegistroEnfermerasComponent implements OnInit {
       alert('Por favor complete todos los campos requeridos.');
       return;
     }
+    
     const formValues = this.nurseForm.get('personalInfo')?.value;
-
     const userData = {
       nombre: formValues.name,
       apellido: formValues.lastname,
@@ -153,54 +211,62 @@ export class RegistroEnfermerasComponent implements OnInit {
       direccion: formValues.address,
       telefono: formValues.phone,
       barrio: formValues.barrio,
-      conjunto: "",
       email: formValues.email,
-      password: formValues.password,
-      latitud: "",
-      longitud: "",
+      password: formValues.password !== '********' ? formValues.password : undefined,
       tipoIdentificacion: {
         name: formValues.identificationType
       },
       turnoEntity: {  
         name: formValues.turno
       }
-      
     };
-  
 
-    
-  
-    this.nurseService.registrarEnfermera(userData).subscribe({
-      next: () => {
-        alert('Enfermera registrada con éxito');
-        this.nurseForm.reset();
-        this.imagePreview = null;
-      },
-      error: (error) => {
-        if (error.status === 400) {
-          alert('Error: ' + error.error.error);
-        } else {
-          alert('Ocurrió un error en el registro');
+    if (this.isEditMode && this.currentNurseId) {
+      this.nurseService.updateEnfermera(this.currentNurseId, userData).subscribe({
+        next: () => {
+          alert('Enfermera actualizada con éxito');
+          this.loadNurses();
+          this.showForm = false;
+        },
+        error: (error) => {
+          this.handleError(error);
         }
-        console.error("Error del backend:", error);
-      }
-    });
-  }
-  onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.nurseForm.get('personalInfo.foto')?.setValue(file);
-      
-      // Vista previa de la imagen
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result;
-      };
-      reader.readAsDataURL(file);
+      });
+    } else {
+      this.nurseService.registrarEnfermera(userData).subscribe({
+        next: () => {
+          alert('Enfermera registrada con éxito');
+          this.nurseForm.reset();
+          this.loadNurses();
+          this.showForm = false;
+        },
+        error: (error) => {
+          this.handleError(error);
+        }
+      });
     }
   }
 
+
+  private handleError(error: any) {
+    if (error.status === 400) {
+      alert('Error: ' + error.error.error);
+    } else {
+      alert('Ocurrió un error en el registro');
+    }
+    console.error("Error del backend:", error);
+  }
+
+  // Métodos para paginación
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadNurses();
+  }
+  
+  getPageNumbers(): number[] {
+    const pageCount = Math.ceil(this.totalItems / this.itemsPerPage);
+    return Array.from({ length: pageCount }, (_, i) => i);
+  }
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
     const passwordField = document.querySelector('[formControlName="password"]') as HTMLInputElement;

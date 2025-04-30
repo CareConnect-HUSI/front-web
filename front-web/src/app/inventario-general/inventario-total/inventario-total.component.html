@@ -1,45 +1,53 @@
 <div class="container">
   <div class="header">
-    <h2 class="title-center">Lista de Medicamentos</h2>
+    <h2 class="title-center">Inventario de Productos</h2>
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="tabActiva === 'medicamentos'" (click)="cambiarTab('medicamentos')">
+        Medicamentos
+      </button>
+      <button class="tab-btn" [class.active]="tabActiva === 'procedimientos'" (click)="cambiarTab('procedimientos')">
+        Procedimientos
+      </button>
+    </div>
     <div class="search-filter-container">
       <div class="search-box">
         <i class="fas fa-search"></i>
         <input type="text" [(ngModel)]="filtro" 
-               (input)="filtrarMedicamentos()" 
+               (input)="filtrarProductos()" 
                placeholder="Buscar por código, nombre o tipo">
       </div>
       <button class="add-btn" (click)="toggleFormulario()">
-        <i class="fas fa-plus"></i> Agregar Medicamento
+        <i class="fas fa-plus"></i> Agregar Producto o procedimiento
       </button>
     </div>
   </div>
 
   <div class="table-container">
-    <table class="medicamentos-table">
+    <table class="productos-table">
       <thead>
         <tr>
           <th>Código</th>
           <th>Nombre</th>
+          <th>Descripción</th>
           <th>Tipo</th>
-          <th>Total</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let medicamento of medicamentosFiltrados" 
-            [class.selected]="medicamentoSeleccionado?.codigo === medicamento.codigo"
-            (click)="seleccionarMedicamento(medicamento)">
-          <td>{{ medicamento.codigo }}</td>
-          <td>{{ medicamento.nombre }}</td>
+        <tr *ngFor="let producto of productosFiltrados" 
+            [class.selected]="productoSeleccionado?.codigo === producto.codigo"
+            (click)="seleccionarProducto(producto)">
+          <td>{{ producto.codigo }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.descripcion || '-' }}</td>
           <td>
-            <span class="badge" [class.oral]="medicamento.tipo === 'Oral'" 
-                  [class.inyectable]="medicamento.tipo === 'Inyectable'">
-              {{ medicamento.tipo }}
+            <span class="badge" [class.medicamento]="producto.tipo === 'Medicamento'" 
+                  [class.procedimiento]="producto.tipo === 'Procedimiento'">
+              {{ producto.tipo }}
             </span>
           </td>
-          <td>{{ medicamento.total }}</td>
           <td>
-            <button class="action-btn delete" (click)="eliminarMedicamento($event, medicamento)">
+            <button class="action-btn delete" (click)="solicitarConfirmacionEliminar($event, producto)">
               <i class="fas fa-trash"></i> Eliminar
             </button>
           </td>
@@ -47,40 +55,40 @@
       </tbody>
     </table>
 
-    <div *ngIf="medicamentosFiltrados.length === 0" class="empty-state">
-      <img src="assets/images/no-medicines.png" alt="No hay medicamentos" class="empty-image">
-      <h3>No se encontraron medicamentos</h3>
-      <p>No hay medicamentos que coincidan con los criterios de búsqueda</p>
+    <div *ngIf="productosFiltrados.length === 0" class="empty-state">
+      <img src="assets/images/no-medicines.png" alt="No hay productos" class="empty-image">
+      <h3>No se encontraron productos</h3>
+      <p>No hay productos que coincidan con los criterios de búsqueda</p>
     </div>
   </div>
 
-  <div class="details-container" *ngIf="medicamentoSeleccionado">
+  <div class="details-container" *ngIf="productoSeleccionado">
     <div class="details-card">
       <div class="details-header">
-        <h3>Información del Medicamento</h3>
-        <button class="close-btn" (click)="medicamentoSeleccionado = null">
+        <h3>Información del Producto</h3>
+        <button class="close-btn" (click)="productoSeleccionado = null">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="details-body">
         <div class="detail-item">
           <label>Código:</label>
-          <span>{{ medicamentoSeleccionado.codigo }}</span>
+          <span>{{ productoSeleccionado.codigo }}</span>
         </div>
         <div class="detail-item">
           <label>Nombre:</label>
-          <span>{{ medicamentoSeleccionado.nombre }}</span>
+          <span>{{ productoSeleccionado.nombre }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Descripción:</label>
+          <span>{{ productoSeleccionado.descripcion || 'Sin descripción' }}</span>
         </div>
         <div class="detail-item">
           <label>Tipo:</label>
-          <span class="badge" [class.oral]="medicamentoSeleccionado.tipo === 'Oral'" 
-                [class.inyectable]="medicamentoSeleccionado.tipo === 'Inyectable'">
-            {{ medicamentoSeleccionado.tipo }}
+          <span class="badge" [class.medicamento]="productoSeleccionado.tipo === 'Medicamento'" 
+                [class.procedimiento]="productoSeleccionado.tipo === 'Procedimiento'">
+            {{ productoSeleccionado.tipo }}
           </span>
-        </div>
-        <div class="detail-item">
-          <label>Total:</label>
-          <span>{{ medicamentoSeleccionado.total }}</span>
         </div>
       </div>
     </div>
@@ -88,33 +96,33 @@
 
   <div class="form-container" *ngIf="mostrarFormulario">
     <div class="form-header">
-      <h3>Agregar Nuevo Medicamento</h3>
+      <h3>Agregar Nuevo Producto</h3>
       <button class="close-btn" (click)="toggleFormulario()">
         <i class="fas fa-times"></i>
       </button>
     </div>
     
-    <form (ngSubmit)="agregarMedicamento()" class="form-content">
+    <form (ngSubmit)="agregarProducto()" class="form-content">
       <div class="form-grid">
         <div class="form-group">
           <label for="codigo">Código:</label>
-          <input type="text" id="codigo" [(ngModel)]="nuevoMedicamento.codigo" name="codigo" required>
+          <input type="text" id="codigo" [(ngModel)]="nuevoProducto.codigo" name="codigo" required>
         </div>
         <div class="form-group">
-          <label for="nombre">Nombre:</label>
-          <input type="text" id="nombre" [(ngModel)]="nuevoMedicamento.nombre" name="nombre" required>
+          <label for="nombre">Nombre con presentación:</label>
+          <input type="text" id="nombre" [(ngModel)]="nuevoProducto.nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción (opcional):</label>
+          <textarea id="descripcion" [(ngModel)]="nuevoProducto.descripcion" name="descripcion" rows="2"></textarea>
         </div>
         <div class="form-group">
           <label for="tipo">Tipo:</label>
-          <select id="tipo" [(ngModel)]="nuevoMedicamento.tipo" name="tipo" required>
+          <select id="tipo" [(ngModel)]="nuevoProducto.tipo" name="tipo" required>
             <option value="" disabled selected>Seleccione tipo</option>
-            <option value="Oral">Oral</option>
-            <option value="Inyectable">Inyectable</option>
+            <option value="Medicamento">Medicamento</option>
+            <option value="Procedimiento">Procedimiento</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="total">Total:</label>
-          <input type="number" id="total" [(ngModel)]="nuevoMedicamento.total" name="total" required>
         </div>
       </div>
 
@@ -123,13 +131,38 @@
           <i class="fas fa-times"></i> Cancelar
         </button>
         <button type="submit" class="save-btn" [disabled]="!camposLlenos()">
-          <i class="fas fa-save"></i> Guardar Medicamento
+          <i class="fas fa-save"></i> Guardar Producto
         </button>
       </div>
 
       <div *ngIf="mostrarError" class="error-message">
-        <i class="fas fa-exclamation-circle"></i> El medicamento ya existe.
+        <i class="fas fa-exclamation-circle"></i> {{ mensajeError }}
       </div>
     </form>
   </div>
+</div>
+<!-- Diálogo de confirmación -->
+<div class="dialog-overlay" *ngIf="confirmacionEliminar.mostrar">
+  <div class="dialog-container">
+    <div class="dialog-header">
+      <h3>Confirmar eliminación</h3>
+    </div>
+    <div class="dialog-body">
+      <p>{{ confirmacionEliminar.mensaje }}</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" (click)="confirmarEliminacion(false)">
+        Cancelar
+      </button>
+      <button class="dialog-btn confirm" (click)="confirmarEliminacion(true)">
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Notificación de éxito -->
+<div class="notification success" *ngIf="mostrarExito">
+  <i class="fas fa-check-circle"></i>
+  <span>{{ mensajeExito }}</span>
 </div>
