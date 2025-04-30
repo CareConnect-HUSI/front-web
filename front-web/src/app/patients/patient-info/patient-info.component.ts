@@ -45,7 +45,8 @@ export class PatientInfoComponent implements OnInit {
           celular: data.telefono,
           nombreFamiliar: data.nombre_acudiente,
           celularFamiliar: data.telefono_acudiente,
-          parentesco: data.parentezco_acudiente
+          segundoCelularFamiliar: data.segundo_telefono_acudiente,
+          estado: data.estado
         };
   
         if (data.actividades) {
@@ -84,9 +85,5 @@ export class PatientInfoComponent implements OnInit {
   saveChanges() {
     alert('Datos guardados correctamente');
     this.closeEditModal();
-  }
-
-  viewTreatment() {
-    alert('Funcionalidad para ver el tratamiento');
   }
 }

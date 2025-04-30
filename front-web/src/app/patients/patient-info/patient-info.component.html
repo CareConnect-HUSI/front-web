@@ -62,8 +62,14 @@
             <span>{{ paciente.celularFamiliar }}</span>
           </div>
           <div class="info-item">
-            <label>Parentesco:</label>
-            <span>{{ paciente.parentesco }}</span>
+            <label>Segundo Celular Familiar:</label>
+            <span>{{ paciente.segundoCelular }}</span>
+          </div>
+          <div class="info-item">
+            <label>Estado:</label>
+            <span [class.active]="paciente.estado === 'Activo'" [class.inactive]="paciente.estado === 'Inactivo'">
+              {{ paciente.estado }}
+            </span>
           </div>
         </div>
       </div>
@@ -76,7 +82,7 @@
             <button class="action-btn" routerLink="/stock">
               <i class="fas fa-pen"></i> Modificar
             </button>
-            <button class="action-btn" (click)="viewTreatment()">
+            <button class="action-btn" routerLink="/stock">
               <i class="fas fa-eye"></i> Ver
             </button>
           </div>

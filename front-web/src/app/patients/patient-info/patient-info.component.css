@@ -104,6 +104,16 @@
   min-height: 38px;
 }
 
+.info-item span.active {
+  color: #28a745; /* Verde para Activo */
+  font-weight: bold;
+}
+
+.info-item span.inactive {
+  color: #dc3545; /* Rojo para Inactivo */
+  font-weight: bold;
+}
+
 /* Tablas */
 .table-responsive {
   overflow-x: auto;

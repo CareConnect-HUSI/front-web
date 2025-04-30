@@ -9,10 +9,15 @@ import { PatientService } from 'src/app/service/patient.service';
 })
 export class PatientsListComponent implements OnInit {
   filtro: string = '';
-  pacientes: any[] = [];
   pacientesFiltrados: any[] = [];
   page: number = 0;
   size: number = 10;
+
+  pacientes = [
+    { id: '12345678910', nombre: 'Juan Pérez', direccion: 'Calle 123', estado: 'Activo' },
+    { id: '789012', nombre: 'María López', direccion: 'Carrera 45', estado: 'Inactivo' },
+    { id: '345678', nombre: 'Carlos Gómez', direccion: 'Avenida 10', estado: 'Activo' }
+  ];
 
   constructor(
     private router: Router,
@@ -49,7 +54,13 @@ export class PatientsListComponent implements OnInit {
     );
   }
 
+  toggleEstado(paciente: any): void {
+    const nuevoEstado = paciente.estado === 'Activo' ? 'Inactivo' : 'Activo';
+    paciente.estado = nuevoEstado; // Actualizar el estado localmente
+    console.log(`Estado del paciente ${paciente.id} cambiado a ${nuevoEstado}`);
+  }
+
   regresar() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/cronograma']);
   }
 }

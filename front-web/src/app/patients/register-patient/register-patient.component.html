@@ -69,8 +69,8 @@
           <input formControlName="celularFamiliar" type="text" placeholder="Ej: 3109876543" />
         </div>
         <div class="form-group">
-          <label>Parentesco</label>
-          <input formControlName="parentesco" type="text" placeholder="Ej: Padre" />
+          <label>Segundo Celular Familiar</label>
+          <input formControlName="segundoCelular" type="text" placeholder="Ej: 3124598734" />
         </div>
         <div class="form-group">
           <label>Correo</label>
@@ -91,7 +91,7 @@
 
     <!-- Sección Tratamiento -->
     <div class="form-section">
-      <h3 class="section-title">Tratamiento</h3>
+      <h3 class="section-title">Aplicación de Medicamentos</h3>
       <div class="table-responsive">
         <table class="form-table">
           <thead>
@@ -102,7 +102,7 @@
               <th>Días</th>
               <th>Fecha Inicio</th>
               <th>Fecha Fin</th>
-              <th>Hora</th>
+              <th>Hora de Administracion</th>
               <th>Duración</th>
               <th>Acciones</th>
             </tr>
@@ -122,7 +122,7 @@
                   <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
                 </select>
               </td>
-              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" [disabled]="true" /></td>
               <td><input type="date" formControlName="fechaInicio" /></td>
               <td><input type="date" formControlName="fechaFin" /></td>
               <td><input type="time" formControlName="horaInicio" /></td>
@@ -155,11 +155,8 @@
           <thead>
             <tr>
               <th>Procedimiento</th>
-              <th>Frecuencia</th>
-              <th>Días</th>
-              <th>Fecha Inicio</th>
-              <th>Fecha Fin</th>
-              <th>Hora</th>
+              <th>Fecha Tentativa</th>
+              <th>Hora Tentativa para Realizar Procedimiento</th>
               <th>Duración</th>
               <th>Acciones</th>
             </tr>
@@ -172,15 +169,7 @@
                   <option *ngFor="let p of listaProcedimientos" [value]="p.codigo">{{ p.descripcion }}</option>
                 </select>
               </td>
-              <td>
-                <select formControlName="frecuencia">
-                  <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
-                </select>
-              </td>
-              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
               <td><input type="date" formControlName="fechaInicio" /></td>
-              <td><input type="date" formControlName="fechaFin" /></td>
               <td><input type="time" formControlName="horaInicio" /></td>
               <td>
                 <select formControlName="duracion">

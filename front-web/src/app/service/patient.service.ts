@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = 'http://localhost:8081/pacientes';
+  private apiUrl = 'http://localhost:4200/stock';
 
   constructor(private http: HttpClient) { }
 
@@ -42,7 +42,12 @@ export class PatientService {
     console.log('ID del paciente:', id);
     return this.http.get(`${this.apiUrl}/${id}`);
   }
+
+  updateEstado(id: string, estado: string): Observable<any> {
+    return this.http.put(`/api/pacientes/${id}/estado`, { estado });
+  }
 }
+
 
 
 /*

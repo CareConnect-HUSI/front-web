@@ -40,9 +40,9 @@ export class RegisterPatientComponent implements OnInit {
   ];
 
   listaMedicamentos: Medicamento[] = [
-    { codigo: '1', nombre: 'Paracetamol', tipo: 'Oral', total: 100 },
-    { codigo: '2', nombre: 'Ibuprofeno', tipo: 'Oral', total: 50 },
-    { codigo: '3', nombre: 'Amoxicilina', tipo: 'Inyectable', total: 30 },
+    { codigo: '1', nombre: 'Paracetamol 500 mg', tipo: 'Oral', total: 100 },
+    { codigo: '2', nombre: 'Ibuprofeno 120 mg', tipo: 'Oral', total: 50 },
+    { codigo: '3', nombre: 'Amoxicilina 100 ml', tipo: 'Inyectable', total: 30 },
   ];
   // Datos DIVIPOLA para Bogotá
   localidades: Localidad[] = [
@@ -100,7 +100,7 @@ export class RegisterPatientComponent implements OnInit {
         barrio: ['', Validators.required],
         conjunto: [''],
         nombreFamiliar: ['', Validators.required],
-        parentesco: ['', Validators.required],
+        segundoCelular: ['', Validators.required],
         celularFamiliar: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
         email: ['', [Validators.required, Validators.email]],
         foto: [null]
@@ -177,23 +177,40 @@ export class RegisterPatientComponent implements OnInit {
       medicamento: ['', Validators.required],
       dosis: ['', Validators.required],
       frecuencia: ['', Validators.required],
-      diasTratamiento: ['', Validators.required],
+      diasTratamiento: [{value: '', disabled: true}],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
       horaInicio: ['', Validators.required],
       duracion: ['', Validators.required]
     });
 
+    medicamentoForm.get('fechaInicio')?.valueChanges.subscribe(() => this.calcularDiasTratamiento(medicamentoForm));
+    medicamentoForm.get('fechaFin')?.valueChanges.subscribe(() => this.calcularDiasTratamiento(medicamentoForm));
     this.tratamiento.push(medicamentoForm);
+  }
+
+  calcularDiasTratamiento(medicamentoForm: FormGroup) {
+    const fechaInicio = medicamentoForm.get('fechaInicio')?.value;
+    const fechaFin = medicamentoForm.get('fechaFin')?.value;
+  
+    if (fechaInicio && fechaFin) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+  
+      if (inicio <= fin) {
+        const dias = Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24));
+        medicamentoForm.get('diasTratamiento')?.setValue(dias);
+      } else {
+        alert('La fecha de inicio no puede ser posterior a la fecha de fin.')
+        medicamentoForm.get('diasTratamiento')?.setValue(0); // Manejo de error si las fechas son inválidas
+      }
+    }
   }
 
   agregarProcedimiento() {
     const procedimientoForm = this.fb.group({
       procedimiento: ['', Validators.required],
-      frecuencia: ['', Validators.required],
-      diasTratamiento: ['', Validators.required],
       fechaInicio: ['', Validators.required],
-      fechaFin: ['', Validators.required],
       horaInicio: ['', Validators.required],
       duracion: ['', Validators.required]
     });

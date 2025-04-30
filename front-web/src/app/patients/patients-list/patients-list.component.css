@@ -102,6 +102,25 @@
 .pacientes-table th:nth-child(4), 
 .pacientes-table td:nth-child(4) { width: 15%; } /* Acciones */
 
+.status-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  background-color: #6c757d; /* Inactivo */
+  transition: background-color 0.3s ease;
+}
+
+.status-btn.active {
+  background-color: #28a745; /* Activo */
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+}
+
 /* Estilo para el botón Ver */
 .details-btn {
   background: #e6f0ff;
