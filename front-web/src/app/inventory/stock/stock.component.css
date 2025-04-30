@@ -310,6 +310,13 @@
 	border-left: 4px solid #ffc107;
   }
   
+  .administered {
+	background-color: #d4edda; /* Verde claro */
+	color: #155724; /* Verde oscuro */
+	font-weight: bold;
+	text-align: center;
+  }
+
   @media (max-width: 768px) {
 	.form-columns {
 	  flex-direction: column;

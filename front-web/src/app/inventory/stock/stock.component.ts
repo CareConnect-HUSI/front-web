@@ -10,6 +10,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class StockComponent  {
   documentoPaciente: string | null = '';
   nombrePaciente: string = '';
+  isEditing: boolean = false;
+  listaMedicamentos = [
+    { nombre: 'Paracetamol' },
+    { nombre: 'Ibuprofeno' },
+    { nombre: 'Amoxicilina' },
+    { nombre: 'Metformina' },
+    { nombre: 'Omeprazol' }
+  ];
   // Inventario con datos quemados
   inventario: any[] = [
     {
@@ -96,17 +104,30 @@ export class StockComponent  {
   }
 
   // Abrir modal de edición
-  openEditModal(med: any, index: number) {
-    this.currentMedication = {...med};
-    this.currentIndex = index;
-    this.extensionDays = 0;
+  openEditModal(med: any = null, index: number = -1): void {
+    if (med) {
+      this.isEditing = true;
+      this.currentMedication = { ...med };
+      this.currentIndex = index;
+    } else {
+      this.isEditing = false;
+      this.currentMedication = {
+        nombre: '',
+        dosis: '',
+        frecuencia: '',
+        cantidad: 1,
+        fechaInicio: '',
+        fechaFin: '',
+        diasTratamiento: 0
+      };
+    }
     this.showEditModal = true;
   }
- 
-
-  closeEditModal() {
+  
+  closeEditModal(): void {
     this.showEditModal = false;
   }
+
   updateMedication() {
     if (this.extensionDays > 0) {
       this.currentMedication.diasTratamiento += this.extensionDays;
@@ -117,6 +138,60 @@ export class StockComponent  {
     
     this.inventario[this.currentIndex] = {...this.currentMedication};
     this.closeEditModal();
+  }
+
+  updateTotal(item: any): void {
+    if (item.cantidad < 1) {
+      alert('La cantidad debe ser al menos 1.');
+      item.cantidad = 1; // Restablecer al mínimo permitido
+    }
+    console.log(`Cantidad actualizada para el medicamento ${item.nombre}: ${item.cantidad}`);
+  }
+
+  saveMedication(): void {
+    if (this.isEditing) {
+      // Actualizar el medicamento existente
+      this.inventario[this.currentIndex] = { ...this.currentMedication };
+      console.log('Medicamento actualizado:', this.currentMedication);
+    } else {
+      // Agregar un nuevo medicamento
+      this.inventario.push({ ...this.currentMedication });
+      console.log('Nuevo medicamento agregado:', this.currentMedication);
+    }
+    this.closeEditModal();
+  }
+
+  calculateDays(medication: any): void {
+    const fechaInicio = new Date(medication.fechaInicio);
+    const fechaFin = new Date(medication.fechaFin);
+  
+    if (fechaInicio && fechaFin && fechaInicio <= fechaFin) {
+      const dias = Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
+      medication.diasTratamiento = dias;
+  
+      // Limpiar el calendario antes de marcar los días
+      medication.calendario = Array(7).fill({ M: false, T: false, N: false });
+  
+      // Obtener la cantidad de dosis por día según la frecuencia
+      const dosisPorDia = this.getDosesPerDay(medication.frecuencia);
+  
+      // Marcar los días en el cronograma
+      for (let i = 0; i < dias && i < 7; i++) {
+        const daySchedule = { M: false, T: false, N: false };
+  
+        if (dosisPorDia >= 1) daySchedule.M = true; // Mañana
+        if (dosisPorDia >= 2) daySchedule.T = true; // Tarde
+        if (dosisPorDia >= 3) daySchedule.N = true; // Noche
+  
+        medication.calendario[i] = daySchedule;
+      }
+  
+      console.log(`Días calculados para el medicamento ${medication.nombre}: ${dias}`);
+      console.log(`Calendario generado:`, medication.calendario);
+    } else {
+      alert('La fecha de fin debe ser posterior a la fecha de inicio.');
+      medication.fechaFin = null; // Restablecer si las fechas son inválidas
+    }
   }
 
   calculateAdditionalDoses(med: any): number {
