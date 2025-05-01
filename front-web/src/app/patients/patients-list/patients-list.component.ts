@@ -40,6 +40,12 @@ export class PatientsListComponent implements OnInit {
     );
   }
 
+  toggleEstado(paciente: any): void {
+    const nuevoEstado = paciente.estado === 'Activo' ? 'Inactivo' : 'Activo';
+    paciente.estado = nuevoEstado;
+    console.log(`Estado del paciente ${paciente.id} cambiado a ${nuevoEstado}`);
+  }
+
   filtrarPacientes() {
     if (!this.filtro) {
       this.pacientesFiltrados = [...this.pacientes];
@@ -54,6 +60,6 @@ export class PatientsListComponent implements OnInit {
   }
 
   regresar() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/cronograma']);
   }
 }

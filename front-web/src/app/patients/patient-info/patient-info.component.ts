@@ -45,7 +45,9 @@ export class PatientInfoComponent implements OnInit {
           celular: data.telefono,
           nombreFamiliar: data.nombreAcudiente,
           celularFamiliar: data.telefonoAcudiente,
-          parentesco: data.parentezcoAcudiente
+          parentesco: data.parentezcoAcudiente,
+          segundoCelularFamiliar: data.segundo_telefono_acudiente,
+          estado: data.estado
         };
 
         if (data.actividades) {

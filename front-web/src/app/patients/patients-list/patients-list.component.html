@@ -26,6 +26,7 @@
           <th>Identificación</th>
           <th>Paciente</th>
           <th>Dirección</th>
+          <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -34,6 +35,14 @@
           <td>{{ paciente.id }}</td>
           <td>{{ paciente.nombre }}</td>
           <td>{{ paciente.direccion }}</td>
+          <td>
+            <button
+            class="status-btn" 
+            [class.active]="paciente.estado === 'Activo'" 
+            (click)="toggleEstado(paciente)">
+            {{ paciente.estado }}
+          </button>
+          </td>
           <td>
             <a routerLink="/pacientes/{{ paciente.id }}" class="details-btn">
               <i class="fas fa-eye"></i> Ver

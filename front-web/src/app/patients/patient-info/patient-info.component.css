@@ -349,3 +349,13 @@
     width: 100%;
   }
 }
+
+.info-item span.active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.info-item span.inactive {
+  color: #dc3545;
+  font-weight: bold;
+}
