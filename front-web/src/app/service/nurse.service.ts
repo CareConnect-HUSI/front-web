@@ -11,17 +11,19 @@ export class NurseService {
   constructor(private http: HttpClient) {}
 
   findAll(page: number, limit: number): Observable<any> {
-    const token = localStorage.getItem('token');
+    // const token = localStorage.getItem('token');
 
-    if (!token) {
-      console.error('No hay token disponible.');
-      return new Observable();
-    }
+    // if (!token) {
+    //   console.error('No hay token disponible.');
+    //   return new Observable();
+    // }
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
+    // const headers = new HttpHeaders({
+    //   'Authorization': `Bearer ${token}`,
+    //   'Content-Type': 'application/json'
+    // });
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, { headers });
   }
