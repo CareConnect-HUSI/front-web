@@ -1,10 +1,15 @@
 import { Component } from '@angular/core';
 
-interface Medicamento {
+interface Producto {
   codigo: string;
   nombre: string;
-  tipo: string; // Oral o Inyectable
-  total: number;
+  descripcion?: string;
+  tipo: string; // 'Medicamento' o 'Procedimiento'
+}
+interface Confirmacion {
+  mostrar: boolean;
+  mensaje: string;
+  producto?: Producto;
 }
 
 @Component({
@@ -12,98 +17,171 @@ interface Medicamento {
   templateUrl: './inventario-total.component.html',
   styleUrls: ['./inventario-total.component.css']
 })
+
 export class InventarioTotalComponent {
-  medicamentos: Medicamento[] = [
-    { codigo: 'M001', nombre: 'Paracetamol', tipo: 'Oral', total: 100 },
-    { codigo: 'M002', nombre: 'Amoxicilina', tipo: 'Inyectable', total: 50 }
+
+
+    confirmacionEliminar: Confirmacion = {
+      mostrar: false,
+      mensaje: '',
+      producto: undefined
+    };
+    
+    mostrarExito: boolean = false;
+    mensajeExito: string = '';
+
+  // Datos quemados
+  medicamentos: Producto[] = [
+    { codigo: 'M001', nombre: 'Paracetamol 500mg Tabletas', descripcion: 'Analgésico y antipirético', tipo: 'Medicamento' },
+    { codigo: 'M002', nombre: 'Amoxicilina 250mg/5ml Suspensión', tipo: 'Medicamento' }
   ];
 
-  // Lista filtrada de medicamentos
-  medicamentosFiltrados: Medicamento[] = [...this.medicamentos];
+  procedimientos: Producto[] = [
+    { codigo: 'P001', nombre: 'Radiografía de tórax', descripcion: 'PA y lateral', tipo: 'Procedimiento' },
+    { codigo: 'P002', nombre: 'Electrocardiograma', tipo: 'Procedimiento' }
+  ];
 
-  // Nuevo medicamento
-  nuevoMedicamento: Medicamento = {
+  // Lista actual según tab activa
+  productosActuales: Producto[] = [...this.medicamentos];
+  productosFiltrados: Producto[] = [...this.medicamentos];
+
+  // Nuevo producto
+  nuevoProducto: Producto = {
     codigo: '',
     nombre: '',
-    tipo: 'Oral',
-    total: 0
+    tipo: 'Medicamento'
   };
 
   // Filtro de búsqueda
   filtro: string = '';
 
-  // Medicamento seleccionado
-  medicamentoSeleccionado: Medicamento | null = null;
+  // Producto seleccionado
+  productoSeleccionado: Producto | null = null;
 
   // Control de errores
   mostrarError: boolean = false;
   mensajeError: string = '';
 
-  // Mostrar formulario de agregar medicamento
+  // Mostrar formulario
   mostrarFormulario: boolean = false;
 
-  // Método para filtrar medicamentos
-  filtrarMedicamentos() {
+  // Tab activa
+  tabActiva: string = 'medicamentos';
+
+  // Método para cambiar entre tabs
+  cambiarTab(tab: string) {
+    this.tabActiva = tab;
+    this.productosActuales = tab === 'medicamentos' ? [...this.medicamentos] : [...this.procedimientos];
+    this.filtrarProductos();
+    this.productoSeleccionado = null;
+  }
+
+  // Método para filtrar productos
+  filtrarProductos() {
     const filtroLower = this.filtro.toLowerCase();
-    this.medicamentosFiltrados = this.medicamentos.filter(medicamento =>
-      medicamento.codigo.toLowerCase().includes(filtroLower) ||
-      medicamento.nombre.toLowerCase().includes(filtroLower) ||
-      medicamento.tipo.toLowerCase().includes(filtroLower)
+    this.productosFiltrados = this.productosActuales.filter(producto =>
+      producto.codigo.toLowerCase().includes(filtroLower) ||
+      producto.nombre.toLowerCase().includes(filtroLower) ||
+      (producto.descripcion && producto.descripcion.toLowerCase().includes(filtroLower)) ||
+      producto.tipo.toLowerCase().includes(filtroLower)
     );
   }
 
-  // Método para seleccionar un medicamento
-  seleccionarMedicamento(medicamento: Medicamento) {
-    this.medicamentoSeleccionado = medicamento;
+  // Método para seleccionar un producto
+  seleccionarProducto(producto: Producto) {
+    this.productoSeleccionado = producto;
   }
 
-  // Método para alternar el formulario de agregar medicamento
+  // Método para alternar el formulario
   toggleFormulario() {
     this.mostrarFormulario = !this.mostrarFormulario;
     this.mostrarError = false;
     this.mensajeError = '';
     if (!this.mostrarFormulario) {
-      this.nuevoMedicamento = { codigo: '', nombre: '', tipo: 'Oral', total: 0 };
+      this.nuevoProducto = { codigo: '', nombre: '', tipo: 'Medicamento' };
     }
   }
 
   camposLlenos(): boolean {
-    return this.nuevoMedicamento.codigo.trim() !== '' &&
-           this.nuevoMedicamento.nombre.trim() !== '' &&
-           this.nuevoMedicamento.tipo.trim() !== '' &&
-           this.nuevoMedicamento.total > 0;
+    return this.nuevoProducto.codigo.trim() !== '' &&
+           this.nuevoProducto.nombre.trim() !== '' &&
+           this.nuevoProducto.tipo.trim() !== '';
   }
-  // Método para agregar un nuevo medicamento con validación
-  agregarMedicamento() {
+
+  // Método para agregar un nuevo producto
+  agregarProducto() {
     if (!this.camposLlenos()) {
       this.mostrarError = true;
-      this.mensajeError  = 'Por favor llenar todos los campos';
+      this.mensajeError = 'Por favor complete todos los campos obligatorios';
       return;
     }
 
-    const existe = this.medicamentos.some(medicamento =>
-      medicamento.codigo === this.nuevoMedicamento.codigo
+    // Verificar si el código ya existe en medicamentos o procedimientos
+    const codigoExiste = [...this.medicamentos, ...this.procedimientos].some(
+      producto => producto.codigo === this.nuevoProducto.codigo
     );
 
-    if (existe) {
+    if (codigoExiste) {
       this.mostrarError = true;
-      this.mensajeError = 'El código del medicamento ya existe';
+      this.mensajeError = 'El código del producto ya existe';
       return;
     }
 
-    this.medicamentos.push({ ...this.nuevoMedicamento });
-    this.filtrarMedicamentos(); // Actualizar lista filtrada
-    this.toggleFormulario(); // Cerrar formulario después de agregar
+    // Agregar al array correspondiente según el tipo
+    if (this.nuevoProducto.tipo === 'Medicamento') {
+      this.medicamentos.push({ ...this.nuevoProducto });
+    } else {
+      this.procedimientos.push({ ...this.nuevoProducto });
+    }
+
+    // Actualizar la vista
+    this.filtrarProductos();
+    this.toggleFormulario();
   }
 
-  // Método para eliminar un medicamento
-  eliminarMedicamento(event: Event, medicamento: Medicamento) {
-    event.stopPropagation(); // Evita que se active la selección de la fila
+  // Método para eliminar un producto
+  solicitarConfirmacionEliminar(event: Event, producto: Producto) {
+    event.stopPropagation();
+    this.confirmacionEliminar = {
+      mostrar: true,
+      mensaje: `¿Estás seguro que deseas eliminar el ${producto.tipo.toLowerCase()} ${producto.nombre}?`,
+      producto: producto
+    };
+  }
 
-    this.medicamentos = this.medicamentos.filter(m => m !== medicamento);
-    this.filtrarMedicamentos(); // Actualizar lista filtrada
-    if (this.medicamentoSeleccionado === medicamento) {
-      this.medicamentoSeleccionado = null; // Deseleccionar si se elimina el medicamento seleccionado
+  confirmarEliminacion(confirmar: boolean) {
+    if (confirmar && this.confirmacionEliminar.producto) {
+      const producto = this.confirmacionEliminar.producto;
+      
+      if (producto.tipo === 'Medicamento') {
+        this.medicamentos = this.medicamentos.filter(m => m.codigo !== producto.codigo);
+      } else {
+        this.procedimientos = this.procedimientos.filter(p => p.codigo !== producto.codigo);
+      }
+
+      // Actualizar lista
+      this.filtrarProductos();
+      
+      // Deseleccionar si es el producto seleccionado
+      if (this.productoSeleccionado?.codigo === producto.codigo) {
+        this.productoSeleccionado = null;
+      }
+
+      // Mostrar mensaje de éxito
+      this.mostrarMensajeExito(`${producto.tipo} eliminado correctamente`);
     }
+    
+    // Cerrar diálogo de confirmación
+    this.confirmacionEliminar.mostrar = false;
+  }
+
+  mostrarMensajeExito(mensaje: string) {
+    this.mensajeExito = mensaje;
+    this.mostrarExito = true;
+    
+    // Ocultar después de 3 segundos
+    setTimeout(() => {
+      this.mostrarExito = false;
+    }, 3000);
   }
 }
