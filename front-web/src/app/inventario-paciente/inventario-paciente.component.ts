@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
   selector: 'app-inventario-paciente',
@@ -7,23 +8,47 @@ import { Router } from '@angular/router';
   styleUrls: ['./inventario-paciente.component.css']
 })
 export class InventarioComponent implements OnInit{
-
-  filtroBusqueda: string = '';
+  filtro: string = '';
+  pacientes: any[] = [];
   pacientesFiltrados: any[] = [];
+  page: number = 0;
+  size: number = 10;
+  isLoading: boolean = false; // Nueva variable para el estado de carga
+  filtroBusqueda: string = '';
 
-  pacientes = [
-    { documento: '12345678910', nombre: 'Juan Pablo Rodríguez' },
-    { documento: '98765432110', nombre: 'María Fernanda López' },
-    { documento: '65432198745', nombre: 'Carlos Ramírez' },
-    { documento: '45612378965', nombre: 'Ana Sofía Méndez' }
-  ];
+  // pacientes = [
+  //   { documento: '12345678910', nombre: 'Juan Pablo Rodríguez' },
+  //   { documento: '98765432110', nombre: 'María Fernanda López' },
+  //   { documento: '65432198745', nombre: 'Carlos Ramírez' },
+  //   { documento: '1111111', nombre: 'Ana Sofía Méndez' }
+  // ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private patientService: PatientService
+  ) {}
 
   ngOnInit(): void {
-    this.pacientesFiltrados = [...this.pacientes];
+    this.loadPacientes();
   }
 
+
+
+  loadPacientes() {
+    this.isLoading = true; // Activar el loading
+    this.patientService.findAll(this.page, this.size).subscribe(
+      (data: any) => {
+        console.log('Pacientes cargados:', data);
+        this.pacientes = data.content;
+        this.pacientesFiltrados = [...this.pacientes];
+        this.isLoading = false; // Desactivar el loading
+      },
+      error => {
+        console.error('Error al cargar pacientes:', error);
+        this.isLoading = false; // Desactivar el loading en caso de error
+      }
+    );
+  }
   filtrarPacientes(): void {
     if (!this.filtroBusqueda) {
       this.pacientesFiltrados = [...this.pacientes];
@@ -40,5 +65,10 @@ export class InventarioComponent implements OnInit{
 
   verInventario(paciente: any) {
     this.router.navigate(['/inventario-paciente', paciente.documento]);
+  }
+
+  limpiarBusqueda() {
+    this.filtroBusqueda = '';
+    this.pacientesFiltrados = [...this.pacientes];
   }
 }
