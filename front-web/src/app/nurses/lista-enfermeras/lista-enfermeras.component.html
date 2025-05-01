@@ -1,4 +1,12 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando enfermeras...</span>
+    </div>
+  </div>
+
   <div class="header">
     <h1 class="title-center">Lista de Enfermeras</h1>
     <div class="search-filter-container">
@@ -48,7 +56,7 @@
   </div>
 
   <ng-template #noEnfermeras>
-    <div class="empty-state">
+    <div *ngIf="!isLoading" class="empty-state">
       <img src="assets/images/enfermera.png" alt="No hay enfermeras" class="empty-image">
       <h3>No hay enfermeras disponibles</h3>
       <p>No se encontraron enfermeras que coincidan con los criterios de búsqueda</p>

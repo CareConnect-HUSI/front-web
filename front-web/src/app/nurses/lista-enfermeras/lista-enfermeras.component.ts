@@ -23,6 +23,7 @@ export class ListaEnfermerasComponent implements OnInit {
 
   enfermeras: any[] = [];
   enfermerasFiltradas: any[] = [];
+  isLoading: boolean = false; // Nueva variable para el estado de carga
 
   constructor(
     private router: Router,
@@ -34,15 +35,18 @@ export class ListaEnfermerasComponent implements OnInit {
   }
 
   getEnfermeras(page: number, limit: number): void {
+    this.isLoading = true; // Activar el loading
     this.nurseService.findAll(page, limit).subscribe({
       next: (data) => {
         console.log('Enfermeras cargadas:', data);
         this.enfermeras = data.content;
         this.enfermerasFiltradas = [...this.enfermeras];
         this.length = data.totalElements;
+        this.isLoading = false; // Desactivar el loading
       },
       error: (error) => {
         console.error('Error cargando enfermeras:', error);
+        this.isLoading = false; // Desactivar el loading en caso de error
       }
     });
   }
@@ -112,7 +116,7 @@ export class ListaEnfermerasComponent implements OnInit {
       turnoEntity: { name: this.enfermeraEditando.turnoEntity.name },
       tipoIdentificacion: this.enfermeraEditando.tipoIdentificacion
     };
-  
+
     this.nurseService.updateEnfermera(this.enfermeraEditando.id, enfermeraActualizada).subscribe({
       next: (res) => {
         console.log('Enfermera actualizada con éxito:', res);
@@ -129,5 +133,4 @@ export class ListaEnfermerasComponent implements OnInit {
       }
     });
   }
-  
 }

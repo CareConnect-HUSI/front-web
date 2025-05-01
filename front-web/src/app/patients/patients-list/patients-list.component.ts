@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NurseService } from 'src/app/service/nurse.service';
 import { PatientService } from 'src/app/service/patient.service';
+
 @Component({
   selector: 'app-patients-list',
   templateUrl: './patients-list.component.html',
@@ -13,6 +13,7 @@ export class PatientsListComponent implements OnInit {
   pacientesFiltrados: any[] = [];
   page: number = 0;
   size: number = 10;
+  isLoading: boolean = false; // Nueva variable para el estado de carga
 
   constructor(
     private router: Router,
@@ -24,14 +25,17 @@ export class PatientsListComponent implements OnInit {
   }
 
   loadPacientes() {
-        this.patientService.findAll(this.page, this.size).subscribe(
+    this.isLoading = true; // Activar el loading
+    this.patientService.findAll(this.page, this.size).subscribe(
       (data: any) => {
         console.log('Pacientes cargados:', data);
         this.pacientes = data.content;
         this.pacientesFiltrados = [...this.pacientes];
+        this.isLoading = false; // Desactivar el loading
       },
       error => {
         console.error('Error al cargar pacientes:', error);
+        this.isLoading = false; // Desactivar el loading en caso de error
       }
     );
   }

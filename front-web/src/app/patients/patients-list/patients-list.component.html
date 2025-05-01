@@ -1,4 +1,12 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  </div>
+
   <div class="header">
     <h2 class="title-center">Lista de Pacientes</h2>
     <div class="search-filter-container">
@@ -35,7 +43,7 @@
       </tbody>
     </table>
 
-    <div *ngIf="pacientesFiltrados.length === 0" class="empty-state">
+    <div *ngIf="pacientesFiltrados.length === 0 && !isLoading" class="empty-state">
       <img src="assets/images/avatar.png" alt="No hay pacientes" class="empty-image">
       <h3>No se encontraron pacientes</h3>
       <p>No hay pacientes que coincidan con los criterios de búsqueda</p>
