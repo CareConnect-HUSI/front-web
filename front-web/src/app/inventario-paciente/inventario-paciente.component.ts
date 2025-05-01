@@ -16,13 +16,6 @@ export class InventarioComponent implements OnInit{
   isLoading: boolean = false; // Nueva variable para el estado de carga
   filtroBusqueda: string = '';
 
-  // pacientes = [
-  //   { documento: '12345678910', nombre: 'Juan Pablo Rodríguez' },
-  //   { documento: '98765432110', nombre: 'María Fernanda López' },
-  //   { documento: '65432198745', nombre: 'Carlos Ramírez' },
-  //   { documento: '1111111', nombre: 'Ana Sofía Méndez' }
-  // ];
-
   constructor(
     private router: Router,
     private patientService: PatientService
