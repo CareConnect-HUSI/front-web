@@ -143,10 +143,7 @@ export class RegistroEnfermerasComponent implements OnInit {
     const currentLocalidad = this.nurseForm.get('personalInfo.localidad')?.value;
     const currentBarrio = this.nurseForm.get('personalInfo.barrio')?.value;
     
-    if (currentAddress) {
-      // Aquí podrías implementar lógica para parsear la dirección si es necesario
-    }
-    
+
     if (currentLocalidad) {
       this.addressForm.get('localidad')?.setValue(currentLocalidad);
       this.onLocalidadChange();
