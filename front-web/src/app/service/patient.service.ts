@@ -4,39 +4,47 @@ import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PatientService {
   private apiUrl = 'http://localhost:8081/pacientes';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   findAll(page: number, limit: number): Observable<any> {
-      // const token = localStorage.getItem('token');
-  
-      // if (!token) {
-      //   console.error('No hay token disponible.');
-      //   return new Observable();
-      // }
-  
-      // const headers = new HttpHeaders({
-      //   'Authorization': `Bearer ${token}`,
-      //   'Content-Type': 'application/json'
-      // });
-      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  
-      return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, { headers });
-    }
+    // const token = localStorage.getItem('token');
+
+    // if (!token) {
+    //   console.error('No hay token disponible.');
+    //   return new Observable();
+    // }
+
+    // const headers = new HttpHeaders({
+    //   'Authorization': `Bearer ${token}`,
+    //   'Content-Type': 'application/json'
+    // });
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, {
+      headers,
+    });
+  }
   registrarPaciente(userData: any): Observable<any> {
     if (!userData || typeof userData !== 'object' || !userData.nombre) {
-      return new Observable(observer => {
-        observer.error({ error: { error: 'Datos inválidos: falta el campo nombre' } });
+      return new Observable((observer) => {
+        observer.error({
+          error: { error: 'Datos inválidos: falta el campo nombre' },
+        });
       });
     }
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
+    return this.http.post(
+      `${this.apiUrl}/registrar-paciente`,
+      JSON.stringify(userData),
+      { headers, responseType: 'text' }
+    );
   }
 
   obtenerPacientePorId(id: number): Observable<any> {
@@ -47,5 +55,9 @@ export class PatientService {
   updateEstado(id: string, estado: string): Observable<any> {
     return this.http.put(`/api/pacientes/${id}/estado`, { estado });
   }
-}
 
+  findActividadesPorDocumento(documento: string): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:8081/actividad-paciente-visita/por-documento/'+documento);
+  }
+  
+}
