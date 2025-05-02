@@ -2,12 +2,17 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { StockService } from 'src/app/service/stock.service';
 
+interface tipoActividad {
+  id: number;
+  name: string;
+}
 interface Producto {
-  codigo: string;
+  codigo?: string;
   nombre: string;
   descripcion?: string;
-  tipo: string;
+  tipo: tipoActividad;
 }
+
 interface Confirmacion {
   mostrar: boolean;
   mensaje: string;
@@ -25,7 +30,7 @@ export class InventarioTotalComponent {
   actividadesFiltrados: any[] = [];
   page: number = 0;
   size: number = 10;
-  isLoading: boolean = false; // Nueva variable para el estado de carga
+  isLoading: boolean = false;
   filtroBusqueda: string = '';
   medicamentos: Producto[] = [];
   procedimientos: Producto[] = [];
@@ -46,43 +51,43 @@ export class InventarioTotalComponent {
   }
 
   loadActividades() {
-    this.isLoading = true; // Activar el loading
+    this.isLoading = true;
     this.stockService.findAll().subscribe(
       (data: any) => {
         this.actividades = data;
         this.actividadesFiltrados = [...this.actividades];
-        this.dividirActividades(); // Procesar actividades después de cargarlas
-        this.isLoading = false; // Desactivar el loading
+        this.dividirActividades();
+        this.isLoading = false;
       },
       (error) => {
         console.error('Error al cargar actividades:', error);
-        this.isLoading = false; // Desactivar el loading en caso de error
+        this.isLoading = false;
       }
     );
   }
 
   dividirActividades() {
-    // Limpiar arreglos existentes
     this.medicamentos = [];
     this.procedimientos = [];
 
-    // Mapear actividades a formato Producto y dividirlas
     this.actividades.forEach((actividad) => {
       const producto: Producto = {
-        codigo: actividad.id.toString(), // Usar id como código
+        codigo: actividad.id.toString(),
         nombre: actividad.name,
         descripcion: actividad.descripcion || '',
-        tipo: actividad.tipoActividad.id === 2 ? 'Medicamento' : 'Procedimiento',
+        tipo: {
+          id: actividad.tipoActividad.id,
+          name: actividad.tipoActividad.name
+        }
       };
 
-      if (actividad.tipoActividad.id === 2) {
+      if (actividad.tipoActividad.id === 1) {
         this.medicamentos.push(producto);
-      } else if (actividad.tipoActividad.id === 1) {
+      } else if (actividad.tipoActividad.id === 2) {
         this.procedimientos.push(producto);
       }
     });
 
-    // Actualizar productos actuales y filtrados según la tab activa
     this.productosActuales =
       this.tabActiva === 'medicamentos'
         ? [...this.medicamentos]
@@ -90,31 +95,23 @@ export class InventarioTotalComponent {
     this.productosFiltrados = [...this.productosActuales];
   }
 
-  // Lista actual según tab activa
   productosActuales: Producto[] = [...this.medicamentos];
   productosFiltrados: Producto[] = [...this.medicamentos];
 
-  // Nuevo producto
   nuevoProducto: Producto = {
-    codigo: '',
     nombre: '',
-    tipo: 'Medicamento',
+    tipo: { id: 1, name: 'Medicamento' }
   };
 
-  // Producto seleccionado
   productoSeleccionado: Producto | null = null;
 
-  // Control de errores
   mostrarError: boolean = false;
   mensajeError: string = '';
 
-  // Mostrar formulario
   mostrarFormulario: boolean = false;
 
-  // Tab activa
   tabActiva: string = 'medicamentos';
 
-  // Método para cambiar entre tabs
   cambiarTab(tab: string) {
     this.tabActiva = tab;
     this.productosActuales =
@@ -125,43 +122,37 @@ export class InventarioTotalComponent {
     this.productoSeleccionado = null;
   }
 
-  // Método para filtrar productos
   filtrarProductos() {
     const filtroLower = this.filtro.toLowerCase();
     this.productosFiltrados = this.productosActuales.filter(
       (producto) =>
-        producto.codigo.toLowerCase().includes(filtroLower) ||
         producto.nombre.toLowerCase().includes(filtroLower) ||
         (producto.descripcion &&
           producto.descripcion.toLowerCase().includes(filtroLower)) ||
-        producto.tipo.toLowerCase().includes(filtroLower)
+        producto.tipo.name.toLowerCase().includes(filtroLower)
     );
   }
 
-  // Método para seleccionar un producto
   seleccionarProducto(producto: Producto) {
     this.productoSeleccionado = producto;
   }
 
-  // Método para alternar el formulario
   toggleFormulario() {
     this.mostrarFormulario = !this.mostrarFormulario;
     this.mostrarError = false;
     this.mensajeError = '';
     if (!this.mostrarFormulario) {
-      this.nuevoProducto = { codigo: '', nombre: '', tipo: 'Medicamento' };
+      this.nuevoProducto = { nombre: '', tipo: { id: 1, name: 'Medicamento' } };
     }
   }
 
   camposLlenos(): boolean {
     return (
-      this.nuevoProducto.codigo.trim() !== '' &&
       this.nuevoProducto.nombre.trim() !== '' &&
-      this.nuevoProducto.tipo.trim() !== ''
+      this.nuevoProducto.tipo.name.trim() !== ''
     );
   }
 
-  // Método para agregar un nuevo producto
   agregarProducto() {
     if (!this.camposLlenos()) {
       this.mostrarError = true;
@@ -169,35 +160,33 @@ export class InventarioTotalComponent {
       return;
     }
 
-    // Verificar si el código ya existe en medicamentos o procedimientos
-    const codigoExiste = [...this.medicamentos, ...this.procedimientos].some(
-      (producto) => producto.codigo === this.nuevoProducto.codigo
-    );
-
-    if (codigoExiste) {
-      this.mostrarError = true;
-      this.mensajeError = 'El código del producto ya existe';
-      return;
-    }
-
-    // Agregar al array correspondiente según el tipo
-    if (this.nuevoProducto.tipo === 'Medicamento') {
-      this.medicamentos.push({ ...this.nuevoProducto });
-    } else {
-      this.procedimientos.push({ ...this.nuevoProducto });
-    }
-
-    // Actualizar la vista
-    this.filtrarProductos();
-    this.toggleFormulario();
+    this.stockService.registrarActividad(this.nuevoProducto).subscribe({
+      next: (response) => {
+        console.log('Actividad registrada:', response);
+        this.loadActividades();
+        this.filtrarProductos();
+        this.toggleFormulario();
+        this.mostrarError = false;
+        this.nuevoProducto = {
+          nombre: '',
+          tipo: { id: 1, name: 'Medicamento' }
+        };
+        this.mostrarMensajeExito('Producto registrado correctamente');
+      },
+      error: (error) => {
+        this.mostrarError = true;
+        this.mensajeError =
+          error.error || 'Error al registrar la actividad';
+        console.error('Error en registrarActividad:', error);
+      },
+    });
   }
 
-  // Método para eliminar un producto
   solicitarConfirmacionEliminar(event: Event, producto: Producto) {
     event.stopPropagation();
     this.confirmacionEliminar = {
       mostrar: true,
-      mensaje: `¿Estás seguro que deseas eliminar el ${producto.tipo.toLowerCase()} ${
+      mensaje: `¿Estás seguro que deseas eliminar el ${producto.tipo.name.toLowerCase()} ${
         producto.nombre
       }?`,
       producto: producto,
@@ -205,40 +194,35 @@ export class InventarioTotalComponent {
   }
 
   confirmarEliminacion(confirmar: boolean) {
-    if (confirmar && this.confirmacionEliminar.producto) {
-      const producto = this.confirmacionEliminar.producto;
-
-      if (producto.tipo === 'Medicamento') {
-        this.medicamentos = this.medicamentos.filter(
-          (m) => m.codigo !== producto.codigo
-        );
-      } else {
-        this.procedimientos = this.procedimientos.filter(
-          (p) => p.codigo !== producto.codigo
-        );
-      }
-
-      // Actualizar lista
-      this.filtrarProductos();
-
-      // Deseleccionar si es el producto seleccionado
-      if (this.productoSeleccionado?.codigo === producto.codigo) {
-        this.productoSeleccionado = null;
-      }
-
-      // Mostrar mensaje de éxito
-      this.mostrarMensajeExito(`${producto.tipo} eliminado correctamente`);
-    }
-
-    // Cerrar diálogo de confirmación
-    this.confirmacionEliminar.mostrar = false;
+    // if (confirmar && this.confirmacionEliminar.producto) {
+    //   const producto = this.confirmacionEliminar.producto;
+    //   this.stockService.delete(Number(producto.codigo)).subscribe({
+    //     next: () => {
+    //       this.medicamentos = this.medicamentos.filter(
+    //         (m) => m.codigo !== producto.codigo
+    //       );
+    //       this.procedimientos = this.procedimientos.filter(
+    //         (p) => p.codigo !== producto.codigo
+    //       );
+    //       this.filtrarProductos();
+    //       if (this.productoSeleccionado?.codigo === producto.codigo) {
+    //         this.productoSeleccionado = null;
+    //       }
+    //       this.mostrarMensajeExito(`${producto.tipo.name} eliminado correctamente`);
+    //     },
+    //     error: (error: any) => {
+    //       console.error('Error al eliminar:', error);
+    //       this.mostrarError = true;
+    //       this.mensajeError = 'Error al eliminar el producto';
+    //     }
+    //   });
+    // }
+    // this.confirmacionEliminar.mostrar = false;
   }
 
   mostrarMensajeExito(mensaje: string) {
     this.mensajeExito = mensaje;
     this.mostrarExito = true;
-
-    // Ocultar después de 3 segundos
     setTimeout(() => {
       this.mostrarExito = false;
     }, 3000);
