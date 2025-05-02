@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
@@ -28,23 +29,26 @@ export class StockService {
 
   }
 
-  // registrarEnfermera(activityData: any): Observable<any> {
-  //   if (!activityData || typeof activityData !== 'object' || !activityData.nombre) {
-  //     return new Observable((observer) => {
-  //       observer.error({
-  //         error: { error: 'Datos inválidos: falta el campo nombre' },
-  //       });
-  //     });
-  //   }
 
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  //   return this.http.post(
-  //     `${this.apiUrl}/registrar-enfermera`,
-  //     JSON.stringify(userData),
-  //     { headers, responseType: 'text' }
-  //   );
-  // }
+  registrarActividad(producto: any): Observable<any> {
+    // Mapear el objeto Producto al formato esperado por el backend
+    const actividad = {
+      name: producto.nombre,
+      tipoActividad: { id: producto.tipo.id },
+      descripcion: producto.descripcion || '',
+      cantidad: 0, // Valor por defecto, ajusta según necesidades
+      usuarioRegistra: 'admin' // Ajusta según autenticación
+    };
+
+    return this.http.post(`${this.apiUrl}/registrar-actividad`, actividad)
+      .pipe(
+        catchError(error => {
+          console.error('Error al registrar actividad:', error);
+          return throwError(() => new Error(error.message || 'Error en el servidor'));
+        })
+      );
+  }
 
   // updateEnfermera(id: number, enfermeraData: any): Observable<any> {
   //   const token = localStorage.getItem('token');

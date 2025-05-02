@@ -41,9 +41,9 @@
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.descripcion || '-' }}</td>
           <td>
-            <span class="badge" [class.medicamento]="producto.tipo === 'Medicamento'" 
-                  [class.procedimiento]="producto.tipo === 'Procedimiento'">
-              {{ producto.tipo }}
+            <span class="badge" [class.medicamento]="producto.tipo.name === 'Medicamento'" 
+                  [class.procedimiento]="producto.tipo.name === 'Procedimiento'">
+              {{ producto.tipo.name }}
             </span>
           </td>
           <td>
@@ -84,9 +84,9 @@
         </div>
         <div class="detail-item">
           <label>Tipo:</label>
-          <span class="badge" [class.medicamento]="productoSeleccionado.tipo === 'Medicamento'" 
-                [class.procedimiento]="productoSeleccionado.tipo === 'Procedimiento'">
-            {{ productoSeleccionado.tipo }}
+          <span class="badge" [class.medicamento]="productoSeleccionado.tipo.name === 'Medicamento'" 
+                [class.procedimiento]="productoSeleccionado.tipo.name === 'Procedimiento'">
+            {{ productoSeleccionado.tipo.name }}
           </span>
         </div>
       </div>
@@ -104,10 +104,6 @@
     <form (ngSubmit)="agregarProducto()" class="form-content">
       <div class="form-grid">
         <div class="form-group">
-          <label for="codigo">Código:</label>
-          <input type="text" id="codigo" [(ngModel)]="nuevoProducto.codigo" name="codigo" required>
-        </div>
-        <div class="form-group">
           <label for="nombre">Nombre con presentación:</label>
           <input type="text" id="nombre" [(ngModel)]="nuevoProducto.nombre" name="nombre" required>
         </div>
@@ -118,9 +114,8 @@
         <div class="form-group">
           <label for="tipo">Tipo:</label>
           <select id="tipo" [(ngModel)]="nuevoProducto.tipo" name="tipo" required>
-            <option value="" disabled selected>Seleccione tipo</option>
-            <option value="Medicamento">Medicamento</option>
-            <option value="Procedimiento">Procedimiento</option>
+            <option [ngValue]="{ id: 1, name: 'Medicamento' }">Medicamento</option>
+            <option [ngValue]="{ id: 2, name: 'Procedimiento' }">Procedimiento</option>
           </select>
         </div>
       </div>
@@ -140,7 +135,7 @@
     </form>
   </div>
 </div>
-<!-- Diálogo de confirmación -->
+
 <div class="dialog-overlay" *ngIf="confirmacionEliminar.mostrar">
   <div class="dialog-container">
     <div class="dialog-header">
@@ -160,7 +155,6 @@
   </div>
 </div>
 
-<!-- Notificación de éxito -->
 <div class="notification success" *ngIf="mostrarExito">
   <i class="fas fa-check-circle"></i>
   <span>{{ mensajeExito }}</span>
