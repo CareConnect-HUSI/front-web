@@ -81,9 +81,9 @@ export class InventarioTotalComponent {
         }
       };
 
-      if (actividad.tipoActividad.id === 1) {
+      if (actividad.tipoActividad.id === 1 && actividad.estado == "Activo") {
         this.medicamentos.push(producto);
-      } else if (actividad.tipoActividad.id === 2) {
+      } else if (actividad.tipoActividad.id === 2 && actividad.estado == "Activo") {
         this.procedimientos.push(producto);
       }
     });
@@ -194,30 +194,21 @@ export class InventarioTotalComponent {
   }
 
   confirmarEliminacion(confirmar: boolean) {
-    // if (confirmar && this.confirmacionEliminar.producto) {
-    //   const producto = this.confirmacionEliminar.producto;
-    //   this.stockService.delete(Number(producto.codigo)).subscribe({
-    //     next: () => {
-    //       this.medicamentos = this.medicamentos.filter(
-    //         (m) => m.codigo !== producto.codigo
-    //       );
-    //       this.procedimientos = this.procedimientos.filter(
-    //         (p) => p.codigo !== producto.codigo
-    //       );
-    //       this.filtrarProductos();
-    //       if (this.productoSeleccionado?.codigo === producto.codigo) {
-    //         this.productoSeleccionado = null;
-    //       }
-    //       this.mostrarMensajeExito(`${producto.tipo.name} eliminado correctamente`);
-    //     },
-    //     error: (error: any) => {
-    //       console.error('Error al eliminar:', error);
-    //       this.mostrarError = true;
-    //       this.mensajeError = 'Error al eliminar el producto';
-    //     }
-    //   });
-    // }
-    // this.confirmacionEliminar.mostrar = false;
+    if (confirmar && this.confirmacionEliminar.producto) {
+      const productoEliminar = this.confirmacionEliminar.producto;
+      this.stockService.eliminarActividad(Number(productoEliminar.codigo)).subscribe({
+        next: () => {
+          this.mostrarMensajeExito('Producto eliminado correctamente');
+          this.loadActividades(); // recarga la lista para reflejar el cambio
+          this.confirmacionEliminar = { mostrar: false, mensaje: '', producto: undefined };
+        },
+        error: (error) => {
+          this.mostrarError = true;
+          this.mensajeError = error.message || 'Error al eliminar el producto';
+          console.error('Error en eliminarActividad:', error);
+        },
+      });
+    }
   }
 
   mostrarMensajeExito(mensaje: string) {

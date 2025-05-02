@@ -26,10 +26,7 @@ export class StockService {
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<any>(`${this.apiUrl}/ver-actividades`, { headers });
-
   }
-
-
 
   registrarActividad(producto: any): Observable<any> {
     // Mapear el objeto Producto al formato esperado por el backend
@@ -37,34 +34,37 @@ export class StockService {
       name: producto.nombre,
       tipoActividad: { id: producto.tipo.id },
       descripcion: producto.descripcion || '',
+      estado: 'Activo',
       cantidad: 0, // Valor por defecto, ajusta según necesidades
-      usuarioRegistra: 'admin' // Ajusta según autenticación
+      usuarioRegistra: 'admin', // Ajusta según autenticación
     };
 
-    return this.http.post(`${this.apiUrl}/registrar-actividad`, actividad)
-      .pipe(
-        catchError(error => {
-          console.error('Error al registrar actividad:', error);
-          return throwError(() => new Error(error.message || 'Error en el servidor'));
-        })
-      );
+    return this.http.post(`${this.apiUrl}/registrar-actividad`, actividad).pipe(
+      catchError((error) => {
+        console.error('Error al registrar actividad:', error);
+        return throwError(
+          () => new Error(error.message || 'Error en el servidor')
+        );
+      })
+    );
   }
 
-  // updateEnfermera(id: number, enfermeraData: any): Observable<any> {
-  //   const token = localStorage.getItem('token');
+  eliminarActividad(id: number): Observable<any> {
+    //   const token = localStorage.getItem('token');
 
-  //   if (!token) {
-  //     console.error('No hay token disponible.');
-  //     return new Observable((observer) => {
-  //       observer.error('Token no disponible');
-  //     });
-  //   }
+    //   if (!token) {
+    //     console.error('No hay token disponible.');
+    //     return new Observable((observer) => {
+    //       observer.error('Token no disponible');
+    //     });
+    //   }
 
-  //   const headers = new HttpHeaders({
-  //     Authorization: `Bearer ${token}`,
-  //     'Content-Type': 'application/json',
-  //   });
+    //   const headers = new HttpHeaders({
+    //     Authorization: `Bearer ${token}`,
+    //     'Content-Type': 'application/json',
+    //   });
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  //   return this.http.put(`${this.apiUrl}/${id}`, enfermeraData, { headers });
-  // }
+    return this.http.patch(`${this.apiUrl}/eliminar/${id}`,{}, { headers });
+  }
 }
