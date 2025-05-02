@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
@@ -15,7 +15,8 @@ export class PatientInfoComponent implements OnInit {
 
   constructor(
     private patientService: PatientService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +73,9 @@ export class PatientInfoComponent implements OnInit {
     });
   }
   
-  
+  verInventario(paciente: any) {
+    this.router.navigate(['/inventario-paciente', paciente.documento]);
+  }
 
   openEditModal() {
     this.showEditModal = true;
