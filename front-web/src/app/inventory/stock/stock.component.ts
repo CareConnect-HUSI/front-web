@@ -8,6 +8,7 @@ import { PatientService } from 'src/app/service/patient.service';
   styleUrls: ['./stock.component.css'],
 })
 export class StockComponent implements OnInit {
+  isLoading: boolean = false; // Nueva variable para el estado de carga
   documentoPaciente: string | null = '';
   nombrePaciente: string = '';
   inventario: any[] = [];
@@ -28,9 +29,13 @@ export class StockComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isLoading = true; // Activar el loading
     this.documentoPaciente = this.route.snapshot.paramMap.get('documento');
     if (this.documentoPaciente) {
       this.loadInventario(this.documentoPaciente);
+    }
+    else {
+      this.isLoading = false; // Desactivar si no hay documento
     }
   }
 
@@ -48,9 +53,13 @@ export class StockComponent implements OnInit {
           usado: 0,
           calendario: this.generarCalendario(act.diasTratamiento, act.frecuencia)
         }));
+        this.isLoading = false; // Desactivar el loading al recibir los datos
       },
       error: (err) => {
         console.error('Error al cargar inventario:', err);
+        this.isLoading = false; // Desactivar el loading al recibir los datos
+        this.medicationMessage = 'Error al cargar el inventario. Intente de nuevo.';
+
       }
     });
   }
