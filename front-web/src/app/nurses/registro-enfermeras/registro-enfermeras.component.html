@@ -42,9 +42,10 @@
             <td>{{ nurse.telefono }}</td>
             <td>{{ nurse.turnoEntity?.name || '' }}</td>
             <td>
-              <span [class]="nurse.activo ? 'status-active' : 'status-inactive'">
-                {{ nurse.activo ? 'Activo' : 'Inactivo' }}
+              <span [class]="nurse.estado === 'Activo' ? 'status-active' : 'status-inactive'">
+                {{ nurse.estado === 'Activo' ? 'Activo' : 'Inactivo' }}
               </span>
+              
             </td>
             <td class="actions">
               <button class="edit-btn" (click)="loadNurseForEdit(nurse)">
@@ -70,111 +71,104 @@
     </div>
   </div>
 
-  <form *ngIf="showForm" [formGroup]="nurseForm" (ngSubmit)="onSubmit()" class="form-container">
-    <div class="form-section">
-      <h3 class="section-title">Datos personales</h3>
+  <!-- ... parte superior sin cambios ... -->
 
-      <div class="form-grid" formGroupName="personalInfo">
-        <div class="form-group">
-          <label>Nombres</label>
-          <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
+<form *ngIf="showForm" [formGroup]="nurseForm" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-section">
+    <h3 class="section-title">Datos personales</h3>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombres</label>
+        <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
+      </div>
+      
+      <div class="form-group">
+        <label>Apellidos</label>
+        <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
+      </div>
+      
+      <div class="form-group">
+        <label>Tipo de Documento</label>
+        <select formControlName="identificationType">
+          <option value="" disabled selected>Seleccione un tipo</option>
+          <option value="CC">Cédula de Ciudadanía (CC)</option>
+          <option value="TI">Tarjeta de Identidad (TI)</option>
+          <option value="Pasaporte">Pasaporte</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>N° de Documento</label>
+        <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
+      </div>
+      
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
+      </div>
+      
+      <div class="form-group">
+        <label>Contraseña</label>
+        <div class="password-input">
+          <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
+          <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
         </div>
-        
-        <div class="form-group">
-          <label>Apellidos</label>
-          <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
+      </div>
+      
+      <div class="form-group">
+        <label>Dirección</label>
+        <div class="address-input">
+          <input formControlName="address" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
+          <button type="button" class="edit-btn" (click)="openAddressModal()">
+            <i class="fas fa-edit"></i> Editar
+          </button>
         </div>
-        
-        <div class="form-group">
-          <label>Tipo de Documento</label>
-          <select formControlName="identificationType">
-            <option value="" disabled selected>Seleccione un tipo</option>
-            <option value="CC">Cédula de Ciudadanía (CC)</option>
-            <option value="TI">Tarjeta de Identidad (TI)</option>
-            <option value="Pasaporte">Pasaporte</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>N° de Documento</label>
-          <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
-        </div>
-        
-        <div class="form-group">
-          <label>Correo Electrónico</label>
-          <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
-        </div>
-        
-        <div class="form-group">
-          <label>Contraseña</label>
-          <div class="password-input">
-            <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
-            <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>Dirección</label>
-          <div class="address-input">
-            <input formControlName="address" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
-            <button type="button" class="edit-btn" (click)="openAddressModal()">
-              <i class="fas fa-edit"></i> Editar
-            </button>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label>Localidad</label>
-          <select formControlName="localidad" required>
-            <option value="" disabled selected>Seleccione localidad</option>
-            <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>Barrio</label>
-          <select formControlName="barrio" required>
-            <option value="" disabled selected>Seleccione barrio</option>
-            <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>Celular</label>
-          <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
-        </div>
-        
-        <div class="form-group">
-          <label>Turno</label>
-          <select formControlName="turno">
-            <option value="" disabled selected>Seleccione turno</option>
-            <option value="Mañana">Mañana 7:00 a 13:00</option>
-            <option value="Tarde">Tarde 13:00 a 19:00</option>
-            <option value="Noche">Noche 19:00 a 7:00</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label>Roll</label>
-          <select formControlName="turno">
-            <option value="" disabled selected>Seleccione roll</option>
-            <option value="Domiciliario">Domiciliario</option>
-            <option value="Administrativo">Administrativo</option>
-          </select>
-        </div>
-    
+      </div>
+      
+      <div class="form-group">
+        <label>Localidad</label>
+        <select formControlName="localidad" required>
+          <option value="" disabled selected>Seleccione localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Barrio</label>
+        <select formControlName="barrio" required>
+          <option value="" disabled selected>Seleccione barrio</option>
+          <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Celular</label>
+        <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
+      </div>
+      
+      <div class="form-group">
+        <label>Turno</label>
+        <select formControlName="turno">
+          <option value="" disabled selected>Seleccione turno</option>
+          <option value="Mañana">Mañana 7:00 a 13:00</option>
+          <option value="Tarde">Tarde 13:00 a 19:00</option>
+          <option value="Noche">Noche 19:00 a 7:00</option>
+        </select>
       </div>
     </div>
+  </div>
 
-    <div class="form-actions">
-      <button type="button" class="cancel-btn" (click)="showForm = false">
-        <i class="fas fa-times"></i> Cancelar
-      </button>
-      <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
-        <i class="fas fa-save"></i> {{ isEditMode ? 'Actualizar' : 'Registrar' }} Enfermera
-      </button>
-    </div>
-  </form>
+  <div class="form-actions">
+    <button type="button" class="cancel-btn" (click)="showForm = false">
+      <i class="fas fa-times"></i> Cancelar
+    </button>
+    <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
+      <i class="fas fa-save"></i> {{ isEditMode ? 'Actualizar' : 'Registrar' }} Enfermera
+    </button>
+  </div>
+</form>
+
 </div>
 <!-- Modal para Dirección -->
 <div *ngIf="showAddressModal" class="modal-overlay">
