@@ -20,11 +20,12 @@
         <div class="form-group">
           <label>Tipo de Documento</label>
           <select formControlName="tipoDocumento">
-            <option value="" disabled selected>Seleccione un tipo de documento</option>
-            <option value="CC">Cédula de Ciudadanía (CC)</option>
-            <option value="TI">Tarjeta de Identidad (TI)</option>
-            <option value="Pasaporte">Pasaporte</option>
-          </select>
+            <option value="" disabled>Seleccione un tipo de documento</option>
+            <option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.id">
+              {{ tipo.name }}
+            </option>
+          </select>          
+          
         </div>
         <div class="form-group">
           <label>N° de Documento</label>
@@ -71,20 +72,6 @@
         <div class="form-group">
           <label>Segundo Celular Familiar</label>
           <input formControlName="segundoCelular" type="text" placeholder="Ej: 3124598734" />
-        </div>
-        <div class="form-group">
-          <label>Correo</label>
-          <input formControlName="email" type="text" placeholder="Ej: correo@ejemplo.com" />
-        </div>
-        <div class="form-group">
-          <label>Foto</label>
-          <div class="file-upload">
-            <label for="foto" class="upload-btn">
-              <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
-            </label>
-            <input id="foto" type="file" formControlName="foto" />
-            <span class="file-name">{{ patientForm.get('personalInfo.foto')?.value?.name || 'Ningún archivo seleccionado' }}</span>
-          </div>
         </div>
       </div>
     </div>

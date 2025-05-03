@@ -256,7 +256,7 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   margin-bottom: 8px;
   font-weight: 500;
   color: #555;

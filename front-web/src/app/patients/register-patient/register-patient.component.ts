@@ -32,6 +32,8 @@ export class RegisterPatientComponent implements OnInit {
   showAddressModal = false;
   addressForm!: FormGroup;
   patientForm!: FormGroup;
+  tiposIdentificacion: any[] = [];
+
 
   listaProcedimientos: Procedimiento[] = [
     { codigo: '1', abreviatura: 'CUR', descripcion: 'Curación' },
@@ -86,6 +88,7 @@ export class RegisterPatientComponent implements OnInit {
     this.initPatientForm();
     this.initAddressForm();
     this.agregarMedicamento();
+    this.cargarTiposIdentificacion();
   }
   initPatientForm() {
     this.patientForm = this.fb.group({
@@ -100,11 +103,8 @@ export class RegisterPatientComponent implements OnInit {
         barrio: ['', Validators.required],
         conjunto: [''],
         nombreFamiliar: ['', Validators.required],
-        parentesco: ['', Validators.required],
         celularFamiliar: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-        segundoCelular: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        foto: [null]
+        segundoCelular: ['', Validators.required]
       }),
       tratamiento: this.fb.array([]),
       procedimientos: this.fb.array([])
@@ -141,30 +141,47 @@ export class RegisterPatientComponent implements OnInit {
   saveAddress() {
     if (this.addressForm.valid) {
       const address = this.addressForm.value;
-      
+  
       // Construir dirección en formato estándar colombiano
       let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
-      
-      if (address.letraVia) direccionCompleta += ` ${address.letraVia}`;
-      if (address.bis) direccionCompleta += ` ${address.bis}`;
-      if (address.complemento) direccionCompleta += ` ${address.complemento}`;
-      
+  
+      if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
+      if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
+      if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
+  
       direccionCompleta += ` # ${address.numeroPlaca}`;
-      
-      if (address.complementoDireccion) {
+  
+      if (address.complementoDireccion?.trim()) {
         direccionCompleta += `, ${address.complementoDireccion}`;
       }
-      
+  
+      if (address.conjunto?.trim()) {
+        direccionCompleta += `, Conjunto ${address.conjunto}`;
+      }
+  
+      // Agregar ciudad y país explícitamente para mejorar la geocodificación
+      direccionCompleta += `, Bogotá, Colombia`;
+  
       // Actualizar el formulario principal
       this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
       this.patientForm.get('personalInfo.localidad')?.setValue(
         this.localidades.find(l => l.codigo === address.localidad)?.nombre
       );
       this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
-      
+  
+      // Si tienes un campo conjunto también en el formulario principal
+      this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
+  
       this.closeAddressModal();
+  
+      // Opcional para depuración
+      console.log('Dirección enviada al backend:', direccionCompleta);
+    } else {
+      alert('Por favor complete todos los campos obligatorios de la dirección.');
     }
   }
+
+  
   get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;
   }
@@ -228,7 +245,7 @@ export class RegisterPatientComponent implements OnInit {
     }
   
     const personalInfo = this.patientForm.get('personalInfo')?.value;
-  
+
     const pacienteData = {
       nombre: personalInfo.nombres,
       apellido: personalInfo.apellidos,
@@ -238,36 +255,31 @@ export class RegisterPatientComponent implements OnInit {
       barrio: personalInfo.barrio,
       conjunto: personalInfo.conjunto || null,
       localidad: personalInfo.localidad,
+      ciudad: 'Bogotá',
       latitud: null,
       longitud: null,
       nombre_acudiente: personalInfo.nombreFamiliar,
-      parentezco_acudiente: personalInfo.parentesco,
       telefono_acudiente: personalInfo.celularFamiliar,
+      telefono_acudiente2: personalInfo.segundoCelular,
+      parentezco_acudiente: personalInfo.parentesco,
       tipoIdentificacion: {
-        name: personalInfo.tipoDocumento
+        id: Number(personalInfo.tipoDocumento)  
       }
     };
-    console.log('Datos a enviar:', pacienteData);
+  
     this.patientService.registrarPaciente(pacienteData).subscribe({
       next: (res) => {
-        console.log('Paciente registrado con éxito:', res);
         alert('Paciente registrado con éxito');
         this.patientForm.reset();
       },
       error: (err) => {
         console.error('Error al registrar paciente:', err);
-        let errorMessage = 'Error al registrar paciente';
-        if (err.error) {
-          if (err.error.message) {
-            errorMessage += `: ${err.error.message}`;
-          } else if (typeof err.error === 'string') {
-            errorMessage += `: ${err.error}`;
-          }
-        }
-        alert(errorMessage);
+        alert('Error al registrar paciente');
       }
     });
   }
+  
+  
 
   calcularDiasTratamiento(medicamentoForm: FormGroup) {
     const fechaInicio = medicamentoForm.get('fechaInicio')?.value;
@@ -287,4 +299,14 @@ export class RegisterPatientComponent implements OnInit {
     }
   }
   
+  cargarTiposIdentificacion() {
+    this.patientService.getTiposIdentificacion().subscribe({
+      next: (tipos) => {
+        this.tiposIdentificacion = tipos;
+      },
+      error: (err) => {
+        console.error('Error al cargar tipos de identificación', err);
+      }
+    });
+  }  
 }

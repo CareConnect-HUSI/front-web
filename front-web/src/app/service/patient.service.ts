@@ -57,13 +57,20 @@ export class PatientService {
   }
 
   findActividadesPorDocumento(documento: string): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8081/actividad-paciente-visita/por-documento/'+documento);
+    return this.http.get<any[]>(
+      'http://localhost:8081/actividad-paciente-visita/por-documento/' +
+        documento
+    );
   }
-  
+
   updatePaciente(id: number, paciente: any): Observable<any> {
-    return this.http.put(`http://localhost:8081/pacientes/actualizar-paciente/${id}`, paciente);
+    return this.http.put(
+      `http://localhost:8081/pacientes/actualizar-paciente/${id}`,
+      paciente
+    );
   }
-  
-  
-  
+
+  getTiposIdentificacion() {
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
+  }
 }
