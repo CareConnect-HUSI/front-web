@@ -245,6 +245,8 @@ export class RegisterPatientComponent implements OnInit {
     }
   
     const personalInfo = this.patientForm.get('personalInfo')?.value;
+    const localidadNombre = this.localidades.find(l => l.codigo === personalInfo.localidad)?.nombre || personalInfo.localidad;
+
 
     const pacienteData = {
       nombre: personalInfo.nombres,
@@ -253,11 +255,10 @@ export class RegisterPatientComponent implements OnInit {
       direccion: personalInfo.direccion,
       telefono: personalInfo.celular,
       barrio: personalInfo.barrio,
-      conjunto: personalInfo.conjunto || null,
+      conjunto: '',
+      latitud: '',
+      longitud: '',
       localidad: personalInfo.localidad,
-      ciudad: 'Bogotá',
-      latitud: null,
-      longitud: null,
       nombre_acudiente: personalInfo.nombreFamiliar,
       telefono_acudiente: personalInfo.celularFamiliar,
       telefono_acudiente2: personalInfo.segundoCelular,
