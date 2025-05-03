@@ -29,7 +29,7 @@
   font-size: 1rem;
 }
 
-/* Estilos base consistentes */
+/* Estilos base */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -41,7 +41,7 @@
   width: 100%;
   color: #2c5697;
   font-size: 28px;
-  margin: 0 0 20px 0;
+  margin-bottom: 20px;
 }
 
 .header {
@@ -83,56 +83,57 @@
 .table-container {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  overflow: hidden;
-  position: relative;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
 }
 
 .pacientes-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0;
-}
-
-.pacientes-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #f8f9fa;
-}
-
-.pacientes-table tbody {
-  overflow-y: auto;
-  display: block;
-  max-height: 550px;
-}
-
-.pacientes-table tr {
-  display: table;
-  width: 100%;
   table-layout: fixed;
 }
 
-.pacientes-table th, 
+.pacientes-table thead {
+  background-color: #f8f9fa;
+}
+
+.pacientes-table th,
 .pacientes-table td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Anchos de columnas */
-.pacientes-table th:nth-child(1), 
-.pacientes-table td:nth-child(1) { width: 20%; } /* Identificación */
-.pacientes-table th:nth-child(2), 
-.pacientes-table td:nth-child(2) { width: 25%; } /* Paciente */
-.pacientes-table th:nth-child(3), 
-.pacientes-table td:nth-child(3) { width: 40%; } /* Dirección */
-.pacientes-table th:nth-child(4), 
-.pacientes-table td:nth-child(4) { width: 15%; } /* Acciones */
+/* Ancho de columnas */
+.pacientes-table th:nth-child(1),
+.pacientes-table td:nth-child(1) {
+  width: 15%; /* Identificación */
+}
 
+.pacientes-table th:nth-child(2),
+.pacientes-table td:nth-child(2) {
+  width: 25%; /* Paciente */
+}
+
+.pacientes-table th:nth-child(3),
+.pacientes-table td:nth-child(3) {
+  width: 30%; /* Dirección */
+}
+
+.pacientes-table th:nth-child(4),
+.pacientes-table td:nth-child(4) {
+  width: 15%; /* Estado */
+}
+
+.pacientes-table th:nth-child(5),
+.pacientes-table td:nth-child(5) {
+  width: 15%; /* Acciones */
+}
+
+/* Botón estado */
 .status-btn {
   padding: 5px 10px;
   border: none;
@@ -140,21 +141,19 @@
   cursor: pointer;
   font-size: 14px;
   color: white;
-  background-color: #6c757d; /* Inactivo */
+  background-color: #6c757d;
   transition: background-color 0.3s ease;
 }
 
 .status-btn.active {
-  background-color: #28a745; /* Activo */
+  background-color: #28a745;
 }
 
 .status-btn:hover {
   opacity: 0.9;
 }
 
-
-
-/* Estilo para el botón Ver */
+/* Botón Ver */
 .details-btn {
   background: #e6f0ff;
   color: #2c5697;
@@ -168,6 +167,7 @@
   font-size: 13px;
   text-decoration: none;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .details-btn:hover {
@@ -175,7 +175,7 @@
   color: white;
 }
 
-/* Efecto hover para filas */
+/* Hover en filas */
 .pacientes-table tr:hover {
   background-color: #f5f8ff;
 }
@@ -228,22 +228,22 @@
   background: #e0e0e0;
 }
 
-/* Scrollbar personalizada */
-.pacientes-table tbody::-webkit-scrollbar {
-  width: 8px;
+/* Scrollbar personalizada solo para table container */
+.table-container::-webkit-scrollbar {
+  height: 8px;
 }
 
-.pacientes-table tbody::-webkit-scrollbar-track {
+.table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
-.pacientes-table tbody::-webkit-scrollbar-thumb {
+.table-container::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
 }
 
-.pacientes-table tbody::-webkit-scrollbar-thumb:hover {
+.table-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
 
@@ -252,16 +252,13 @@
   .search-box {
     min-width: 100%;
   }
-  
-  .pacientes-table th, 
+
+  .pacientes-table th,
   .pacientes-table td {
     padding: 8px 10px;
     font-size: 14px;
   }
-  
-  .pacientes-table th:nth-child(1), 
-  .pacientes-table td:nth-child(1) { width: 25%; }
-  
+
   .details-btn {
     padding: 4px 8px;
     font-size: 12px;

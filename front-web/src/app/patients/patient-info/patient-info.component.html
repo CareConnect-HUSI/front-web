@@ -167,10 +167,10 @@
           <!-- Columna 1 -->
           <div class="form-column">
             <div class="form-group">
-              <label>Nombre:</label>
+              <label>Nombres:</label>
               <input
                 [(ngModel)]="paciente.nombres"
-                name="nombre"
+                name="nombres"
                 class="form-input"
               />
             </div>
@@ -183,7 +183,19 @@
               />
             </div>
             <div class="form-group">
-              <label>Documento:</label>
+              <label>Tipo de Documento:</label>
+              <select
+                [(ngModel)]="paciente.tipoIdentificacion.nombre"
+                name="tipoIdentificacion"
+                class="form-input"
+              >
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="Pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número de Documento:</label>
               <input
                 [(ngModel)]="paciente.documento"
                 name="documento"
@@ -211,14 +223,6 @@
           <!-- Columna 2 -->
           <div class="form-column">
             <div class="form-group">
-              <label>Barrio:</label>
-              <input
-                [(ngModel)]="paciente.barrio"
-                name="barrio"
-                class="form-input"
-              />
-            </div>
-            <div class="form-group">
               <label>Celular:</label>
               <input
                 [(ngModel)]="paciente.celular"
@@ -227,26 +231,42 @@
               />
             </div>
             <div class="form-group">
-              <label>Correo:</label>
-              <input
-                [(ngModel)]="paciente.email"
-                name="email"
-                class="form-input"
-              />
-            </div>
-            <div class="form-group">
-              <label>Nombre Familiar:</label>
+              <label>Nombre del Acudiente:</label>
               <input
                 [(ngModel)]="paciente.nombreFamiliar"
-                name="nombre familiar"
+                name="nombreFamiliar"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Parentesco:</label>
+              <label>Celular del Acudiente:</label>
               <input
-                [(ngModel)]="paciente.parentesco"
-                name="parentesco"
+                [(ngModel)]="paciente.celularFamiliar"
+                name="celularFamiliar"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Segundo Celular Acudiente:</label>
+              <input
+                [(ngModel)]="paciente.segundoCelularFamiliar"
+                name="segundoCelularFamiliar"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Conjunto:</label>
+              <input
+                [(ngModel)]="paciente.conjunto"
+                name="conjunto"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Barrio:</label>
+              <input
+                [(ngModel)]="paciente.barrio"
+                name="barrio"
                 class="form-input"
               />
             </div>
