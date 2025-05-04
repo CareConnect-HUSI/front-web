@@ -25,7 +25,7 @@ const routes: Routes = [
   { path: 'registro-pacientes', component: RegisterPatientComponent },
   { path: 'pacientes/:id', component: PatientInfoComponent},
   { path: 'nurses-assignment/:id', component: NursesAssignmentComponent},
-  { path: 'inventario-paciente/:documento', component: StockComponent},
+  { path: 'inventario-paciente/:id', component: StockComponent},
   { path: 'login', component: LoginComponent },
   { path: 'medicamento', component: MedInfoComponent},
   {path: 'pacientes', component: PatientsListComponent},

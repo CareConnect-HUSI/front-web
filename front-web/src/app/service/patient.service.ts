@@ -48,7 +48,6 @@ export class PatientService {
   }
 
   obtenerPacientePorId(id: number): Observable<any> {
-    console.log('ID del paciente:', id);
     return this.http.get(`${this.apiUrl}/${id}`);
   }
 

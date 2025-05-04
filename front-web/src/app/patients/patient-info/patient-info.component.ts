@@ -23,7 +23,6 @@ export class PatientInfoComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.pacienteId = id;
-    console.log('ID del paciente:', id);
     if (id) {
       this.loadPatient(id);
     }

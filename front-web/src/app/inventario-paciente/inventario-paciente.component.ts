@@ -56,7 +56,7 @@ export class InventarioComponent implements OnInit {
   }
 
   verInventario(paciente: any) {
-    this.router.navigate(['/inventario-paciente', paciente.numero_identificacion]);
+    this.router.navigate(['/inventario-paciente', paciente.id]);
   }
   
 

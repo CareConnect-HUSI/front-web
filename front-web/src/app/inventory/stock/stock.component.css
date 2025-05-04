@@ -130,19 +130,6 @@
   font-size: 13px;
 }
 
-.shift-header th {
-  font-size: 12px;
-  padding: 5px;
-  background-color: #e9ecef;
-}
-
-.administered {
-  background-color: #d4edda;
-  color: #155724;
-  font-weight: bold;
-  text-align: center;
-}
-
 .low-stock {
   background-color: #fff3cd;
   color: #856404;
@@ -178,15 +165,6 @@
   padding: 5px 8px;
   font-size: 12px;
   margin: 0 3px;
-}
-
-.action-btn.delete {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.action-btn.delete:hover {
-  background: #f5c6cb;
 }
 
 /* Notificaciones */

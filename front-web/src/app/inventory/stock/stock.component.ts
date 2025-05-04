@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { InsumoService } from 'src/app/service/insumo.service';
 import { PatientService } from 'src/app/service/patient.service';
 import { StockService } from 'src/app/service/stock.service';
 
@@ -10,6 +11,7 @@ import { StockService } from 'src/app/service/stock.service';
 })
 export class StockComponent implements OnInit {
   isLoading: boolean = false; // Nueva variable para el estado de carga
+  idPaciente: number =  0;
   documentoPaciente: string | null = '';
   nombrePaciente: string = '';
   inventario: any[] = [];
@@ -26,30 +28,49 @@ export class StockComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private patientService: PatientService,
+    private insumoService: InsumoService,
     private stockService: StockService,
+    private pacienteService: PatientService
   ) {}
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.documentoPaciente = this.route.snapshot.paramMap.get('documento');
-    if (this.documentoPaciente) {
-      this.loadInventario(this.documentoPaciente);
-    }
-    else {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    
+    if (idParam) {
+      this.idPaciente = +idParam; // Convert string to number
+      this.loadPatientData(this.idPaciente);
+      this.loadInventario(this.idPaciente);
+    } else {
       this.isLoading = false;
-    }
+      console.log("ID paciente no  encontrado");
 
+      this.medicationMessage = 'No se proporcionó un ID de paciente.';
+    }
+    
     this.loadMedicamentos();
+  }
+
+  loadPatientData(id: number): void {
+    this.pacienteService.obtenerPacientePorId(id).subscribe({
+      next: (patient: any) => {
+        this.nombrePaciente = patient.nombre;
+        this.documentoPaciente = patient.numeroIdentificacion; 
+      },
+      error: (err) => {
+        console.error('Error al cargar datos del paciente:', err);
+        this.nombrePaciente = '';
+        this.documentoPaciente = '';
+        this.medicationMessage = 'Error al cargar los datos del paciente.';
+      }
+    });
   }
 
   loadMedicamentos(): void {
     this.stockService.getListaMedicamentos().subscribe({
       next: (data: any[]) => {
         // Filtrar solo medicamentos activos
-        this.listaMedicamentos = data.filter(
-          (item) => item.tipoActividad?.id === 1 && item.estado === 'Activo'
-        );
+        this.listaMedicamentos = data;
       },
       error: (err) => {
         console.error('Error al cargar medicamentos:', err);
@@ -57,24 +78,16 @@ export class StockComponent implements OnInit {
       }
     });
   }
-    
-  
 
-  loadInventario(documento: string) {
-    this.patientService.findActividadesPorDocumento(documento).subscribe({
+  loadInventario(id: number) {
+    this.insumoService.getMedicamentosPorPaciente(id).subscribe({
       next: (data: any[]) => {
-        console.log('Inventario recibido:', data);
-        this.nombrePaciente = data[0]?.pacienteNombre ?? '';
         this.inventario = data.map(act => ({
-          nombre: act.nombreActividad,
-          dosis: `${act.dosis} mg`,
-          via: 'Oral',
-          frecuencia: `${act.frecuencia} veces al día`,
-          cantidad: act.dosis * act.diasTratamiento,
-          usado: 0,
-          calendario: this.generarCalendario(act.diasTratamiento, act.frecuencia)
+          nombre: act.nombre,
+          cantidad: act.cantidad,
+          usado: 0, //Todavía no carga de la BD
         }));
-        this.isLoading = false; // Desactivar el loading al recibir los datos
+        this.isLoading = false; 
       },
       error: (err) => {
         console.error('Error al cargar inventario:', err);
@@ -83,18 +96,6 @@ export class StockComponent implements OnInit {
 
       }
     });
-  }
-
-  generarCalendario(dias: number, frecuencia: number): any[] {
-    const calendario = [];
-    for (let i = 0; i < 7; i++) {
-      calendario.push({
-        M: frecuencia >= 1,
-        T: frecuencia >= 2,
-        N: frecuencia >= 3
-      });
-    }
-    return calendario;
   }
 
   isLowStock(item: any): boolean {
@@ -141,49 +142,7 @@ export class StockComponent implements OnInit {
     this.closeEditModal();
   }
 
-  calculateDays(medication: any): void {
-    const fechaInicio = new Date(medication.fechaInicio);
-    const fechaFin = new Date(medication.fechaFin);
-
-    if (fechaInicio && fechaFin && fechaInicio <= fechaFin) {
-      const dias = Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
-      medication.diasTratamiento = dias;
-
-      medication.calendario = Array(7).fill({ M: false, T: false, N: false });
-      const dosisPorDia = this.getDosesPerDay(medication.frecuencia);
-
-      for (let i = 0; i < dias && i < 7; i++) {
-        const daySchedule = { M: false, T: false, N: false };
-        if (dosisPorDia >= 1) daySchedule.M = true;
-        if (dosisPorDia >= 2) daySchedule.T = true;
-        if (dosisPorDia >= 3) daySchedule.N = true;
-        medication.calendario[i] = daySchedule;
-      }
-    } else {
-      alert('La fecha de fin debe ser posterior a la fecha de inicio.');
-      medication.fechaFin = null;
-    }
-  }
-
-  getDosesPerDay(frecuencia: string): number {
-    if (frecuencia.includes('6')) return 4;
-    if (frecuencia.includes('8')) return 3;
-    if (frecuencia.includes('12')) return 2;
-    return 1;
-  }
-
   addMedication() {
     this.openEditModal();
-  }
-
-  confirmDelete(index: number) {
-    this.inventario.splice(index, 1);
-  }
-
-  logAdministration(item: any, day: any, shift: string) {
-    if (!day[shift]) {
-      day[shift] = true;
-      item.usado++;
-    }
   }
 }

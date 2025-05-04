@@ -18,10 +18,10 @@
       <p>{{ nombrePaciente }}</p>
     </div>
 
-    <!-- Tabla de seguimiento -->
+    <!-- Tabla simplificada -->
     <div class="info-section">
       <div class="section-header">
-        <h3 class="section-title">Registro de Administración</h3>
+        <h3 class="section-title">Inventario de Medicamentos</h3>
         <div class="section-actions">
           <button class="action-btn" (click)="addMedication()">
             <i class="fas fa-plus"></i> Agregar Medicamento
@@ -33,65 +33,20 @@
         <table class="info-table medication-table">
           <thead>
             <tr>
-              <th rowspan="2">Medicamento</th>
-              <th rowspan="2">Dosis</th>
-              <th rowspan="2">Frecuencia</th>
-              <th rowspan="2">Cantidad</th>
-              <th colspan="21">Administración por Día y Turno</th>
-              <th rowspan="2">Disponible</th>
-              <th rowspan="2">Total</th>
-              <th rowspan="2">Acciones</th>
-            </tr>
-            <tr>
-              <th colspan="3">Lunes</th>
-              <th colspan="3">Martes</th>
-              <th colspan="3">Miércoles</th>
-              <th colspan="3">Jueves</th>
-              <th colspan="3">Viernes</th>
-              <th colspan="3">Sábado</th>
-              <th colspan="3">Domingo</th>
-            </tr>
-            <tr class="shift-header">
-              <th *ngFor="let header of ['', '', '', '', '',
-                                          'M','T','N','M','T','N','M','T','N',
-                                          'M','T','N','M','T','N','M','T','N','',
-                                          '','']">
-                {{ header }}
-              </th>
+              <th>Medicamento</th>
+              <th>Cantidad Disponible</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of inventario; let i = index">
               <td>{{ item.nombre }}</td>
-              <td>{{ item.dosis }}</td>
-              <td>{{ item.frecuencia }}</td>
-              <td>
-                <input
-                  type="number"
-                  [(ngModel)]="item.cantidad"
-                  (change)="updateTotal(item)"
-                  min="1"
-                  class="quantity-input"
-                />
-              </td>
-
-              <!-- Administración por día y turno -->
-              <ng-container *ngFor="let dia of item.calendario">
-                <td [class.administered]="dia.M">{{ dia.M ? '✓' : '-' }}</td>
-                <td [class.administered]="dia.T">{{ dia.T ? '✓' : '-' }}</td>
-                <td [class.administered]="dia.N">{{ dia.N ? '✓' : '-' }}</td>
-              </ng-container>
-
               <td [class.low-stock]="isLowStock(item)">
                 {{ item.cantidad - item.usado }}
               </td>
-              <td>{{ item.cantidad }}</td>
               <td>
                 <button class="action-btn small" (click)="openEditModal(item, i)">
                   <i class="fas fa-edit"></i>
-                </button>
-                <button class="action-btn small delete" (click)="confirmDelete(i)">
-                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
@@ -121,8 +76,7 @@
       </div>
 
       <form class="modal-form" (ngSubmit)="saveMedication()">
-
-        <!-- Fila: Nombre y Dosis -->
+        <!-- Fila: Nombre y Cantidad -->
         <div class="form-row">
           <div class="form-group">
             <label>Nombre:</label>
@@ -130,35 +84,6 @@
               <option *ngFor="let medicamento of listaMedicamentos" [value]="medicamento.name">
                 {{ medicamento.name }}
               </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Dosis:</label>
-            <input
-              type="text"
-              [(ngModel)]="currentMedication.dosis"
-              name="dosis"
-              required
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Fila: Frecuencia y Cantidad -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Frecuencia:</label>
-            <select
-              [(ngModel)]="currentMedication.frecuencia"
-              name="frecuencia"
-              required
-              class="form-input"
-            >
-              <option value="Cada 6h">Cada 6 horas</option>
-              <option value="Cada 8h">Cada 8 horas</option>
-              <option value="Cada 12h">Cada 12 horas</option>
-              <option value="Cada 24h">Cada 24 horas</option>
             </select>
           </div>
 
@@ -173,44 +98,6 @@
               class="form-input"
             />
           </div>
-        </div>
-
-        <!-- Fila: Fechas -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Fecha de Inicio:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaInicio"
-              name="fechaInicio"
-              required
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Fecha de Fin:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaFin"
-              name="fechaFin"
-              (change)="calculateDays(currentMedication)"
-              required
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Días de tratamiento -->
-        <div class="form-group">
-          <label>Días de Tratamiento:</label>
-          <input
-            type="number"
-            [(ngModel)]="currentMedication.diasTratamiento"
-            name="diasTratamiento"
-            disabled
-            class="form-input"
-          />
         </div>
 
         <!-- Botones -->
