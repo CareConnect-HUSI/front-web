@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PatientService } from 'src/app/service/patient.service';
+import { StockService } from 'src/app/service/stock.service';
 
 @Component({
   selector: 'app-stock',
@@ -25,19 +26,39 @@ export class StockComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private stockService: StockService,
   ) {}
 
   ngOnInit(): void {
-    this.isLoading = true; // Activar el loading
+    this.isLoading = true;
     this.documentoPaciente = this.route.snapshot.paramMap.get('documento');
     if (this.documentoPaciente) {
       this.loadInventario(this.documentoPaciente);
     }
     else {
-      this.isLoading = false; // Desactivar si no hay documento
+      this.isLoading = false;
     }
+
+    this.loadMedicamentos();
   }
+
+  loadMedicamentos(): void {
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (data: any[]) => {
+        // Filtrar solo medicamentos activos
+        this.listaMedicamentos = data.filter(
+          (item) => item.tipoActividad?.id === 1 && item.estado === 'Activo'
+        );
+      },
+      error: (err) => {
+        console.error('Error al cargar medicamentos:', err);
+        this.listaMedicamentos = [];
+      }
+    });
+  }
+    
+  
 
   loadInventario(documento: string) {
     this.patientService.findActividadesPorDocumento(documento).subscribe({

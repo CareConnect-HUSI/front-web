@@ -67,4 +67,9 @@ export class StockService {
 
     return this.http.patch(`${this.apiUrl}/eliminar/${id}`,{}, { headers });
   }
+
+  getListaMedicamentos(): Observable<any[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<any[]>(`${this.apiUrl}/ver-actividades`, { headers });
+  }
 }
