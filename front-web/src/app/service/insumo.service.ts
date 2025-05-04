@@ -14,6 +14,9 @@ export class InsumoService {
       const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
       return this.http.get<any[]>(`${this.apiUrl}/medicamentos/${id}`, { headers });
     }
-
+    addMedicamentoPorPaciente(medicamento: any): Observable<any> {
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+      return this.http.post<any>(`${this.apiUrl}/agregar`, medicamento, { headers });
+    }
     
 }

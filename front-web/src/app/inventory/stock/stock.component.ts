@@ -10,8 +10,8 @@ import { StockService } from 'src/app/service/stock.service';
   styleUrls: ['./stock.component.css'],
 })
 export class StockComponent implements OnInit {
-  isLoading: boolean = false; // Nueva variable para el estado de carga
-  idPaciente: number =  0;
+  isLoading: boolean = false;
+  idPaciente: number = 0;
   documentoPaciente: string | null = '';
   nombrePaciente: string = '';
   inventario: any[] = [];
@@ -20,6 +20,7 @@ export class StockComponent implements OnInit {
   listaMedicamentos: any[] = [];
 
   showEditModal: boolean = false;
+  showAddModal: boolean = false;
   showMedicationWarning: boolean = false;
   medicationMessage: string = '';
 
@@ -36,65 +37,90 @@ export class StockComponent implements OnInit {
   ngOnInit(): void {
     this.isLoading = true;
     const idParam = this.route.snapshot.paramMap.get('id');
-    
+
     if (idParam) {
-      this.idPaciente = +idParam; // Convert string to number
+      this.idPaciente = +idParam;
       this.loadPatientData(this.idPaciente);
       this.loadInventario(this.idPaciente);
     } else {
       this.isLoading = false;
-      console.log("ID paciente no  encontrado");
-
       this.medicationMessage = 'No se proporcionó un ID de paciente.';
     }
-    
+
     this.loadMedicamentos();
   }
 
   loadPatientData(id: number): void {
     this.pacienteService.obtenerPacientePorId(id).subscribe({
       next: (patient: any) => {
-        this.nombrePaciente = patient.nombre;
-        this.documentoPaciente = patient.numeroIdentificacion; 
+        console.log('Datos del paciente:', patient);
+        this.nombrePaciente = patient.nombre || '';
+        this.documentoPaciente = patient.numeroIdentificacion || '';
       },
+
       error: (err) => {
         console.error('Error al cargar datos del paciente:', err);
         this.nombrePaciente = '';
         this.documentoPaciente = '';
         this.medicationMessage = 'Error al cargar los datos del paciente.';
-      }
+      },
     });
   }
 
   loadMedicamentos(): void {
     this.stockService.getListaMedicamentos().subscribe({
       next: (data: any[]) => {
-        // Filtrar solo medicamentos activos
-        this.listaMedicamentos = data;
+        this.listaMedicamentos = data
+          .filter(
+            (item) =>
+              item.tipoActividad?.name === 'Medicamento' &&
+              item.estado === 'Activo' &&
+              !this.inventario.some(
+                (inv) => inv.nombre === (item.nombre || item.name)
+              )
+          )
+          .map((item) => ({
+            ...item,
+            name: item.nombre || item.name, // Ensure compatibility with template
+          }));
+
+        // Mostrar mensaje si no hay medicamentos disponibles
+        if (this.listaMedicamentos.length === 0) {
+          this.medicationMessage =
+            'No hay más medicamentos activos para agregar!';
+          this.showMedicationWarning = true;
+        } else {
+          this.showMedicationWarning = false;
+        }
       },
       error: (err) => {
         console.error('Error al cargar medicamentos:', err);
         this.listaMedicamentos = [];
-      }
+        this.medicationMessage = 'Error al cargar los medicamentos.';
+        this.showMedicationWarning = true;
+      },
     });
   }
 
   loadInventario(id: number) {
     this.insumoService.getMedicamentosPorPaciente(id).subscribe({
       next: (data: any[]) => {
-        this.inventario = data.map(act => ({
+        this.inventario = data.map((act) => ({
           nombre: act.nombre,
           cantidad: act.cantidad,
-          usado: 0, //Todavía no carga de la BD
+          usado: 0,
         }));
-        this.isLoading = false; 
+        this.isLoading = false;
+        // Reload medicamentos to update filtering based on new inventory
+        this.loadMedicamentos();
       },
       error: (err) => {
         console.error('Error al cargar inventario:', err);
-        this.isLoading = false; // Desactivar el loading al recibir los datos
-        this.medicationMessage = 'Error al cargar el inventario. Intente de nuevo.';
-
-      }
+        this.isLoading = false;
+        this.medicationMessage =
+          'Error al cargar el inventario. Intente de nuevo.';
+        this.showMedicationWarning = true;
+      },
     });
   }
 
@@ -102,24 +128,31 @@ export class StockComponent implements OnInit {
     return item.cantidad - item.usado <= item.cantidad * 0.3;
   }
 
-  openEditModal(med: any = null, index: number = -1): void {
-    if (med) {
-      this.isEditing = true;
-      this.currentMedication = { ...med };
-      this.currentIndex = index;
-    } else {
-      this.isEditing = false;
-      this.currentMedication = {
-        nombre: '',
-        dosis: '',
-        frecuencia: '',
-        cantidad: 1,
-        fechaInicio: '',
-        fechaFin: '',
-        diasTratamiento: 0,
-      };
-    }
+  openAddModal(): void {
+    this.isEditing = false;
+    this.currentMedication = {
+      id: null,
+      nombre: '',
+      dosis: '',
+      frecuencia: '',
+      cantidad: 1,
+      fechaInicio: '',
+      fechaFin: '',
+      diasTratamiento: 0,
+    };
+    this.currentIndex = -1;
+    this.showAddModal = true;
+  }
+
+  openEditModal(med: any, index: number): void {
+    this.isEditing = true;
+    this.currentMedication = { ...med };
+    this.currentIndex = index;
     this.showEditModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
   }
 
   closeEditModal(): void {
@@ -133,16 +166,66 @@ export class StockComponent implements OnInit {
     }
   }
 
+  onMedicamentoChange(medicationId: number): void {
+    const selectedMed = this.listaMedicamentos.find(med => med.id === medicationId);
+    if (selectedMed) {
+      this.currentMedication.nombre = selectedMed.name;
+    } else {
+      this.currentMedication.nombre = '';
+    }
+  }
+
   saveMedication(): void {
+
+     // Validate required fields
+     if (!this.currentMedication.id) {
+      this.medicationMessage = 'Por favor, seleccione un medicamento.';
+      this.showMedicationWarning = true;
+      return;
+    }
+    if (!this.currentMedication.cantidad || this.currentMedication.cantidad < 1) {
+      this.medicationMessage = 'La cantidad debe ser al menos 1.';
+      this.showMedicationWarning = true;
+      return;
+    }
+
+    const medicationData = {
+      pacienteId: this.idPaciente,
+      actividadId: this.currentMedication.id,
+      cantidad: this.currentMedication.cantidad,
+    };
+
+    this.isLoading = true;
+    this.insumoService.addMedicamentoPorPaciente(medicationData).subscribe({
+      next: (newMedication) => {
+        console.log('Medicamento agregado:', newMedication);
+        this.closeAddModal();
+        this.loadInventario(this.idPaciente);
+        this.medicationMessage = 'Medicamento agregado correctamente.';
+        this.showMedicationWarning = true;
+      },
+      error: (err) => {
+        console.error('Error al agregar medicamento:', err);
+        this.isLoading = false; // Hide loading spinner on error
+        this.medicationMessage = err.error || 'Error al agregar el medicamento. Intente de nuevo.';
+        this.showMedicationWarning = true;
+      },
+    });
+  }
+
+  updateMedication(): void {
     if (this.isEditing) {
       this.inventario[this.currentIndex] = { ...this.currentMedication };
     } else {
       this.inventario.push({ ...this.currentMedication });
     }
+    this.closeAddModal();
     this.closeEditModal();
+    // Reload medicamentos to update filtering based on updated inventory
+    this.loadMedicamentos();
   }
 
   addMedication() {
-    this.openEditModal();
+    this.openAddModal();
   }
 }
