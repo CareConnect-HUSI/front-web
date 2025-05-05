@@ -86,7 +86,7 @@ export class PatientInfoComponent implements OnInit {
   }
 
   verInventario(paciente: any) {
-    this.router.navigate(['/inventario-paciente', paciente.documento]);
+    this.router.navigate(['/inventario-paciente', paciente.id]);
   }
 
   openEditModal() {
