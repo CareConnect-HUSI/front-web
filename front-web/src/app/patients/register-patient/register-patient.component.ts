@@ -102,6 +102,7 @@ export class RegisterPatientComponent implements OnInit {
         localidad: ['', Validators.required],
         barrio: ['', Validators.required],
         conjunto: [''],
+        estado: ['Activo'],
         nombreFamiliar: ['', Validators.required],
         celularFamiliar: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
         segundoCelular: ['', Validators.required]
@@ -262,7 +263,7 @@ export class RegisterPatientComponent implements OnInit {
       nombre_acudiente: personalInfo.nombreFamiliar,
       telefono_acudiente: personalInfo.celularFamiliar,
       telefono_acudiente2: personalInfo.segundoCelular,
-      parentezco_acudiente: personalInfo.parentesco,
+      estado: personalInfo.estado,
       tipoIdentificacion: {
         id: Number(personalInfo.tipoDocumento)  
       }

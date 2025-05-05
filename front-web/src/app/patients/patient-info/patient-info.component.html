@@ -56,16 +56,16 @@
             <span>{{ paciente.celular }}</span>
           </div>
           <div class="info-item">
-            <label>Nombre Familiar:</label>
+            <label>Nombre Acudiente:</label>
             <span>{{ paciente.nombreFamiliar}}</span>
           </div>
           <div class="info-item">
-            <label>Celular Familiar:</label>
+            <label>Celular Acudiente:</label>
             <span>{{ paciente.celularFamiliar}}</span>
           </div>
           <div class="info-item">
-            <label>Segundo Celular Familiar:</label>
-            <span>{{ paciente.segundoCelularFamiliar  }}</span>
+            <label>Segundo Celular Acudiente:</label>
+            <span>{{ paciente.segundoCelularFamiliar}}</span>
           </div>
           <div class="info-item">
             <label>Estado:</label>
@@ -218,6 +218,14 @@
                 class="form-input"
               />
             </div>
+            <div class="form-group">
+              <label>Estado:</label>
+              <select [(ngModel)]="paciente.estado" name="estado" class="form-input">
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+            
           </div>
 
           <!-- Columna 2 -->

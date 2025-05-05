@@ -3,7 +3,7 @@
     <h2 class="title-center">Registrar Paciente</h2>
   </div>
 
-  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()" class="form-container">
+  <form [formGroup]="patientForm"  class="form-container">
     
     <div class="form-section">
       <h3 class="section-title">Datos personales</h3>
@@ -62,15 +62,15 @@
           <input formControlName="celular" type="text" placeholder="Ej: 3001234567" />
         </div>
         <div class="form-group">
-          <label>Nombre Familiar</label>
+          <label>Nombre Acudiente</label>
           <input formControlName="nombreFamiliar" type="text" placeholder="Ej: Carlos López" />
         </div>
         <div class="form-group">
-          <label>Celular Familiar</label>
+          <label>Celular Acudiente</label>
           <input formControlName="celularFamiliar" type="text" placeholder="Ej: 3109876543" />
         </div>
         <div class="form-group">
-          <label>Segundo Celular Familiar</label>
+          <label>Segundo Celular Acudiente</label>
           <input formControlName="segundoCelular" type="text" placeholder="Ej: 3124598734" />
         </div>
       </div>
