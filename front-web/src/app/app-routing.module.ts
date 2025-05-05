@@ -19,6 +19,8 @@ import { CronogramaComponent } from './inventory/cronograma/cronograma.component
 import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asignar-pacientes.component';
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
 import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-asignacion.component';
+import { TreatmentsComponent } from './inventory/treatments/treatments.component';
+import { PageNotFoundComponent } from './not-found/page-not-found/page-not-found.component';
 
 const routes: Routes = [
   { path: 'cronograma', component: CronogramaComponent },
@@ -38,8 +40,10 @@ const routes: Routes = [
   { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
   { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
   { path: 'stock', component: StockComponent },
-  { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' },
+  { path: '', redirectTo: 'cronograma', pathMatch: 'full' },
   { path: 'detalle-asignacion', component: DetalleAsignacionComponent },
+  { path: 'treatments/:id', component: TreatmentsComponent},
+  { path: '**', component: PageNotFoundComponent }
 
 ];
 

@@ -1,0 +1,338 @@
+<div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  </div>
+
+  <div class="header">
+    <h2 class="title-center">Tratamientos</h2>
+  </div>
+
+  <div class="profile-container">
+    <!-- Información del paciente -->
+    <div class="info-section patient-info">
+      <p>{{ documentoPaciente }}</p>
+      <p>{{ nombrePaciente }}</p>
+    </div>
+
+    <!-- Tabla de seguimiento -->
+    <div class="info-section">
+      <div class="section-header">
+        <h3 class="section-title">Registro de tratamientos</h3>
+        <div class="section-actions">
+          <button class="action-btn" (click)="addMedication()">
+            <i class="fas fa-plus"></i> Agregar nuevo tratamiento
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="info-table medication-table">
+          <thead>
+            <tr>
+              <th>Medicamento</th>
+              <th>Dosis</th>
+              <th>Frecuencia</th>
+              <th>Hora</th>
+              <th>Cantidad</th>
+              <th>Disponible</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of tratamientos; let i = index">
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.dosis }}</td>
+              <td>{{ item.frecuencia }}</td>
+              <td>{{ item.hora }}</td>
+              <td>
+                <input
+                  type="number"
+                  [(ngModel)]="item.cantidad"
+                  (change)="updateTotal(item)"
+                  min="1"
+                  class="quantity-input"
+                />
+              </td>
+              <td [class.low-stock]="isLowStock(item)">
+                {{ item.cantidad - item.usado }}
+              </td>
+              <td>{{ item.cantidad }}</td>
+              <td>
+                <button class="action-btn small" (click)="openEditModal(item, i)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn small delete" (click)="confirmDelete(i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notificación -->
+    <div *ngIf="showMedicationWarning" class="notification warning">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ medicationMessage }}</span>
+      <button class="close-notification" (click)="showMedicationWarning = false">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Tratamiento -->
+  <div *ngIf="showAddModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Agregar Tratamiento</h3>
+        <button class="close-btn" (click)="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="saveMedication()">
+        <!-- Fila: Nombre y Dosis -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre:</label>
+            <select [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
+              <option *ngFor="let medicamento of listaMedicamentos" [value]="medicamento.name">
+                {{ medicamento.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Dosis:</label>
+            <input
+              type="text"
+              [(ngModel)]="currentMedication.dosis"
+              name="dosis"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Frecuencia y Hora -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Frecuencia:</label>
+            <select
+              [(ngModel)]="currentMedication.frecuencia"
+              name="frecuencia"
+              required
+              class="form-input"
+            >
+              <option value="Cada 6h">Cada 6 horas</option>
+              <option value="Cada 8h">Cada 8 horas</option>
+              <option value="Cada 12h">Cada 12 horas</option>
+              <option value="Cada 24h">Cada 24 horas</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Hora:</label>
+            <input
+              type="time"
+              [(ngModel)]="currentMedication.hora"
+              name="hora"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Cantidad -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cantidad:</label>
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.cantidad"
+              name="cantidad"
+              min="1"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Fechas -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Inicio:</label>
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaInicio"
+              name="fechaInicio"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Fin:</label>
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaFin"
+              name="fechaFin"
+              (change)="calculateDays(currentMedication)"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Días de tratamiento -->
+        <div class="form-group">
+          <label>Días de Tratamiento:</label>
+          <input
+            type="number"
+            [(ngModel)]="currentMedication.diasTratamiento"
+            name="diasTratamiento"
+            disabled
+            class="form-input"
+          />
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancelar</button>
+          <button type="submit" class="save-btn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Editar Tratamiento -->
+  <div *ngIf="showEditModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Modificar Medicamento</h3>
+        <button class="close-btn" (click)="closeEditModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="saveMedication()">
+        <!-- Fila: Nombre y Dosis -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre:</label>
+            <select [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
+              <option *ngFor="let medicamento of listaMedicamentos" [value]="medicamento.name">
+                {{ medicamento.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Dosis:</label>
+            <input
+              type="text"
+              [(ngModel)]="currentMedication.dosis"
+              name="dosis"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Frecuencia y Hora -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Frecuencia:</label>
+            <select
+              [(ngModel)]="currentMedication.frecuencia"
+              name="frecuencia"
+              required
+              class="form-input"
+            >
+              <option value="Cada 6h">Cada 6 horas</option>
+              <option value="Cada 8h">Cada 8 horas</option>
+              <option value="Cada 12h">Cada 12 horas</option>
+              <option value="Cada 24h">Cada 24 horas</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Hora:</label>
+            <input
+              type="time"
+              [(ngModel)]="currentMedication.hora"
+              name="hora"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Cantidad -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cantidad:</label>
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.cantidad"
+              name="cantidad"
+              min="1"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Fila: Fechas -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Inicio:</label>
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaInicio"
+              name="fechaInicio"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Fin:</label>
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaFin"
+              name="fechaFin"
+              (change)="calculateDays(currentMedication)"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Días de tratamiento -->
+        <div class="form-group">
+          <label>Días de Tratamiento:</label>
+          <input
+            type="number"
+            [(ngModel)]="currentMedication.diasTratamiento"
+            name="diasTratamiento"
+            disabled
+            class="form-input"
+          />
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeEditModal()">Cancelar</button>
+          <button type="submit" class="save-btn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

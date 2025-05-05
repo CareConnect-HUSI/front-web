@@ -62,6 +62,10 @@ export class PatientService {
     );
   }
 
+  getTratamientosPorId(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
+  }
+
   updatePaciente(id: number, paciente: any): Observable<any> {
     return this.http.put(
       `http://localhost:8081/pacientes/actualizar-paciente/${id}`,

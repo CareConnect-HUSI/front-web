@@ -1,0 +1,21 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TreatmentsComponent } from './treatments.component';
+
+describe('TreatmentsComponent', () => {
+  let component: TreatmentsComponent;
+  let fixture: ComponentFixture<TreatmentsComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [TreatmentsComponent]
+    });
+    fixture = TestBed.createComponent(TreatmentsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
