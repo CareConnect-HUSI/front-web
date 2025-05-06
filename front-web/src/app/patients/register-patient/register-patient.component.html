@@ -99,10 +99,13 @@
               <td>
                 <select formControlName="medicamento">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let m of listaMedicamentos" [value]="m.codigo">{{ m.nombre }}</option>
+                  <option *ngFor="let m of listaMedicamentos" [value]="m.id">{{ m.name }}</option>
                 </select>
               </td>
-              <td><input type="number" formControlName="dosis" placeholder="Dosis" /></td>
+              <td>
+                <input type="number" formControlName="dosis" placeholder="Dosis" min="1" />
+              </td>
+              
               <td>
                 <select formControlName="frecuencia">
                   <option value="" disabled selected>Seleccionar</option>
@@ -153,7 +156,7 @@
               <td>
                 <select formControlName="procedimiento">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let p of listaProcedimientos" [value]="p.codigo">{{ p.descripcion }}</option>
+                  <option *ngFor="let p of listaProcedimientos" [value]="p.id">{{ p.name }}</option>
                 </select>
               </td>
               

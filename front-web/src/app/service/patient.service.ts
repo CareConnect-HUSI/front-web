@@ -72,4 +72,9 @@ export class PatientService {
   getTiposIdentificacion() {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
   }
+
+  getTiposActividad(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
+  }
+  
 }
