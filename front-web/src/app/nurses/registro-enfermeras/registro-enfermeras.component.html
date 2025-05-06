@@ -79,37 +79,50 @@
 
     <div class="form-grid">
       <div class="form-group">
-        <label>Nombres</label>
+        <label>Nombres
+          <span class="required-asterisk">*</span>
+        </label>
         <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
       </div>
       
       <div class="form-group">
-        <label>Apellidos</label>
+        <label>Apellidos
+          <span class="required-asterisk">*</span>
+        </label>
         <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
       </div>
       
       <div class="form-group">
-        <label>Tipo de Documento</label>
+        <label>Tipo de Documento
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="identificationType">
-          <option value="" disabled selected>Seleccione un tipo</option>
-          <option value="CC">Cédula de Ciudadanía (CC)</option>
-          <option value="TI">Tarjeta de Identidad (TI)</option>
-          <option value="Pasaporte">Pasaporte</option>
-        </select>
+          <option value="" disabled>Seleccione un tipo de documento</option>
+          <option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.id">
+            {{ tipo.name }}
+          </option>
+        </select>          
+        
       </div>
       
       <div class="form-group">
-        <label>N° de Documento</label>
+        <label>N° de Documento
+          <span class="required-asterisk">*</span>
+        </label>
         <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
       </div>
       
       <div class="form-group">
-        <label>Correo Electrónico</label>
+        <label>Correo Electrónico
+          <span class="required-asterisk">*</span>
+        </label>
         <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
       </div>
       
       <div class="form-group">
-        <label>Contraseña</label>
+        <label>Contraseña
+          <span class="required-asterisk">*</span>
+        </label>
         <div class="password-input">
           <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
           <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
@@ -117,7 +130,9 @@
       </div>
       
       <div class="form-group">
-        <label>Dirección</label>
+        <label>Dirección
+          <span class="required-asterisk">*</span>
+        </label>
         <div class="address-input">
           <input formControlName="address" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
           <button type="button" class="edit-btn" (click)="openAddressModal()">
@@ -127,7 +142,9 @@
       </div>
       
       <div class="form-group">
-        <label>Localidad</label>
+        <label>Localidad
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="localidad" required>
           <option value="" disabled selected>Seleccione localidad</option>
           <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
@@ -135,7 +152,9 @@
       </div>
       
       <div class="form-group">
-        <label>Barrio</label>
+        <label>Barrio
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="barrio" required>
           <option value="" disabled selected>Seleccione barrio</option>
           <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
@@ -143,12 +162,16 @@
       </div>
       
       <div class="form-group">
-        <label>Celular</label>
+        <label>Celular
+          <span class="required-asterisk">*</span>
+        </label>
         <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
       </div>
       
       <div class="form-group">
-        <label>Turno</label>
+        <label>Turno
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="turno">
           <option value="" disabled selected>Seleccione turno</option>
           <option value="Mañana">Mañana 7:00 a 13:00</option>
@@ -184,7 +207,9 @@
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
-            <label>Tipo de Vía</label>
+            <label>Tipo de Vía
+              <span class="required-asterisk">*</span>
+            </label>
             <select formControlName="tipoVia" required>
               <option value="" disabled selected>Seleccionar</option>
               <option value="Calle">Calle</option>
@@ -196,7 +221,9 @@
           </div>
           
           <div class="form-group">
-            <label>Número Vía</label>
+            <label>Número Vía
+              <span class="required-asterisk">*</span>
+            </label>
             <input type="text" formControlName="numeroVia" placeholder="Ej: 12" required>
           </div>
           
@@ -210,7 +237,7 @@
           <div class="form-group">
             <label>Bis</label>
             <select formControlName="bis">
-              <option value="">No</option>
+              <option value=""></option>
               <option value="Bis">Bis</option>
               <option value="Bis A">Bis A</option>
               <option value="Bis B">Bis B</option>
@@ -223,14 +250,18 @@
           </div>
           
           <div class="form-group">
-            <label>Número Placa</label>
+            <label>Número Placa
+              <span class="required-asterisk">*</span>
+            </label>
             <input type="text" formControlName="numeroPlaca" placeholder="Ej: 45-67" required>
           </div>
         </div>
       </div>
       
       <div class="form-group">
-        <label>Localidad</label>
+        <label>Localidad
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="localidad" required (change)="onLocalidadChange()">
           <option value="" disabled selected>Seleccionar localidad</option>
           <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
@@ -238,7 +269,9 @@
       </div>
       
       <div class="form-group">
-        <label>Barrio</label>
+        <label>Barrio
+          <span class="required-asterisk">*</span>
+        </label>
         <select formControlName="barrio" required>
           <option value="" disabled selected>Seleccionar barrio</option>
           <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>

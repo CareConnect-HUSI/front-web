@@ -10,15 +10,21 @@
 
       <div class="form-grid" formGroupName="personalInfo">
         <div class="form-group">
-          <label>Nombres</label>
+          <label>Nombres
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="nombres" type="text" placeholder="Ej: María José" />
         </div>
         <div class="form-group">
-          <label>Apellidos</label>
+          <label>Apellidos
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="apellidos" type="text" placeholder="Ej: González Pérez" />
         </div>
         <div class="form-group">
-          <label>Tipo de Documento</label>
+          <label>Tipo de Documento
+            <span class="required-asterisk">*</span>
+          </label>
           <select formControlName="tipoDocumento">
             <option value="" disabled>Seleccione un tipo de documento</option>
             <option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.id">
@@ -28,11 +34,15 @@
           
         </div>
         <div class="form-group">
-          <label>N° de Documento</label>
+          <label>N° de Documento
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="numeroDocumento" type="text" placeholder="Ej: 123456789" />
         </div>
         <div class="form-group">
-          <label>Dirección</label>
+          <label>Dirección
+            <span class="required-asterisk">*</span>
+          </label>
           <div class="address-input">
             <input formControlName="direccion" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
             <button type="button" class="edit-btn" (click)="openAddressModal()">
@@ -45,7 +55,9 @@
           <input formControlName="conjunto" type="text" placeholder="Ej: Conjunto Alegria" />
         </div>
         <div class="form-group">
-          <label>Localidad</label>
+          <label>Localidad
+            <span class="required-asterisk">*</span>
+          </label>
           <select formControlName="localidad">
             <option value="" disabled selected>Seleccione una localidad</option>
             <option value="Suba">Suba</option>
@@ -54,19 +66,27 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Barrio</label>
+          <label>Barrio
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="barrio" type="text" placeholder="Ej: El Prado" />
         </div>
         <div class="form-group">
-          <label>Celular</label>
+          <label>Celular
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="celular" type="text" placeholder="Ej: 3001234567" />
         </div>
         <div class="form-group">
-          <label>Nombre Acudiente</label>
+          <label>Nombre Acudiente
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="nombreFamiliar" type="text" placeholder="Ej: Carlos López" />
         </div>
         <div class="form-group">
-          <label>Celular Acudiente</label>
+          <label>Celular Acudiente
+            <span class="required-asterisk">*</span>
+          </label>
           <input formControlName="celularFamiliar" type="text" placeholder="Ej: 3109876543" />
         </div>
         <div class="form-group">

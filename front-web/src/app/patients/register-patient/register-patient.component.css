@@ -330,3 +330,8 @@
 .edit-btn:hover {
   background: #d0e0ff;
 }
+
+.required-asterisk {
+  color: #c62828;
+  margin-left: 4px;
+}
