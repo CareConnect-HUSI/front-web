@@ -31,7 +31,6 @@ export class TreatmentsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isLoading = true;
     const idParam = this.route.snapshot.paramMap.get('id');
 
     if (idParam) {
@@ -48,6 +47,8 @@ export class TreatmentsComponent implements OnInit {
   }
 
   loadPatientData(id: number): void {
+    this.isLoading = true;
+
     this.pacienteService.obtenerPacientePorId(id).subscribe({
       
       next: (patient: any) => {
@@ -59,15 +60,15 @@ export class TreatmentsComponent implements OnInit {
           this.tratamientos = patient.actividades.map((actividad: any) => ({
             nombre: actividad.nombreActividad,
             dosis: actividad.dosis ? `${actividad.dosis} mg` : '',
-            hora: actividad.hora || '',
-            frecuencia: actividad.frecuencia || '',
-            cantidad: actividad.cantidad || 1,
+            hora: actividad.hora || 'NA',
+            frecuencia: actividad.frecuencia || 'NA',
             usado: actividad.usado || 0,
             fechaInicio: actividad.fechaInicio || '',
             fechaFin: actividad.fechaFin || '',
             diasTratamiento: actividad.diasTratamiento || 0,
             // calendario: actividad.calendario || this.generarCalendario(7, this.getDosesPerDay(actividad.frecuencia || 'Cada 24h'))
           }));
+          this.isLoading = false; 
           console.log('Tratamientos:', this.tratamientos);
         } else {
           console.log('Tratamientos:', this.tratamientos);
@@ -82,7 +83,6 @@ export class TreatmentsComponent implements OnInit {
         this.medicationMessage = 'Error al cargar los datos del paciente.';
       },
     });
-    this.isLoading = false; //Quitarlo
   }
 
 

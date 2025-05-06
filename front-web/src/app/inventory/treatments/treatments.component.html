@@ -3,7 +3,7 @@
   <div *ngIf="isLoading" class="loading-overlay">
     <div class="spinner">
       <i class="fas fa-spinner fa-spin"></i>
-      <span>Cargando pacientes...</span>
+      <span>Cargando tratamientos...</span>
     </div>
   </div>
 
@@ -33,13 +33,13 @@
         <table class="info-table medication-table">
           <thead>
             <tr>
-              <th>Medicamento</th>
+              <th>Tratamiento</th>
               <th>Dosis</th>
               <th>Frecuencia</th>
               <th>Hora</th>
-              <th>Cantidad</th>
-              <th>Disponible</th>
-              <th>Total</th>
+              <th>Días de tratamiento</th>
+              <th>Fecha de inicio</th>
+              <th>Fecha de fin</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -47,21 +47,11 @@
             <tr *ngFor="let item of tratamientos; let i = index">
               <td>{{ item.nombre }}</td>
               <td>{{ item.dosis }}</td>
-              <td>{{ item.frecuencia }}</td>
+              <td>Cada {{ item.frecuencia }} horas</td>
               <td>{{ item.hora }}</td>
-              <td>
-                <input
-                  type="number"
-                  [(ngModel)]="item.cantidad"
-                  (change)="updateTotal(item)"
-                  min="1"
-                  class="quantity-input"
-                />
-              </td>
-              <td [class.low-stock]="isLowStock(item)">
-                {{ item.cantidad - item.usado }}
-              </td>
-              <td>{{ item.cantidad }}</td>
+              <td>{{ item.diasTratamiento }}</td>
+              <td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
               <td>
                 <button class="action-btn small" (click)="openEditModal(item, i)">
                   <i class="fas fa-edit"></i>
@@ -106,17 +96,6 @@
                 {{ medicamento.name }}
               </option>
             </select>
-          </div>
-
-          <div class="form-group">
-            <label>Dosis:</label>
-            <input
-              type="text"
-              [(ngModel)]="currentMedication.dosis"
-              name="dosis"
-              required
-              class="form-input"
-            />
           </div>
         </div>
 
