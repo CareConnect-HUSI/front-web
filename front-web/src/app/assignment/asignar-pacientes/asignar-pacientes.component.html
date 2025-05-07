@@ -1,4 +1,12 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando Pacientes...</span>
+    </div>
+  </div>
+
   <div class="header">
     <h2 class="title-center">Asignación de Pacientes</h2>
     <div class="info-jornada">
@@ -43,7 +51,6 @@
 
       <ng-template #noProgramados>
         <div class="empty-state">
-          <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
           <h4>No hay pacientes programados sin asignar</h4>
         </div>
       </ng-template>
@@ -73,7 +80,6 @@
 
       <ng-template #noAsignados>
         <div class="empty-state">
-          <img src="assets/images/no-assignments.png" alt="No hay asignaciones" class="empty-image">
           <h4>No hay pacientes asignados aún</h4>
         </div>
       </ng-template>
@@ -115,7 +121,6 @@
 
       <ng-template #noDisponibles>
         <div class="empty-state">
-          <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
           <h4>No hay otros pacientes disponibles</h4>
         </div>
       </ng-template>
@@ -152,7 +157,7 @@
     <button class="btn btn-primary" (click)="navegarARegistroPaciente()">
       <i class="fas fa-plus-circle"></i> Registrar Nuevo Paciente
     </button>
-    <button class="btn btn-success" [disabled]="pacientesAsignados.length === 0" routerLink="/asignar-enfermeras">
+    <button class="btn btn-success" [disabled]="pacientesAsignados.length === 0" (click)="navegarSiguiente()">
       <i class="fas fa-user-nurse"></i> Asignar Enfermeras
     </button>
   </div>

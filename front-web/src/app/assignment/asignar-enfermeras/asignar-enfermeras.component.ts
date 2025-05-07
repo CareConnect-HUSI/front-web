@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NurseService } from 'src/app/service/nurse.service';
+import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 
 interface Enfermera {
   id: number;
@@ -42,10 +43,12 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   isLoading: boolean = false;
 
-  constructor(private router: Router, private nurseService: NurseService) {}
+  constructor(private router: Router, private nurseService: NurseService,     private optimizationDataService: OptimizationDataService,
+  ) {}
 
   ngOnInit(): void {
     this.cargarEnfermeras();
+    console.log('Datos de optimización:', this.optimizationDataService.getAllData());
   }
 
   cargarEnfermeras(): void {

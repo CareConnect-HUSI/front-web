@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
@@ -28,17 +29,24 @@ export class AsignarPacientesComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private pacienteService: PatientService
+    private pacienteService: PatientService,
+    private optimizationDataService: OptimizationDataService,
   ) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
+
     this.pacienteService.findAll(0, 50).subscribe({
       next: (response) => {
-        this.isLoading = true;
         this.todosPacientes = response.content;
         this.clasificarPacientes();
+        this.isLoading = false;
+        console.log('Pacientes obtenidos:', this.todosPacientes);
+
       },
       error: (err) => {
+        this.isLoading = false;
+        this.todosPacientes = [];
         console.error('Error al obtener pacientes:', err);
       }
     });
@@ -129,6 +137,7 @@ export class AsignarPacientesComponent implements OnInit {
       this.pacientesAsignados.push({ ...paciente });
       this.actualizarListas();
     }
+    console.log('Pacientes asignados:', this.pacientesAsignados);
   }
 
   abrirModalConfirmacion(paciente: any): void {
@@ -153,9 +162,17 @@ export class AsignarPacientesComponent implements OnInit {
         this.actualizarListas();
       }
     }
+    console.log('Pacientes asignados:', this.pacientesAsignados);
+
   }
 
   navegarARegistroPaciente(): void {
-    this.router.navigate(['/registro-paciente']);
+    this.router.navigate(['/registro-pacientes']);
+  }
+
+  navegarSiguiente(): void {
+    this.optimizationDataService.setInfoPacientes(this.pacientesAsignados);
+    console.log('Pacientes asignados para el registro:', this.optimizationDataService.getAllData().dataPacientes);
+    this.router.navigate(['/asignar-enfermeras']);
   }
 }
