@@ -15,7 +15,7 @@ export class TreatmentsComponent implements OnInit {
   nombrePaciente: string = '';
   tratamientos: any[] = [];
 
-  listaMedicamentos: any[] = [];
+  listaTratamientos: any[] = [];
   showEditModal: boolean = false;
   showAddModal: boolean = false;
   showMedicationWarning: boolean = false;
@@ -58,21 +58,22 @@ export class TreatmentsComponent implements OnInit {
 
         if (patient.actividades) {
           this.tratamientos = patient.actividades.map((actividad: any) => ({
+            id: actividad.id,
             nombre: actividad.nombreActividad,
-            dosis: actividad.dosis ? `${actividad.dosis} mg` : '',
-            hora: actividad.hora || 'NA',
-            frecuencia: actividad.frecuencia || 'NA',
+            hora: actividad.hora || '',
+            dosis: `${actividad.dosis} unidades` || '',
+            frecuencia: `Cada ${actividad.frecuencia} horas` || '',
             usado: actividad.usado || 0,
             fechaInicio: actividad.fechaInicio || '',
             fechaFin: actividad.fechaFin || '',
             diasTratamiento: actividad.diasTratamiento || 0,
-            // calendario: actividad.calendario || this.generarCalendario(7, this.getDosesPerDay(actividad.frecuencia || 'Cada 24h'))
           }));
           this.isLoading = false; 
-          console.log('Tratamientos:', this.tratamientos);
         } else {
           console.log('Tratamientos:', this.tratamientos);
           this.tratamientos = [];
+          this.isLoading = false; 
+
         }
       },
 
@@ -81,6 +82,7 @@ export class TreatmentsComponent implements OnInit {
         this.nombrePaciente = '';
         this.documentoPaciente = '';
         this.medicationMessage = 'Error al cargar los datos del paciente.';
+        this.isLoading = false; 
       },
     });
   }
@@ -174,13 +176,36 @@ export class TreatmentsComponent implements OnInit {
       calendario: this.generarCalendario(7, 0)
     };
     this.showAddModal = true;
+    this.loadListaTratamientos();
+  }
+
+
+  loadListaTratamientos(): void {
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (data: any[]) => {
+        this.listaTratamientos = data.filter(
+          (item) => item.estado === 'Activo'
+        );
+      },
+      error: (err) => {
+        console.error('Error al cargar medicamentos:', err);
+        this.listaTratamientos = [];
+        this.medicationMessage = 'Error al cargar la lista de medicamentos.';
+        this.showMedicationWarning = true;
+      }
+    });
   }
 
   openEditModal(med: any, index: number): void {
     this.currentMedication = { ...med };
+    this.currentMedication.id = med.id;  //NO me trae correctamente el id
+    console.log('Tratamiento a editar:', this.currentMedication);
     this.currentIndex = index;
     this.showEditModal = true;
+    this.loadListaTratamientos();
   }
+
+  
 
   closeAddModal(): void {
     this.showAddModal = false;
@@ -226,6 +251,41 @@ export class TreatmentsComponent implements OnInit {
     // }
     // this.closeAddModal();
     // this.closeEditModal();
+  }
+
+  updateTreatment(): void {
+    // Actualizar el tratamiento
+    // Validación de campos requeridos
+    if (!this.currentMedication.hora || !this.currentMedication.frecuencia || !this.currentMedication.fechaInicio || !this.currentMedication.fechaFin) {
+    this.medicationMessage = 'Por favor, completa todos los campos requeridos.';
+    this.showMedicationWarning = true;
+    return;
+    }
+
+    // Validación de nombre
+    if (!this.currentMedication.nombre) {
+      this.medicationMessage = 'El nombre es requerido.';
+      this.showMedicationWarning = true;
+      return;
+    }
+    const treatmentToUpdate = {
+      ...this.currentMedication
+    };
+    console.log('Tratamiento a actualizar:', treatmentToUpdate);
+    if (this.showEditModal && this.currentIndex >= 0) {
+      this.isLoading = true;
+      this.pacienteService.updateTratamiento(this.idPaciente, treatmentToUpdate).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          // ... handle success ...
+        },
+        error: (err) => {
+          this.isLoading = false;
+          // ... handle error ...
+        }
+      });
+    }
+
   }
 
   updateTotal(item: any): void {
