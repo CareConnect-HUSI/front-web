@@ -36,8 +36,6 @@ export class TreatmentsComponent implements OnInit {
     if (idParam) {
       this.idPaciente = +idParam;
       this.loadPatientData(this.idPaciente);
-      // this.loadInventario(this.idPaciente);
-      // this.loadTratamientos(this.idPaciente);
     } else {
       this.isLoading = false;
       this.medicationMessage = 'No se proporcionó un ID de paciente.';
@@ -56,18 +54,28 @@ export class TreatmentsComponent implements OnInit {
         this.nombrePaciente = patient.nombre || '';
         this.documentoPaciente = patient.numeroIdentificacion || '';
 
+        
         if (patient.actividades) {
-          this.tratamientos = patient.actividades.map((actividad: any) => ({
-            id: actividad.id,
-            nombre: actividad.nombreActividad,
-            hora: actividad.hora || '',
-            dosis: `${actividad.dosis} unidades` || '',
-            frecuencia: `Cada ${actividad.frecuencia} horas` || '',
-            usado: actividad.usado || 0,
-            fechaInicio: actividad.fechaInicio || '',
-            fechaFin: actividad.fechaFin || '',
-            diasTratamiento: actividad.diasTratamiento || 0,
-          }));
+          this.tratamientos = patient.actividades.map((actividad: any) => {
+            console.log('Actividad completa:', actividad);
+
+            return {
+              idRelacion: actividad.id,
+              nombre: actividad.actividad?.nombreActividad || actividad.nombreActividad || 'Sin nombre',
+              hora: actividad.hora || '',
+              dosis: actividad.dosis,
+              frecuencia: actividad.frecuencia,
+              usado: actividad.usado || 0,
+              fechaInicio: actividad.fechaInicio || '',
+              fechaFin: actividad.fechaFin || '',
+              diasTratamiento: actividad.diasTratamiento || 0,
+              actividadId: actividad.actividad?.id || actividad.actividadId || null
+            };
+          });
+          
+          console.log('Tratamientos construidos:', this.tratamientos);
+
+
           this.isLoading = false; 
         } else {
           console.log('Tratamientos:', this.tratamientos);
@@ -85,66 +93,6 @@ export class TreatmentsComponent implements OnInit {
         this.isLoading = false; 
       },
     });
-  }
-
-
-  loadTratamientos(id: number): void {
-    // this.pacienteService.getTratamientosPorId(id).subscribe({
-    //   next: (data: any[]) => {
-    //     this.tratamientos = data; // Sin filtro, asigna todos los datos recibidos
-    //     console.log('Tratamientos:', data);
-    //     console.log('Medicamentos:', this.tratamientos);
-    //   },
-    //   error: (err) => {
-    //     console.log('Medicamentos error:', this.tratamientos);
-    //     console.error('Error al cargar medicamentos:', err);
-    //     this.listaMedicamentos = [];
-    //     this.medicationMessage = 'Error al cargar la lista de medicamentos.';
-    //     this.showMedicationWarning = true;
-    //   }
-    // });
-  }
-
-  loadMedicamentos(): void {
-    // this.stockService.getListaMedicamentos().subscribe({
-    //   next: (data: any[]) => {
-    //     this.listaMedicamentos = data.filter(
-    //       (item) => item.tipoActividad?.id === 1 && item.estado === 'Activo'
-    //     );
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al cargar medicamentos:', err);
-    //     this.listaMedicamentos = [];
-    //     this.medicationMessage = 'Error al cargar la lista de medicamentos.';
-    //     this.showMedicationWarning = true;
-    //   }
-    // });
-  }
-
-  loadInventario(documento: string): void {
-    // this.stockService.getTratamientosPorPaciente(documento).subscribe({
-    //   next: (tratamientos: any[]) => {
-    //     this.inventario = tratamientos.map((tratamiento) => ({
-    //       nombre: tratamiento.nombre,
-    //       dosis: tratamiento.dosis,
-    //       frecuencia: tratamiento.frecuencia,
-    //       cantidad: tratamiento.cantidad,
-    //       usado: tratamiento.usado || 0,
-    //       fechaInicio: tratamiento.fechaInicio,
-    //       fechaFin: tratamiento.fechaFin,
-    //       diasTratamiento: tratamiento.diasTratamiento || 0,
-    //       calendario: tratamiento.calendario || this.generarCalendario(7, this.getDosesPerDay(tratamiento.frecuencia))
-    //     }));
-    //     this.isLoading = false;
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al cargar inventario:', err);
-    //     this.inventario = [];
-    //     this.medicationMessage = 'Error al cargar el inventario de tratamientos.';
-    //     this.showMedicationWarning = true;
-    //     this.isLoading = false;
-    //   }
-    // });
   }
 
   generarCalendario(dias: number, frecuencia: number): any[] {
@@ -186,6 +134,7 @@ export class TreatmentsComponent implements OnInit {
         this.listaTratamientos = data.filter(
           (item) => item.estado === 'Activo'
         );
+        console.log('Lista de tratamientos activos:', this.listaTratamientos); 
       },
       error: (err) => {
         console.error('Error al cargar medicamentos:', err);
@@ -197,14 +146,63 @@ export class TreatmentsComponent implements OnInit {
   }
 
   openEditModal(med: any, index: number): void {
-    this.currentMedication = { ...med };
-    this.currentMedication.id = med.id;  //NO me trae correctamente el id
-    console.log('Tratamiento a editar:', this.currentMedication);
+    console.log('Tratamiento recibido en modal:', med);
+  
+    if (!med.idRelacion) {
+      console.warn('Tratamiento sin idRelacion. No se puede editar.');
+      this.medicationMessage = 'Este tratamiento no puede editarse porque falta el identificador de la relación.';
+      this.showMedicationWarning = true;
+      return;
+    }
+  
     this.currentIndex = index;
-    this.showEditModal = true;
-    this.loadListaTratamientos();
+  
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (data: any[]) => {
+        this.listaTratamientos = data.filter(item => item.estado === 'Activo');
+  
+        const nombreActividad = (med.nombre || med.nombreActividad || '')
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
+          .trim().toLowerCase();
+  
+        const actividadEncontrada = this.listaTratamientos.find(item => {
+          const nombreItem = (item.name || item.nombre || '')
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
+            .trim().toLowerCase();
+          return nombreItem === nombreActividad;
+        });
+  
+        const actividadId = actividadEncontrada ? actividadEncontrada.id : null;
+  
+        if (!actividadId) {
+          console.warn('No se encontró ID para la actividad:', nombreActividad);
+        }
+  
+        this.currentMedication = {
+          idRelacion: med.idRelacion,
+          actividadId: actividadId,
+          nombre: med.nombre || med.nombreActividad || '',
+          dosis: med.dosis,
+          frecuencia: med.frecuencia,
+          hora: med.hora,
+          fechaInicio: med.fechaInicio,
+          fechaFin: med.fechaFin,
+          diasTratamiento: med.diasTratamiento,
+          usado: med.usado,
+        };
+  
+        this.showEditModal = true;
+      },
+      error: (err) => {
+        console.error('Error al cargar medicamentos:', err);
+        this.listaTratamientos = [];
+        this.medicationMessage = 'Error al cargar la lista de medicamentos.';
+        this.showMedicationWarning = true;
+      },
+    });
+    this.calculateDays(this.currentMedication);
   }
-
+  
   
 
   closeAddModal(): void {
@@ -254,81 +252,93 @@ export class TreatmentsComponent implements OnInit {
   }
 
   updateTreatment(): void {
-    // Actualizar el tratamiento
-    // Validación de campos requeridos
-    if (!this.currentMedication.hora || !this.currentMedication.frecuencia || !this.currentMedication.fechaInicio || !this.currentMedication.fechaFin) {
-    this.medicationMessage = 'Por favor, completa todos los campos requeridos.';
-    this.showMedicationWarning = true;
-    return;
-    }
-
-    // Validación de nombre
-    if (!this.currentMedication.nombre) {
-      this.medicationMessage = 'El nombre es requerido.';
+    if (!this.currentMedication?.actividadId || !this.currentMedication?.idRelacion) {
+      this.medicationMessage = 'Falta información clave del tratamiento.';
+      console.error('Falta información clave del tratamiento:', this.currentMedication);
       this.showMedicationWarning = true;
       return;
     }
+    
+    const horaFormateada = this.currentMedication.hora?.slice(0, 5);
+
+    
     const treatmentToUpdate = {
-      ...this.currentMedication
+      id: this.currentMedication.idRelacion,
+      dosis: parseInt(this.currentMedication.dosis),
+      frecuencia: parseInt(this.currentMedication.frecuencia),
+      hora: horaFormateada,
+      fechaInicio: this.currentMedication.fechaInicio,
+      fechaFin: this.currentMedication.fechaFin,
+      diasTratamiento: this.currentMedication.diasTratamiento,
+      actividad: {
+        id: this.currentMedication.actividadId
+      },
+      paciente: {
+        id: this.idPaciente
+      }
     };
-    console.log('Tratamiento a actualizar:', treatmentToUpdate);
-    if (this.showEditModal && this.currentIndex >= 0) {
-      this.isLoading = true;
-      this.pacienteService.updateTratamiento(this.idPaciente, treatmentToUpdate).subscribe({
-        next: (response) => {
+    console.log('Payload a enviar:', treatmentToUpdate);
+
+    this.pacienteService.updateTratamiento(this.currentMedication.idRelacion, treatmentToUpdate)
+      .subscribe({
+        next: () => {
           this.isLoading = false;
-          // ... handle success ...
+          this.medicationMessage = 'Tratamiento actualizado correctamente.';
+          this.showMedicationWarning = true;
+          this.closeEditModal();
         },
         error: (err) => {
           this.isLoading = false;
-          // ... handle error ...
+          this.medicationMessage = 'Error al actualizar el tratamiento.';
+          this.showMedicationWarning = true;
+          console.error('Error al actualizar tratamiento:', err);
         }
       });
+
+      const idParam = this.route.snapshot.paramMap.get('id');
+
+    if (idParam) {
+      this.idPaciente = +idParam;
+      this.loadPatientData(this.idPaciente);
+    } else {
+      this.isLoading = false;
+      this.medicationMessage = 'No se proporcionó un ID de paciente.';
     }
-
+    
   }
-
-  updateTotal(item: any): void {
-    // if (item.cantidad < 1) {
-    //   alert('La cantidad debe ser al menos 1.');
-    //   item.cantidad = 1;
-    // }
-    // this.stockService.actualizarTratamiento(this.documentoPaciente!, item).subscribe({
-    //   next: () => {
-    //     console.log('Cantidad actualizada correctamente.');
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al actualizar cantidad:', err);
-    //     this.medicationMessage = 'Error al actualizar la cantidad.';
-    //     this.showMedicationWarning = true;
-    //   }
-    // });
-  }
+  
 
   calculateDays(medication: any): void {
+    if (!medication?.fechaInicio || !medication?.fechaFin) {
+      medication.diasTratamiento = 0;
+      return;
+    }
+  
     const fechaInicio = new Date(medication.fechaInicio);
     const fechaFin = new Date(medication.fechaFin);
-
-    if (fechaInicio && fechaFin && fechaInicio <= fechaFin) {
-      const dias = Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24));
-      medication.diasTratamiento = dias;
-
-      const dosisPorDia = this.getDosesPerDay(medication.frecuencia);
-      medication.calendario = Array(7).fill({ M: false, T: false, N: false });
-
-      for (let i = 0; i < dias && i < 7; i++) {
-        const daySchedule = { M: false, T: false, N: false };
-        if (dosisPorDia >= 1) daySchedule.M = true;
-        if (dosisPorDia >= 2) daySchedule.T = true;
-        if (dosisPorDia >= 3) daySchedule.N = true;
-        medication.calendario[i] = daySchedule;
-      }
-    } else {
+  
+    if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime()) || fechaInicio > fechaFin) {
       alert('La fecha de fin debe ser posterior a la fecha de inicio.');
       medication.fechaFin = null;
+      medication.diasTratamiento = 0;
+      return;
+    }
+  
+    const dias = Math.ceil((fechaFin.getTime() - fechaInicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    medication.diasTratamiento = dias;
+  
+    const dosisPorDia = this.getDosesPerDay(medication.frecuencia);
+    medication.calendario = Array(7).fill({ M: false, T: false, N: false });
+  
+    for (let i = 0; i < dias && i < 7; i++) {
+      const daySchedule = { M: false, T: false, N: false };
+      if (dosisPorDia >= 1) daySchedule.M = true;
+      if (dosisPorDia >= 2) daySchedule.T = true;
+      if (dosisPorDia >= 3) daySchedule.N = true;
+      medication.calendario[i] = daySchedule;
     }
   }
-
+  
   getDosesPerDay(frecuencia: string): number {
     if (frecuencia.includes('6')) return 4;
     if (frecuencia.includes('8')) return 3;
@@ -352,20 +362,5 @@ export class TreatmentsComponent implements OnInit {
     // });
   }
 
-  logAdministration(item: any, day: any, shift: string): void {
-    // if (!day[shift]) {
-    //   day[shift] = true;
-    //   item.usado++;
-    //   this.stockService.actualizarTratamiento(this.documentoPaciente!, item).subscribe({
-    //     next: () => {
-    //       console.log('Administración registrada correctamente.');
-    //     },
-    //     error: (err) => {
-    //       console.error('Error al registrar administración:', err);
-    //       this.medicationMessage = 'Error al registrar la administración.';
-    //       this.showMedicationWarning = true;
-    //     }
-    //   });
-    // }
-  }
+
 }
