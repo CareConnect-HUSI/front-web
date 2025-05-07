@@ -77,6 +77,10 @@ export class PatientService {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
   }
 
+
+  getTiposActividad(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
+  }
   updateTratamiento(id: number, tratamiento: any): Observable<any> {
     return this.http.put(`http://localhost:8081/actividad-paciente-visita/actualizar/${id}`, tratamiento);
   }

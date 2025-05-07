@@ -2,6 +2,7 @@ import { AuthService } from 'src/app/service/auth.service';
 import { NurseService } from 'src/app/service/nurse.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PatientService } from 'src/app/service/patient.service';
 
 interface Localidad {
   codigo: string;
@@ -34,16 +35,19 @@ export class RegistroEnfermerasComponent implements OnInit {
   isEditMode = false;
   currentNurseId: number | null = null;
   nurses: any[] = [];
+  tiposIdentificacion: any[] = [];
   currentPage = 0;
   itemsPerPage = 10;
   totalItems = 0;
 
   constructor(
     private fb: FormBuilder,
+    private patientService: PatientService,
     private nurseService: NurseService
   ) {}
 
   ngOnInit() {
+    this.cargarTiposIdentificacion();
     this.initNurseForm();
     this.initAddressForm();
     this.loadNurses();
@@ -121,6 +125,13 @@ export class RegistroEnfermerasComponent implements OnInit {
     }
   }
 
+  cargarTiposIdentificacion() {
+    this.patientService.getTiposIdentificacion().subscribe({
+      next: tipos => this.tiposIdentificacion = tipos,
+      error: err => console.error('Error al cargar tipos de identificación', err)
+    });
+  }
+  
   onSubmit() {
     if (this.nurseForm.invalid) {
       alert('Por favor complete todos los campos requeridos.');

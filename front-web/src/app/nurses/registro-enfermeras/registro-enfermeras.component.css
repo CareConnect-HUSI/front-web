@@ -461,3 +461,8 @@ tr:hover {
 .pagination button:hover:not(.active) {
   background: #f0f0f0;
 }
+
+.required-asterisk {
+  color: #c62828;;
+  margin-left: 4px;
+}
