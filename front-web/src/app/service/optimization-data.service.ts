@@ -9,17 +9,37 @@ export class OptimizationDataService {
 
 
   private data = {
-    dataPacientes: null,
-    dataEnfermeras: null,
+    dataPacientesManana: null,
+    dataPacientesTarde: null,
+    dataPacientesNoche: null,
+
+    dataEnfermerasManana: null,
+    dataEnfermerasTarde: null,
+    dataEnfermerasNoche: null,
   };
 
   // Métodos para establecer datos
-  setInfoPacientes(info: any) {
-    this.data.dataPacientes = info;
+  setInfoPacientesManana(info: any) {
+    this.data.dataPacientesManana = info;
   }
 
-  setInfoEnfermeras(info: any) {
-    this.data.dataEnfermeras = info;
+  setInfoPacientesTarde(info: any) {
+    this.data.dataPacientesTarde = info;
+  }
+
+  setInfoPacientesNoche(info: any) {
+    this.data.dataPacientesNoche = info;
+  }
+
+  setInfoEnfermerasManana(info: any) {
+    this.data.dataEnfermerasManana = info;
+  }
+
+  setInfoEnfermerasTarde(info: any) {
+    this.data.dataEnfermerasTarde = info;
+  }
+  setInfoEnfermerasNoche(info: any) {
+    this.data.dataEnfermerasNoche = info;
   }
 
   // Método para obtener todos los datos acumulados
@@ -27,9 +47,51 @@ export class OptimizationDataService {
     return this.data;
   }
 
+  // Métodos para obtener datos
+  getInfoPacientesManana() {
+    return this.data.dataPacientesManana;
+  }
+
+  getInfoPacientesTarde() {
+    return this.data.dataPacientesTarde;
+  }
+
+  getInfoPacientesNoche() {
+    return this.data.dataPacientesNoche;
+  }
+
+  getInfoEnfermerasManana() {
+    return this.data.dataEnfermerasManana;
+  }
+
+  getInfoEnfermerasTarde() {
+    return this.data.dataEnfermerasTarde;
+  }
+
+  getInfoEnfermerasNoche() {
+    return this.data.dataEnfermerasNoche;
+  }
+
+  // Métodos para obtener todos los datos de pacientes y enfermeras
+  getAllPacientes() {
+    return {
+      dataPacientesManana: this.data.dataPacientesManana,
+      dataPacientesTarde: this.data.dataPacientesTarde,
+      dataPacientesNoche: this.data.dataPacientesNoche,
+    };
+  }
+
+  getAllEnfermeras() {
+    return {
+      dataEnfermerasManana: this.data.dataEnfermerasManana,
+      dataEnfermerasTarde: this.data.dataEnfermerasTarde,
+      dataEnfermerasNoche: this.data.dataEnfermerasNoche,
+    };
+  }
+
   // Método para limpiar datos (opcional)
   clearData() {
-    this.data = { dataPacientes: null, dataEnfermeras: null };
+    this.data = { dataPacientesManana: null, dataPacientesNoche: null, dataPacientesTarde:null, dataEnfermerasManana:  null, dataEnfermerasNoche:null, dataEnfermerasTarde:null };
   }
 
 

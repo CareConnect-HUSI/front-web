@@ -3,14 +3,6 @@ import { Router } from '@angular/router';
 import { NurseService } from 'src/app/service/nurse.service';
 import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 
-interface Enfermera {
-  id: number;
-  nombre: string;
-  apellido?: string;
-  numeroIdentificacion: string;
-  telefono: string;
-  turnoId: number | null;
-}
 
 interface Turno {
   id: number;
@@ -29,16 +21,19 @@ export class AsignarEnfermerasComponent implements OnInit {
     { id: 3, nombre: 'Noche' }
   ];
 
-  enfermeras: Enfermera[] = [];
-  enfermerasManana: Enfermera[] = [];
-  enfermerasTarde: Enfermera[] = [];
-  enfermerasNoche: Enfermera[] = [];
+  enfermeras: any[] = [];
+  enfermerasManana: any[] = [];
+  enfermerasTarde: any[] = [];
+  enfermerasNoche: any[] = [];
+  enfermerasSinTurno: any[] = []; // Nueva lista para enfermeras sin turno
+
 
   filtroNombre: string = '';
+  filtroNoSeleccionadas: string = ''; // Nuevo filtro para búsqueda de no seleccionadas
   filtroTurnoId: number | null = null;
 
   mostrarModalRemover: boolean = false;
-  enfermeraARemover: Enfermera | null = null;
+  enfermeraARemover: any | null = null;
   motivoRemocion: string = '';
 
   isLoading: boolean = false;
@@ -61,7 +56,9 @@ export class AsignarEnfermerasComponent implements OnInit {
           apellido: e.apellido || '',
           numeroIdentificacion: e.numeroIdentificacion,
           telefono: e.telefono || '',
-          turnoId: e.turnoEntity?.id ?? null
+          turnoId: e.turnoEntity?.id ?? null,
+          latitud: e.latitud,
+          longitud: e.longitud
         }));
   
         console.log('Enfermeras cargadas:', this.enfermeras);
@@ -69,6 +66,7 @@ export class AsignarEnfermerasComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
+        this.isLoading = false;
         console.error('Error al cargar enfermeras', error);
       }
     });
@@ -77,7 +75,7 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   actualizarListasPorTurno(): void {
     let baseList = this.enfermeras;
-
+    console.log("Lista  base", baseList);
     if (this.filtroNombre) {
       const filtro = this.filtroNombre.toLowerCase();
       baseList = baseList.filter(e =>
@@ -85,14 +83,29 @@ export class AsignarEnfermerasComponent implements OnInit {
         e.numeroIdentificacion.includes(this.filtroNombre)
       );
     }
-
+    
+    console.log("Enfermeras: ", baseList);
     this.enfermerasManana = baseList.filter(e => e.turnoId === 1);
     this.enfermerasTarde = baseList.filter(e => e.turnoId === 2);
     this.enfermerasNoche = baseList.filter(e => e.turnoId === 3);
+    this.enfermerasSinTurno = baseList.filter((e) => !e.turnoId); // Filtra enfermeras sin turno
+
+    console.log("Enfermeras noche: ", this.enfermerasNoche);
+
   }
 
   filtrarEnfermeras(): void {
     this.actualizarListasPorTurno();
+  }
+
+  filtrarEnfermerasNoSeleccionadas(): void {
+    const filtro = this.filtroNoSeleccionadas.toLowerCase();
+    this.enfermerasSinTurno = this.enfermeras.filter(
+      (e) =>
+        !e.turnoId &&
+        (e.nombre.toLowerCase().includes(filtro) ||
+          e.numeroIdentificacion.includes(filtro))
+    );
   }
 
   filtrarPorTurno(turnoId: number | null): void {
@@ -100,22 +113,30 @@ export class AsignarEnfermerasComponent implements OnInit {
     this.actualizarListasPorTurno();
   }
 
-  cambiarTurno(enfermera: Enfermera): void {
+  cambiarTurno(enfermera: any): void {
     const index = this.enfermeras.findIndex(e => e.id === enfermera.id);
     if (index !== -1) {
       this.enfermeras[index] = { ...enfermera };
       this.enfermeras = [...this.enfermeras];
+      console.log("Enfermeras:", this.enfermeras)
       this.actualizarListasPorTurno();
     }
+  }
 
-    // Actualizar en backend
-    this.nurseService.updateEnfermera(enfermera.id, enfermera).subscribe({
-      next: () => console.log('Turno actualizado en backend'),
-      error: (e) => console.error('Error al actualizar turno', e)
+  asignarTurno(enfermera: any): void {
+    if (enfermera.turnoId) {
+      this.cambiarTurno(enfermera); // Reutiliza la lógica de cambiarTurno
+    }
+  }
+
+  seleccionarTodasNoSeleccionadas(): void {
+    this.enfermerasSinTurno.forEach((enfermera) => {
+      enfermera.turnoId = 1; // Asigna Turno Mañana por defecto (puedes cambiarlo)
+      this.cambiarTurno(enfermera); // Actualiza cada enfermera
     });
   }
 
-  abrirModalRemover(enfermera: Enfermera): void {
+  abrirModalRemover(enfermera: any): void {
     this.enfermeraARemover = enfermera;
     this.motivoRemocion = '';
     this.mostrarModalRemover = true;
@@ -130,14 +151,17 @@ export class AsignarEnfermerasComponent implements OnInit {
   confirmarRemocion(): void {
     if (!this.enfermeraARemover || !this.motivoRemocion) return;
 
-    this.enfermeras = this.enfermeras.filter(e => e.id !== this.enfermeraARemover?.id);
-    this.actualizarListasPorTurno();
-    this.cerrarModalRemover();
+    const enfermera = this.enfermeras.find((e) => e.id === this.enfermeraARemover?.id);
+    if (enfermera) {
+      enfermera.turnoId = null; // Quita el turno en lugar de eliminar la enfermera
+      this.cambiarTurno(enfermera); // Actualiza en frontend y backend
+    }
 
     console.log(`Motivo de remoción: ${this.motivoRemocion}`);
+    this.cerrarModalRemover();
   }
 
-  trackByEnfermeraId(index: number, enfermera: Enfermera): number {
+  trackByEnfermeraId(index: number, enfermera: any): number {
     return enfermera.id;
   }
 
@@ -148,5 +172,11 @@ export class AsignarEnfermerasComponent implements OnInit {
         state: { enfermeras: this.enfermeras }
       });
     }, 2000);
+  }
+
+  volverAPacientes():void{
+    this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
+    console.log('Pacientes asignados para el registro:', this.optimizationDataService.getAllData());
+    this.router.navigate(['/asignar-pacientes']);
   }
 }
