@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PatientService } from 'src/app/service/patient.service';
 
+
 @Component({
   selector: 'app-asignar-pacientes',
   templateUrl: './asignar-pacientes.component.html',
@@ -156,6 +157,6 @@ export class AsignarPacientesComponent implements OnInit {
   }
 
   navegarARegistroPaciente(): void {
-    this.router.navigate(['/registro-paciente']);
+    this.router.navigate(['/registro-pacientes']);
   }
 }
