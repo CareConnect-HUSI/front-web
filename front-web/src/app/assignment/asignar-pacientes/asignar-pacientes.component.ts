@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 import { PatientService } from 'src/app/service/patient.service';
 
+
 @Component({
   selector: 'app-asignar-pacientes',
   templateUrl: './asignar-pacientes.component.html',
