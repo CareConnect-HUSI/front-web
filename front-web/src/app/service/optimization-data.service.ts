@@ -173,7 +173,14 @@ export class OptimizationDataService {
 
     console.log("Payload para la API:", payload);
 
-    return this.http.post('http://localhost:8086/rutas', "", { headers, responseType: 'json' });
+    return this.http.post(`${this.apiUrl}`, payload).subscribe({
+      next: (response) => {
+          console.log('Respuesta:', response);
+      },
+      error: (error) => {
+          console.error('Error:', error);
+      }
+  });
   }
 
   // Método para limpiar datos (opcional)
