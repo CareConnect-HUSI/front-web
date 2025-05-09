@@ -94,7 +94,7 @@ export class OptimizationDataService {
   generarCronogramaManana() {
     const horaInicio = '7:00';
     const tipoTurno = 6;
-    const margen = 1; // Assumed margin of 1 hour for time window
+    const margen = 1.5; // Assumed margin of 1 hour for time window
 
     // Get nurse and patient data
     const enfermeras = this.getInfoEnfermerasManana() || [];
@@ -140,7 +140,8 @@ export class OptimizationDataService {
         (sum: number, act: any) => sum + (act.duracionVisita || 0),
         0
       );
-      tiempoAtencion.push(totalDuracion);
+      const tempoVisita = totalDuracion/60 // Pasar de minutos a horas
+      tiempoAtencion.push(tempoVisita);
 
 
       // Buscar la primera hora recomendada válida en las actividades

@@ -38,7 +38,7 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   isLoading: boolean = false;
 
-  constructor(private router: Router, private nurseService: NurseService,     private optimizationDataService: OptimizationDataService,
+  constructor(private router: Router, private nurseService: NurseService, private optimizationDataService: OptimizationDataService,
   ) {}
 
   ngOnInit(): void {
