@@ -36,7 +36,9 @@ export class AsignarPacientesComponent implements OnInit {
       next: (response) => {
         this.isLoading = true;
         this.todosPacientes = response.content;
+        this.isLoading = false;
         this.clasificarPacientes();
+        
       },
       error: (err) => {
         console.error('Error al obtener pacientes:', err);
@@ -156,6 +158,6 @@ export class AsignarPacientesComponent implements OnInit {
   }
 
   navegarARegistroPaciente(): void {
-    this.router.navigate(['/registro-paciente']);
+    this.router.navigate(['/registro-pacientes']);
   }
 }

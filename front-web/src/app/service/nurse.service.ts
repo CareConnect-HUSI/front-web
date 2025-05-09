@@ -59,5 +59,11 @@ export class NurseService {
     return this.http.put(`${this.apiUrl}/${id}`, enfermeraData, { headers });
   }
   
-
+  getLocalidades() {
+    return this.http.get<any[]>('http://localhost:8088/enfermeras/localidades');
+  }
+  
+  getBarriosPorLocalidad(codigoLocalidad: string) {
+    return this.http.get<string[]>(`http://localhost:8088/enfermeras/barrios/${codigoLocalidad}`);
+  }  
 }

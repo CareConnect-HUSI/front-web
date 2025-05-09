@@ -1,4 +1,11 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  </div>
   <div class="header">
     <h2 class="title-center">Asignación de Pacientes</h2>
     <div class="info-jornada">

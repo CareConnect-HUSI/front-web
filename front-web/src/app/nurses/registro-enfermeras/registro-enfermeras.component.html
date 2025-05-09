@@ -5,22 +5,24 @@
 
   <!-- Tabs para alternar entre lista y formulario -->
   <div class="tabs">
-    <button 
-      class="tab-btn" 
-      [class.active]="!showForm" 
-      (click)="showForm = false">
+    <button
+      class="tab-btn"
+      [class.active]="!showForm"
+      (click)="showForm = false"
+    >
       Lista de Enfermeras
     </button>
-    <button 
-      class="tab-btn" 
-      [class.active]="showForm" 
-      (click)="showForm = true; isEditMode = false; nurseForm.reset()">
-      {{ isEditMode ? 'Editar Enfermera' : 'Registrar Enfermera' }}
+    <button
+      class="tab-btn"
+      [class.active]="showForm"
+      (click)="showForm = true; isEditMode = false; nurseForm.reset()"
+    >
+      {{ isEditMode ? "Editar Enfermera" : "Registrar Enfermera" }}
     </button>
   </div>
 
-   <!-- Lista de enfermeras -->
-   <div *ngIf="!showForm" class="list-container">
+  <!-- Lista de enfermeras -->
+  <div *ngIf="!showForm" class="list-container">
     <div class="table-container">
       <table>
         <thead>
@@ -37,15 +39,23 @@
         <tbody>
           <tr *ngFor="let nurse of nurses">
             <td>{{ nurse.nombre }} {{ nurse.apellido }}</td>
-            <td>{{ nurse.tipoIdentificacion?.name || 'CC' }} {{ nurse.numeroIdentificacion }}</td>
+            <td>
+              {{ nurse.tipoIdentificacion?.name || "CC" }}
+              {{ nurse.numeroIdentificacion }}
+            </td>
             <td>{{ nurse.email }}</td>
             <td>{{ nurse.telefono }}</td>
-            <td>{{ nurse.turnoEntity?.name || '' }}</td>
+            <td>{{ nurse.turnoEntity?.name || "" }}</td>
             <td>
-              <span [class]="nurse.estado === 'Activo' ? 'status-active' : 'status-inactive'">
-                {{ nurse.estado === 'Activo' ? 'Activo' : 'Inactivo' }}
+              <span
+                [class]="
+                  nurse.estado === 'Activo'
+                    ? 'status-active'
+                    : 'status-inactive'
+                "
+              >
+                {{ nurse.estado === "Activo" ? "Activo" : "Inactivo" }}
               </span>
-              
             </td>
             <td class="actions">
               <button class="edit-btn" (click)="loadNurseForEdit(nurse)">
@@ -56,12 +66,13 @@
         </tbody>
       </table>
     </div>
-    
+
     <div class="pagination" *ngIf="totalItems > itemsPerPage">
-      <button 
+      <button
         *ngFor="let page of getPageNumbers()"
         (click)="onPageChange(page)"
-        [class.active]="page === currentPage">
+        [class.active]="page === currentPage"
+      >
         {{ page + 1 }}
       </button>
     </div>
@@ -73,125 +84,184 @@
 
   <!-- ... parte superior sin cambios ... -->
 
-<form *ngIf="showForm" [formGroup]="nurseForm" (ngSubmit)="onSubmit()" class="form-container">
-  <div class="form-section">
-    <h3 class="section-title">Datos personales</h3>
+  <form
+    *ngIf="showForm"
+    [formGroup]="nurseForm"
+    (ngSubmit)="onSubmit()"
+    class="form-container"
+  >
+    <div class="form-section">
+      <h3 class="section-title">Datos personales</h3>
 
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Nombres
-          <span class="required-asterisk">*</span>
-        </label>
-        <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
-      </div>
-      
-      <div class="form-group">
-        <label>Apellidos
-          <span class="required-asterisk">*</span>
-        </label>
-        <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
-      </div>
-      
-      <div class="form-group">
-        <label>Tipo de Documento
-          <span class="required-asterisk">*</span>
-        </label>
-        <select formControlName="identificationType">
-          <option value="" disabled>Seleccione un tipo de documento</option>
-          <option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.id">
-            {{ tipo.name }}
-          </option>
-        </select>          
-        
-      </div>
-      
-      <div class="form-group">
-        <label>N° de Documento
-          <span class="required-asterisk">*</span>
-        </label>
-        <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
-      </div>
-      
-      <div class="form-group">
-        <label>Correo Electrónico
-          <span class="required-asterisk">*</span>
-        </label>
-        <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
-      </div>
-      
-      <div class="form-group">
-        <label>Contraseña
-          <span class="required-asterisk">*</span>
-        </label>
-        <div class="password-input">
-          <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
-          <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
+      <div class="form-grid">
+        <div class="form-group">
+          <label
+            >Nombres
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="name"
+            type="text"
+            placeholder="Ingrese nombres completos"
+          />
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label>Dirección
-          <span class="required-asterisk">*</span>
-        </label>
-        <div class="address-input">
-          <input formControlName="address" type="text" readonly placeholder="Ej: Calle 123 #45-67" />
-          <button type="button" class="edit-btn" (click)="openAddressModal()">
-            <i class="fas fa-edit"></i> Editar
-          </button>
+
+        <div class="form-group">
+          <label
+            >Apellidos
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="lastname"
+            type="text"
+            placeholder="Ingrese apellidos completos"
+          />
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label>Localidad
-          <span class="required-asterisk">*</span>
-        </label>
-        <select formControlName="localidad" required>
-          <option value="" disabled selected>Seleccione localidad</option>
-          <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label>Barrio
-          <span class="required-asterisk">*</span>
-        </label>
-        <select formControlName="barrio" required>
-          <option value="" disabled selected>Seleccione barrio</option>
-          <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label>Celular
-          <span class="required-asterisk">*</span>
-        </label>
-        <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
-      </div>
-      
-      <div class="form-group">
-        <label>Turno
-          <span class="required-asterisk">*</span>
-        </label>
-        <select formControlName="turno">
-          <option value="" disabled selected>Seleccione turno</option>
-          <option value="Mañana">Mañana 7:00 a 13:00</option>
-          <option value="Tarde">Tarde 13:00 a 19:00</option>
-          <option value="Noche">Noche 19:00 a 7:00</option>
-        </select>
+
+        <div class="form-group">
+          <label
+            >Tipo de Documento
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="identificationType">
+            <option
+              *ngFor="let tipo of tiposIdentificacion"
+              [value]="tipo.name"
+            >
+              {{ tipo.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label
+            >N° de Documento
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="identificationNumber"
+            type="text"
+            placeholder="Ingrese número de documento"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Correo Electrónico
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Contraseña
+            <span class="required-asterisk">*</span>
+          </label>
+          <div class="password-input">
+            <input
+              type="password"
+              formControlName="password"
+              placeholder="Ingrese una contraseña segura"
+              required
+            />
+            <i
+              class="fas fa-eye toggle-password"
+              (click)="togglePasswordVisibility()"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label
+            >Dirección
+            <span class="required-asterisk">*</span>
+          </label>
+          <div class="address-input">
+            <input
+              formControlName="address"
+              type="text"
+              readonly
+              placeholder="Ej: Calle 123 #45-67"
+            />
+            <button type="button" class="edit-btn" (click)="openAddressModal()">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label
+            >Localidad
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="localidad" required (change)="onLocalidadChange()">
+            <option value="" disabled selected>Seleccione localidad</option>
+            <option *ngFor="let loc of localidades" [value]="loc.codigo">
+              {{ loc.nombre }}
+            </option>
+          </select>
+          
+        </div>
+
+        <div class="form-group">
+          <label
+            >Barrio
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="barrio" required>
+            <option value="" disabled selected>Seleccione barrio</option>
+            <option *ngFor="let barrio of barriosFiltrados" [value]="barrio.nombre">
+              {{ barrio.nombre }}
+            </option>
+          </select>
+          
+          
+          
+        </div>
+
+        <div class="form-group">
+          <label
+            >Celular
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="phone"
+            type="text"
+            placeholder="Ingrese número celular"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Turno
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="turno">
+            <option value="" disabled selected>Seleccione turno</option>
+            <option value="Mañana">Mañana 7:00 a 13:00</option>
+            <option value="Tarde">Tarde 13:00 a 19:00</option>
+            <option value="Noche">Noche 19:00 a 7:00</option>
+          </select>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="form-actions">
-    <button type="button" class="cancel-btn" (click)="showForm = false">
-      <i class="fas fa-times"></i> Cancelar
-    </button>
-    <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
-      <i class="fas fa-save"></i> {{ isEditMode ? 'Actualizar' : 'Registrar' }} Enfermera
-    </button>
-  </div>
-</form>
-
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" (click)="showForm = false">
+        <i class="fas fa-times"></i> Cancelar
+      </button>
+      <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
+        <i class="fas fa-save"></i>
+        {{ isEditMode ? "Actualizar" : "Registrar" }} Enfermera
+      </button>
+    </div>
+  </form>
 </div>
 <!-- Modal para Dirección -->
 <div *ngIf="showAddressModal" class="modal-overlay">
@@ -202,12 +272,13 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <form class="modal-form" [formGroup]="addressForm">
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
-            <label>Tipo de Vía
+            <label
+              >Tipo de Vía
               <span class="required-asterisk">*</span>
             </label>
             <select formControlName="tipoVia" required>
@@ -219,20 +290,26 @@
               <option value="Transversal">Transversal</option>
             </select>
           </div>
-          
+
           <div class="form-group">
-            <label>Número Vía
+            <label
+              >Número Vía
               <span class="required-asterisk">*</span>
             </label>
-            <input type="text" formControlName="numeroVia" placeholder="Ej: 12" required>
+            <input
+              type="text"
+              formControlName="numeroVia"
+              placeholder="Ej: 12"
+              required
+            />
           </div>
-          
+
           <div class="form-group">
             <label>Letra Vía (Opcional)</label>
-            <input type="text" formControlName="letraVia" placeholder="Ej: B">
+            <input type="text" formControlName="letraVia" placeholder="Ej: B" />
           </div>
         </div>
-        
+
         <div class="form-column">
           <div class="form-group">
             <label>Bis</label>
@@ -243,46 +320,65 @@
               <option value="Bis B">Bis B</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label>Complemento</label>
-            <input type="text" formControlName="complemento" placeholder="Ej: Este, Oeste">
+            <input
+              type="text"
+              formControlName="complemento"
+              placeholder="Ej: Este, Oeste"
+            />
           </div>
-          
+
           <div class="form-group">
-            <label>Número Placa
+            <label
+              >Número Placa
               <span class="required-asterisk">*</span>
             </label>
-            <input type="text" formControlName="numeroPlaca" placeholder="Ej: 45-67" required>
+            <input
+              type="text"
+              formControlName="numeroPlaca"
+              placeholder="Ej: 45-67"
+              required
+            />
           </div>
         </div>
       </div>
-      
+
       <div class="form-group">
-        <label>Localidad
+        <label
+          >Localidad
           <span class="required-asterisk">*</span>
         </label>
         <select formControlName="localidad" required (change)="onLocalidadChange()">
-          <option value="" disabled selected>Seleccionar localidad</option>
-          <option *ngFor="let loc of localidades" [value]="loc.codigo">{{ loc.nombre }}</option>
+          <option value="" disabled selected>Seleccione localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">
+            {{ loc.nombre }}
+          </option>
         </select>
       </div>
-      
+
       <div class="form-group">
-        <label>Barrio
+        <label
+          >Barrio
           <span class="required-asterisk">*</span>
         </label>
         <select formControlName="barrio" required>
-          <option value="" disabled selected>Seleccionar barrio</option>
-          <option *ngFor="let barrio of barriosFiltrados" [value]="barrio">{{ barrio }}</option>
+          <option value="" disabled selected>Seleccione barrio</option>
+        <option *ngFor="let barrio of barriosFiltrados" [value]="barrio.nombre">
+          {{ barrio.nombre }}
+        </option>
         </select>
       </div>
-      
+
       <div class="form-group">
         <label>Complemento Dirección</label>
-        <textarea formControlName="complementoDireccion" placeholder="Ej: Torre 2, Apartamento 301"></textarea>
+        <textarea
+          formControlName="complementoDireccion"
+          placeholder="Ej: Torre 2, Apartamento 301"
+        ></textarea>
       </div>
-      
+
       <div class="form-actions">
         <button type="button" class="cancel-btn" (click)="closeAddressModal()">
           <i class="fas fa-times"></i> Cancelar

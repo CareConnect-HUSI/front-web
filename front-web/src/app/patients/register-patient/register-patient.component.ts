@@ -26,23 +26,9 @@ export class RegisterPatientComponent implements OnInit {
   listaProcedimientos: any[] = [];
   listaMedicamentos: any[] = [];
 
-  localidades: Localidad[] = [
-    { codigo: '1', nombre: 'Usaquén' }, { codigo: '2', nombre: 'Chapinero' }, { codigo: '3', nombre: 'Santa Fe' },
-    { codigo: '4', nombre: 'San Cristóbal' }, { codigo: '5', nombre: 'Usme' }, { codigo: '6', nombre: 'Tunjuelito' },
-    { codigo: '7', nombre: 'Bosa' }, { codigo: '8', nombre: 'Kennedy' }, { codigo: '9', nombre: 'Fontibón' },
-    { codigo: '10', nombre: 'Engativá' }, { codigo: '11', nombre: 'Suba' }, { codigo: '12', nombre: 'Barrios Unidos' },
-    { codigo: '13', nombre: 'Teusaquillo' }, { codigo: '14', nombre: 'Los Mártires' },
-    { codigo: '15', nombre: 'Antonio Nariño' }, { codigo: '16', nombre: 'Puente Aranda' },
-    { codigo: '17', nombre: 'La Candelaria' }, { codigo: '18', nombre: 'Rafael Uribe Uribe' },
-    { codigo: '19', nombre: 'Ciudad Bolívar' }, { codigo: '20', nombre: 'Sumapaz' }
-  ];
-
-  barriosPorLocalidad: { [key: string]: string[] } = {
-    '1': ['Santa Bárbara', 'Cedritos', 'Toberín', 'Usaquén', 'Calle 170'],
-    '2': ['Chapinero', 'El Lago', 'La Salle', 'Rosales', 'Quinta Camacho']
-  };
-
-  barriosFiltrados: string[] = [];
+  localidades: { codigo: string, nombre: string }[] = [];
+  barriosFiltrados: { id: number; nombre: string }[] = [];
+  
 
   frecuencias: number[] = [72, 48, 24, 12, 8, 6];
   duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
@@ -61,6 +47,7 @@ export class RegisterPatientComponent implements OnInit {
     this.cargarTiposActividad();
     this.cargarProcedimientos();
     this.cargarTratamientos();
+    this.cargarLocalidades(); 
   }
 
   initPatientForm() {
@@ -108,10 +95,31 @@ export class RegisterPatientComponent implements OnInit {
     this.showAddressModal = false;
   }
 
+  cargarLocalidades() {
+    this.patientService.getLocalidades().subscribe({
+      next: (localidades: Localidad[]) => {
+        this.localidades = localidades.map(l => ({ codigo: l.codigo, nombre: l.nombre }));
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+      }
+    });
+  }
+
   onLocalidadChange() {
-    const localidadCod = this.addressForm.get('localidad')?.value;
-    this.barriosFiltrados = this.barriosPorLocalidad[localidadCod] || [];
-    this.addressForm.get('barrio')?.reset();
+    const codigo = this.addressForm.get('localidad')?.value || this.patientForm.get('personalInfo.localidad')?.value;
+
+  
+    if (!codigo) return;
+  
+    this.patientService.getBarriosPorLocalidad(codigo).subscribe({
+      next: (barrios: any[]) => {
+        this.barriosFiltrados = barrios.map(b => ({ id: b.id, nombre: b.nombre }));
+      },
+      error: (err: any) => {
+        console.error('Error al cargar barrios:', err);
+      }
+    });
   }
 
   saveAddress() {

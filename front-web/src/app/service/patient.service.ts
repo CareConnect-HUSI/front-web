@@ -85,4 +85,11 @@ export class PatientService {
     return this.http.put(`http://localhost:8081/actividad-paciente-visita/actualizar/${id}`, tratamiento);
   }
   
+  getLocalidades() {
+    return this.http.get<any[]>(`${this.apiUrl}/localidades`);
+  }
+  
+  getBarriosPorLocalidad(codigoLocalidad: string) {
+    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
+  }  
 }
