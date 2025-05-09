@@ -6,7 +6,7 @@ import { catchError, tap, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class OptimizationDataService {
-  private apiUrl = 'https://localhost:8086/rutas';
+  private apiUrl = 'http://localhost:8086/rutas';
 
 
   constructor(private http: HttpClient) {}
@@ -173,7 +173,7 @@ export class OptimizationDataService {
 
     console.log("Payload para la API:", payload);
 
-    return this.http.post(`${this.apiUrl}`, payload).subscribe({
+    return this.http.post<any>(`${this.apiUrl}`, payload).subscribe({
       next: (response) => {
           console.log('Respuesta:', response);
       },
