@@ -140,6 +140,18 @@ export class RegistroEnfermerasComponent implements OnInit {
 
     const formValues = this.nurseForm.value;
     const localidadNombre = this.localidades.find(l => l.codigo === formValues.localidad)?.nombre || formValues.localidad;
+    var  identificacion;
+
+    if(formValues.identificationType == 1){
+       identificacion = "CC"
+    }if(formValues.identificationType == 2){
+       identificacion = "TI"
+    }if(formValues.identificationType == 3){
+       identificacion = "CE"
+    }
+    else{
+       identificacion = "CC"
+    }
 
     const userData = {
       nombre: formValues.name,
@@ -152,7 +164,7 @@ export class RegistroEnfermerasComponent implements OnInit {
       localidad: localidadNombre,
       email: formValues.email,
       password: formValues.password !== '********' ? formValues.password : undefined,
-      tipoIdentificacion: { name: formValues.identificationType },
+      tipoIdentificacion: { id: formValues.identificationType, name: identificacion },
       turnoEntity: { name: formValues.turno },
       latitud: '',
       longitud: ''
