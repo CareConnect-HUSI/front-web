@@ -3,14 +3,12 @@ import { Injectable } from '@angular/core';
 import { catchError, tap, throwError } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OptimizationDataService {
   private apiUrl = 'http://localhost:8086/rutas';
 
-
   constructor(private http: HttpClient) {}
-
 
   private data = {
     dataPacientesManana: null,
@@ -93,9 +91,8 @@ export class OptimizationDataService {
     };
   }
 
-  generarCronogramaManana(){
-
-    const horaInicio = "7:00";
+  generarCronogramaManana() {
+    const horaInicio = '7:00';
     const tipoTurno = 6;
     const margen = 1; // Assumed margin of 1 hour for time window
 
@@ -118,11 +115,11 @@ export class OptimizationDataService {
 
     // Process nurses
     enfermeras.forEach((enfermera: any) => {
-      ids.push(enfermera.id.toString());
+      ids.push(enfermera.numeroIdentificacion.toString());
       var latitud = enfermera.latitud;
       var longitud = enfermera.longitud;
-      // Convert latitud and longitud to coordinates
       var coordenada = [latitud, longitud];
+
       coordenadas.push(coordenada);
 
       tiempoAtencion.push(0);
@@ -131,31 +128,41 @@ export class OptimizationDataService {
 
     // Process patients
     pacientes.forEach((paciente: any) => {
-      ids.push(paciente.id.toString());
-      var latitud = paciente.latitud;
-      var longitud = paciente.longitud;
-      // Convert latitud and longitud to coordinates
-      var coordenada = [latitud, longitud];
-      coordenadas.push(coordenada);
-
-      // Calculate total attention time
-      const totalDuracion = paciente.actividad
-        ? paciente.actividad.reduce((sum: number, act: any) => sum + (act.duracionVisita || 0), 0)
-        : 0;
+      ids.push(paciente.numero_identificacion.toString());
+      const latitud = paciente.latitud;
+      const longitud = paciente.longitud;
+      coordenadas.push([latitud, longitud]);
+    
+      const actividades = paciente.actividades || [];
+    
+      // Sumar todas las duraciones
+      const totalDuracion = actividades.reduce(
+        (sum: number, act: any) => sum + (act.duracionVisita || 0),
+        0
+      );
       tiempoAtencion.push(totalDuracion);
 
-      // Calculate time window
-      if (paciente.hora) {
-        const horaRecomendada = timeToHours(paciente.hora);
+
+      // Buscar la primera hora recomendada válida en las actividades
+      let horaRecomendada: number | null = null;
+      for (const act of actividades) {
+        if (act.hora) {
+          horaRecomendada = timeToHours(act.hora);
+          break;
+        }
+      }
+    
+      if (horaRecomendada !== null) {
         const horaInicioHours = timeToHours(horaInicio);
         const diff = horaRecomendada - horaInicioHours;
         const valorInicial = Math.max(0, diff - margen);
         const valorFinal = Math.max(0, diff + margen);
         matrizVentanaTiempo.push([valorInicial, valorFinal]);
       } else {
-        matrizVentanaTiempo.push([0, 6]); // Default if no recommended hour
+        matrizVentanaTiempo.push([0, 6]); // Default si no hay hora
       }
     });
+    
 
     // Construct JSON package
     const payload = {
@@ -171,22 +178,27 @@ export class OptimizationDataService {
     // Set headers and make HTTP POST request
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    console.log("Payload para la API:", payload);
+    console.log('Payload para la API:', payload);
 
     return this.http.post<any>(`${this.apiUrl}`, payload).subscribe({
       next: (response) => {
-          console.log('Respuesta:', response);
+        console.log('Respuesta:', response);
       },
       error: (error) => {
-          console.error('Error:', error);
-      }
-  });
+        console.error('Error:', error);
+      },
+    });
   }
 
   // Método para limpiar datos (opcional)
   clearData() {
-    this.data = { dataPacientesManana: null, dataPacientesNoche: null, dataPacientesTarde:null, dataEnfermerasManana:  null, dataEnfermerasNoche:null, dataEnfermerasTarde:null };
+    this.data = {
+      dataPacientesManana: null,
+      dataPacientesNoche: null,
+      dataPacientesTarde: null,
+      dataEnfermerasManana: null,
+      dataEnfermerasNoche: null,
+      dataEnfermerasTarde: null,
+    };
   }
-
-
 }
