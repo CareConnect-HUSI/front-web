@@ -60,8 +60,6 @@ export class AsignarEnfermerasComponent implements OnInit {
           latitud: e.latitud,
           longitud: e.longitud
         }));
-  
-        console.log('Enfermeras cargadas:', this.enfermeras);
         this.actualizarListasPorTurno();
         this.isLoading = false;
       },
@@ -75,7 +73,6 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   actualizarListasPorTurno(): void {
     let baseList = this.enfermeras;
-    console.log("Lista  base", baseList);
     if (this.filtroNombre) {
       const filtro = this.filtroNombre.toLowerCase();
       baseList = baseList.filter(e =>
@@ -83,14 +80,10 @@ export class AsignarEnfermerasComponent implements OnInit {
         e.numeroIdentificacion.includes(this.filtroNombre)
       );
     }
-    
-    console.log("Enfermeras: ", baseList);
     this.enfermerasManana = baseList.filter(e => e.turnoId === 1);
     this.enfermerasTarde = baseList.filter(e => e.turnoId === 2);
     this.enfermerasNoche = baseList.filter(e => e.turnoId === 3);
-    this.enfermerasSinTurno = baseList.filter((e) => !e.turnoId); // Filtra enfermeras sin turno
-
-    console.log("Enfermeras noche: ", this.enfermerasNoche);
+    this.enfermerasSinTurno = baseList.filter((e) => !e.turnoId); 
 
   }
 
@@ -118,7 +111,6 @@ export class AsignarEnfermerasComponent implements OnInit {
     if (index !== -1) {
       this.enfermeras[index] = { ...enfermera };
       this.enfermeras = [...this.enfermeras];
-      console.log("Enfermeras:", this.enfermeras)
       this.actualizarListasPorTurno();
     }
   }
@@ -156,8 +148,6 @@ export class AsignarEnfermerasComponent implements OnInit {
       enfermera.turnoId = null; // Quita el turno en lugar de eliminar la enfermera
       this.cambiarTurno(enfermera); // Actualiza en frontend y backend
     }
-
-    console.log(`Motivo de remoción: ${this.motivoRemocion}`);
     this.cerrarModalRemover();
   }
 
@@ -167,6 +157,15 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   generarCronograma(): void {
     alert('El cronograma se generará con los pacientes asignados y en los turnos asignados a las enfermeras');
+
+    this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
+    this.optimizationDataService.setInfoEnfermerasTarde(this.enfermerasTarde);
+    this.optimizationDataService.setInfoEnfermerasNoche(this.enfermerasNoche);
+
+
+    console.log("Todos a cronograma:", this.optimizationDataService.getAllData());
+
+    this.optimizationDataService.generarCronogramaManana();
     setTimeout(() => {
       this.router.navigate(['/cronograma'], {
         state: { enfermeras: this.enfermeras }
@@ -176,7 +175,6 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   volverAPacientes():void{
     this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
-    console.log('Pacientes asignados para el registro:', this.optimizationDataService.getAllData());
     this.router.navigate(['/asignar-pacientes']);
   }
 }

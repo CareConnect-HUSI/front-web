@@ -50,7 +50,7 @@
           </div>
           <div class="enfermera-actions">
             <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-              <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
             </select>
             <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
               <i class="fas fa-user-minus"></i> Remover
@@ -76,7 +76,7 @@
           </div>
           <div class="enfermera-actions">
             <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-              <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
             </select>
             <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
               <i class="fas fa-user-minus"></i> Remover
@@ -102,7 +102,7 @@
           </div>
           <div class="enfermera-actions">
             <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-              <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
             </select>
             <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
               <i class="fas fa-user-minus"></i> Remover

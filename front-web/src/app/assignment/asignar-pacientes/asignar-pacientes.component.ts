@@ -34,6 +34,7 @@ export class AsignarPacientesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("Datos:", this.optimizationDataService.getAllData())
     this.isLoading = true;
 
     this.pacienteService.findAll(0, 50).subscribe({
@@ -177,6 +178,38 @@ export class AsignarPacientesComponent implements OnInit {
   }
 
   navegarARegistroPaciente(): void {
+    const pacientesManana: any[] = [];
+    const pacientesTarde: any[] = [];
+    const pacientesNoche: any[] = [];
+
+    this.pacientesAsignados.forEach((paciente) => {
+      // Buscar la primera hora válida en las actividades
+      const hora = this.getPrimeraHoraValida(paciente.actividades);
+
+      if (!hora) {
+        console.warn(
+          `El paciente ${paciente.nombre} no tiene horario asignado. Asignado a Turno Noche por defecto.`
+        );
+        pacientesNoche.push(paciente);
+        return;
+      }
+
+      // Determinar el turno basado en la hora encontrada
+      const turno = this.getTurnoByHora(hora);
+
+      if (turno === 'Manana') {
+        pacientesManana.push(paciente);
+      } else if (turno === 'Tarde') {
+        pacientesTarde.push(paciente);
+      } else {
+        pacientesNoche.push(paciente);
+      }
+    });
+
+    // Guardar en OptimizationDataService
+    this.optimizationDataService.setInfoPacientesManana(pacientesManana);
+    this.optimizationDataService.setInfoPacientesTarde(pacientesTarde);
+    this.optimizationDataService.setInfoPacientesNoche(pacientesNoche);
     this.router.navigate(['/registro-pacientes']);
   }
   // Función auxiliar para determinar el turno basado en la hora

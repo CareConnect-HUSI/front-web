@@ -176,7 +176,7 @@
 }
 
 .seccion-tarde .section-title::before {
-  content: '\f5c8'; /* Ícono de puesta de sol */
+  content: '\f6c4'; /* Ícono de puesta de sol */
   font-family: 'Font Awesome 5 Free';
   font-weight: 900;
   font-size: 18px;
