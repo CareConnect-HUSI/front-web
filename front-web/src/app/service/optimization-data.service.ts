@@ -20,6 +20,45 @@ export class OptimizationDataService {
     dataEnfermerasNoche: null,
   };
 
+  private respuestaManana: any = "";
+  private respuestaTarde: any = "";
+  private respuestaNoche: any = "";
+
+  private borrador: boolean = false;
+
+
+  public getBorrador(): boolean {
+    return this.borrador;
+  }
+  
+  public setBorrador(valor: boolean): void {
+    this.borrador = valor;
+  }
+
+  public getRespuestaManana(): any {
+    return this.respuestaManana;
+  }
+  
+  public setRespuestaManana(valor: any): void {
+    this.respuestaManana = valor;
+  }
+
+  public getRespuestaTarde(): any {
+    return this.respuestaTarde;
+  }
+  
+  public setRespuestaTarde(valor: any): void {
+    this.respuestaTarde = valor;
+  }
+  
+  public getRespuestaNoche(): any {
+    return this.respuestaNoche;
+  }
+  
+  public setRespuestaNoche(valor: any): void {
+    this.respuestaNoche = valor;
+  }  
+
   // Métodos para establecer datos
   setInfoPacientesManana(info: any) {
     this.data.dataPacientesManana = info;
@@ -94,7 +133,7 @@ export class OptimizationDataService {
   generarCronogramaManana() {
     const horaInicio = '7:00';
     const tipoTurno = 6;
-    const margen = 1.5; // Assumed margin of 1 hour for time window
+    const margen = 0.5; // Assumed margin of 1 hour for time window
 
     // Get nurse and patient data
     const enfermeras = this.getInfoEnfermerasManana() || [];
@@ -181,9 +220,11 @@ export class OptimizationDataService {
 
     console.log('Payload para la API:', payload);
 
+
     return this.http.post<any>(`${this.apiUrl}`, payload).subscribe({
       next: (response) => {
-        console.log('Respuesta:', response);
+        this.respuestaManana = response;
+        console.log('Respuesta:', this.respuestaManana);
       },
       error: (error) => {
         console.error('Error:', error);

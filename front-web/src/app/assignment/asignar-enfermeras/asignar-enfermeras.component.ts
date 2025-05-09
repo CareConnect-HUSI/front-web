@@ -166,6 +166,9 @@ export class AsignarEnfermerasComponent implements OnInit {
     console.log("Todos a cronograma:", this.optimizationDataService.getAllData());
 
     this.optimizationDataService.generarCronogramaManana();
+
+    this.optimizationDataService.setBorrador(true);
+    
     setTimeout(() => {
       this.router.navigate(['/cronograma'], {
         state: { enfermeras: this.enfermeras }
