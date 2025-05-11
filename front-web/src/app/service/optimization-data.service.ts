@@ -2,6 +2,24 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, tap, throwError } from 'rxjs';
 
+// Interfaces defined here or in a separate file
+export interface RawNurse {
+  numeroIdentificacion: number;
+  name: string;
+  direccion?: string;
+  latitud?: number;
+  longitud?: number;
+}
+
+export interface RawPatient {
+  numero_identificacion: number;
+  name: string;
+  direccion?: string;
+  latitud?: number;
+  longitud?: number;
+  actividades?: { duracionVisita: number; hora: string; prioridad?: string }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -10,27 +28,31 @@ export class OptimizationDataService {
 
   constructor(private http: HttpClient) {}
 
-  private data = {
+  private data: {
+    dataPacientesManana: RawPatient[] | null;
+    dataPacientesTarde: RawPatient[] | null;
+    dataPacientesNoche: RawPatient[] | null;
+    dataEnfermerasManana: RawNurse[] | null;
+    dataEnfermerasTarde: RawNurse[] | null;
+    dataEnfermerasNoche: RawNurse[] | null;
+  } = {
     dataPacientesManana: null,
     dataPacientesTarde: null,
     dataPacientesNoche: null,
-
     dataEnfermerasManana: null,
     dataEnfermerasTarde: null,
     dataEnfermerasNoche: null,
   };
 
-  private respuestaManana: any = "";
-  private respuestaTarde: any = "";
-  private respuestaNoche: any = "";
-
+  private respuestaManana: any = '';
+  private respuestaTarde: any = '';
+  private respuestaNoche: any = '';
   private borrador: boolean = false;
-
 
   public getBorrador(): boolean {
     return this.borrador;
   }
-  
+
   public setBorrador(valor: boolean): void {
     this.borrador = valor;
   }
@@ -38,7 +60,7 @@ export class OptimizationDataService {
   public getRespuestaManana(): any {
     return this.respuestaManana;
   }
-  
+
   public setRespuestaManana(valor: any): void {
     this.respuestaManana = valor;
   }
@@ -46,75 +68,86 @@ export class OptimizationDataService {
   public getRespuestaTarde(): any {
     return this.respuestaTarde;
   }
-  
+
   public setRespuestaTarde(valor: any): void {
     this.respuestaTarde = valor;
   }
-  
+
   public getRespuestaNoche(): any {
     return this.respuestaNoche;
   }
-  
+
   public setRespuestaNoche(valor: any): void {
     this.respuestaNoche = valor;
-  }  
+  }
 
   // Métodos para establecer datos
-  setInfoPacientesManana(info: any) {
+  setInfoPacientesManana(info: RawPatient[] | null) {
     this.data.dataPacientesManana = info;
   }
 
-  setInfoPacientesTarde(info: any) {
+  setInfoPacientesTarde(info: RawPatient[] | null) {
     this.data.dataPacientesTarde = info;
   }
 
-  setInfoPacientesNoche(info: any) {
+  setInfoPacientesNoche(info: RawPatient[] | null) {
     this.data.dataPacientesNoche = info;
   }
 
-  setInfoEnfermerasManana(info: any) {
+  setInfoEnfermerasManana(info: RawNurse[] | null) {
     this.data.dataEnfermerasManana = info;
   }
 
-  setInfoEnfermerasTarde(info: any) {
+  setInfoEnfermerasTarde(info: RawNurse[] | null) {
     this.data.dataEnfermerasTarde = info;
   }
-  setInfoEnfermerasNoche(info: any) {
+
+  setInfoEnfermerasNoche(info: RawNurse[] | null) {
     this.data.dataEnfermerasNoche = info;
   }
 
   // Método para obtener todos los datos acumulados
-  getAllData() {
+  getAllData(): {
+    dataPacientesManana: RawPatient[] | null;
+    dataPacientesTarde: RawPatient[] | null;
+    dataPacientesNoche: RawPatient[] | null;
+    dataEnfermerasManana: RawNurse[] | null;
+    dataEnfermerasTarde: RawNurse[] | null;
+    dataEnfermerasNoche: RawNurse[] | null;
+  } {
     return this.data;
   }
 
   // Métodos para obtener datos
-  getInfoPacientesManana() {
+  getInfoPacientesManana(): RawPatient[] | null {
     return this.data.dataPacientesManana;
   }
 
-  getInfoPacientesTarde() {
+  getInfoPacientesTarde(): RawPatient[] | null {
     return this.data.dataPacientesTarde;
   }
 
-  getInfoPacientesNoche() {
+  getInfoPacientesNoche(): RawPatient[] | null {
     return this.data.dataPacientesNoche;
   }
 
-  getInfoEnfermerasManana() {
+  getInfoEnfermerasManana(): RawNurse[] | null {
     return this.data.dataEnfermerasManana;
   }
 
-  getInfoEnfermerasTarde() {
+  getInfoEnfermerasTarde(): RawNurse[] | null {
     return this.data.dataEnfermerasTarde;
   }
 
-  getInfoEnfermerasNoche() {
+  getInfoEnfermerasNoche(): RawNurse[] | null {
     return this.data.dataEnfermerasNoche;
   }
 
-  // Métodos para obtener todos los datos de pacientes y enfermeras
-  getAllPacientes() {
+  getAllPacientes(): {
+    dataPacientesManana: RawPatient[] | null;
+    dataPacientesTarde: RawPatient[] | null;
+    dataPacientesNoche: RawPatient[] | null;
+  } {
     return {
       dataPacientesManana: this.data.dataPacientesManana,
       dataPacientesTarde: this.data.dataPacientesTarde,
@@ -122,7 +155,11 @@ export class OptimizationDataService {
     };
   }
 
-  getAllEnfermeras() {
+  getAllEnfermeras(): {
+    dataEnfermerasManana: RawNurse[] | null;
+    dataEnfermerasTarde: RawNurse[] | null;
+    dataEnfermerasNoche: RawNurse[] | null;
+  } {
     return {
       dataEnfermerasManana: this.data.dataEnfermerasManana,
       dataEnfermerasTarde: this.data.dataEnfermerasTarde,
@@ -133,57 +170,42 @@ export class OptimizationDataService {
   generarCronogramaManana() {
     const horaInicio = '7:00';
     const tipoTurno = 6;
-    const margen = 0.5; // Assumed margin of 1 hour for time window
+    const margen = 0.5;
 
-    // Get nurse and patient data
     const enfermeras = this.getInfoEnfermerasManana() || [];
     const pacientes = this.getInfoPacientesManana() || [];
     const numMaxEnfermeras = enfermeras.length;
 
-    // Helper function to convert time string (HH:mm) to hours
     const timeToHours = (time: string): number => {
       const [hours, minutes] = time.split(':').map(Number);
       return hours + minutes / 60;
     };
 
-    // Initialize arrays for the JSON package
     const ids: string[] = [];
     const coordenadas: number[][] = [];
     const tiempoAtencion: number[] = [];
     const matrizVentanaTiempo: number[][] = [];
 
-    // Process nurses
-    enfermeras.forEach((enfermera: any) => {
+    enfermeras.forEach((enfermera: RawNurse) => {
       ids.push(enfermera.numeroIdentificacion.toString());
-      var latitud = enfermera.latitud;
-      var longitud = enfermera.longitud;
-      var coordenada = [latitud, longitud];
-
+      const coordenada = [enfermera.latitud || 0, enfermera.longitud || 0];
       coordenadas.push(coordenada);
-
       tiempoAtencion.push(0);
       matrizVentanaTiempo.push([0, 6]);
     });
 
-    // Process patients
-    pacientes.forEach((paciente: any) => {
+    pacientes.forEach((paciente: RawPatient) => {
       ids.push(paciente.numero_identificacion.toString());
-      const latitud = paciente.latitud;
-      const longitud = paciente.longitud;
-      coordenadas.push([latitud, longitud]);
-    
+      coordenadas.push([paciente.latitud || 0, paciente.longitud || 0]);
+
       const actividades = paciente.actividades || [];
-    
-      // Sumar todas las duraciones
       const totalDuracion = actividades.reduce(
         (sum: number, act: any) => sum + (act.duracionVisita || 0),
         0
       );
-      const tempoVisita = totalDuracion/60 // Pasar de minutos a horas
+      const tempoVisita = totalDuracion / 60;
       tiempoAtencion.push(tempoVisita);
 
-
-      // Buscar la primera hora recomendada válida en las actividades
       let horaRecomendada: number | null = null;
       for (const act of actividades) {
         if (act.hora) {
@@ -191,7 +213,7 @@ export class OptimizationDataService {
           break;
         }
       }
-    
+
       if (horaRecomendada !== null) {
         const horaInicioHours = timeToHours(horaInicio);
         const diff = horaRecomendada - horaInicioHours;
@@ -199,12 +221,10 @@ export class OptimizationDataService {
         const valorFinal = Math.max(0, diff + margen);
         matrizVentanaTiempo.push([valorInicial, valorFinal]);
       } else {
-        matrizVentanaTiempo.push([0, 6]); // Default si no hay hora
+        matrizVentanaTiempo.push([0, 6]);
       }
     });
-    
 
-    // Construct JSON package
     const payload = {
       coordenadas,
       matrizVentanaTiempo,
@@ -215,24 +235,22 @@ export class OptimizationDataService {
       horaInicio,
     };
 
-    // Set headers and make HTTP POST request
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     console.log('Payload para la API:', payload);
 
-
-    return this.http.post<any>(`${this.apiUrl}`, payload).subscribe({
-      next: (response) => {
-        this.respuestaManana = response;
-        console.log('Respuesta:', this.respuestaManana);
-      },
-      error: (error) => {
-        console.error('Error:', error);
-      },
-    });
+    return this.http.post<any>(`${this.apiUrl}`, payload, { headers }).pipe(
+      tap((response) => {
+        console.log('Respuesta recibida:', response);
+        this.setRespuestaManana(response);
+      }),
+      catchError((error) => {
+        console.error('Error en la API:', error);
+        return throwError(() => new Error('Error en la API: ' + error.message));
+      })
+    );
   }
 
-  // Método para limpiar datos (opcional)
   clearData() {
     this.data = {
       dataPacientesManana: null,

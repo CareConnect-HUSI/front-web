@@ -156,6 +156,7 @@ export class AsignarEnfermerasComponent implements OnInit {
   }
 
   generarCronograma(): void {
+    this.isLoading = true;
     alert('El cronograma se generará con los pacientes asignados y en los turnos asignados a las enfermeras');
 
     this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
@@ -165,8 +166,23 @@ export class AsignarEnfermerasComponent implements OnInit {
 
     console.log("Todos a cronograma:", this.optimizationDataService.getAllData());
 
-    this.optimizationDataService.generarCronogramaManana();
-
+    this.optimizationDataService.generarCronogramaManana()
+    .subscribe({
+      next: (response) => {
+        this.optimizationDataService.setBorrador(true);
+        
+        // Navigate to cronograma after successful response
+        this.router.navigate(['/cronograma'], {
+          state: { enfermeras: this.enfermeras }
+        });
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error("Error en optimización:", error);
+        // Show error message to user (using your preferred notification system)
+        alert('Error al generar el cronograma. Por favor, inténtelo de nuevo.');
+      }
+    });
     this.optimizationDataService.setBorrador(true);
     
     setTimeout(() => {

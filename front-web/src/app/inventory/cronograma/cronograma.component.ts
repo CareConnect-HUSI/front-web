@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { NurseService } from 'src/app/service/nurse.service';
+import { OptimizationDataService } from 'src/app/service/optimization-data.service';
+import { PatientService } from 'src/app/service/patient.service';
 
 interface Visit {
   id: number;
@@ -74,68 +78,11 @@ export class CronogramaComponent implements OnInit {
   toastType: 'success' | 'error' | 'warning' = 'success';
   toastTimeout: any;
 
-  // Datos quemados
-  morningNurses: Nurse[] = [
-    { id: 1000001, name: 'JOHAN POLANCO', shift: 'morning' },
-    { id: 1000002, name: 'SANDRA LOPEZ', shift: 'morning' },
-    { id: 1000003, name: 'ANGELINA RAMIREZ', shift: 'morning' },
-    { id: 1000004, name: 'SARA MARTINEZ', shift: 'morning' },
-    { id: 1000005, name: 'SOFIA RODRIGUEZ', shift: 'morning' },
-  ];
-  
-  afternoonNurses: Nurse[] = [
-    { id: 1000050, name: 'JUDY FORERO', shift: 'afternoon' },
-    { id: 1000051, name: 'MONICA QUIÑONEZ', shift: 'afternoon' },
-    { id: 1000052, name: 'PABLO CHAPARRO', shift: 'afternoon' }
-  ];
-  
-  nightNurses: Nurse[] = [
-    { id: 1000053, name: 'WALTHER HERNANDEZ', shift: 'night' },
-    { id: 1000054, name: 'YESSENIA HOYOS', shift: 'night' },
-    { id: 1000055, name: 'ANGIE ESCANDON', shift: 'night' }
-  ];
-  
-  allNurses: Nurse[] = [...this.morningNurses, ...this.afternoonNurses, ...this.nightNurses];
-  
-  patients: Patient[] = [
-    { id: 1000006, name: 'BLANCA VILLAMIL', document: '12345678', address: 'ANTONIO NARIÑO', priority: 'normal' },
-    { id: 1000007, name: 'NEBER SOFIA VELANDIA', document: '87654321', address: 'BRAVO PAEZ', priority: 'high' },
-    { id: 1000008, name: 'GRACIELA RUBIANO', document: '56781234', address: 'RAFAEL URIBE', priority: 'normal' },
-    { id: 1000008, name: 'CARLOS MENDOZA', document: '84523901', address: 'SUBA', priority: 'alta' },
-    { id: 1000011, name: 'LAURA GÓMEZ', document: '90318234', address: 'TEUSAQUILLO', priority: 'baja' },
-    { id: 1000024, name: 'ANDRÉS FERNÁNDEZ', document: '77290123', address: 'USAQUÉN', priority: 'normal' },
-    { id: 1000021, name: 'MÓNICA CÁRDENAS', document: '98234122', address: 'FONTIBÓN', priority: 'alta' },
-    { id: 1000034, name: 'DIEGO RUIZ', document: '76890345', address: 'KENNEDY', priority: 'normal' },
-    { id: 1000029, name: 'PATRICIA NIÑO', document: '89347218', address: 'SAN CRISTÓBAL', priority: 'baja' },
-    { id: 1000014, name: 'JULIÁN TORO', document: '71420987', address: 'ENGATIVÁ', priority: 'normal' },
-    { id: 1000028, name: 'MARCELA LÓPEZ', document: '81230987', address: 'BOSA', priority: 'alta' },
-    { id: 1000040, name: 'FERNANDO CASTRO', document: '75620139', address: 'CHAPINERO', priority: 'normal' },
-    { id: 1000013, name: 'LINA HERRERA', document: '83475029', address: 'CIUDAD BOLÍVAR', priority: 'baja' },
-    { id: 1000035, name: 'RAFAEL SALAZAR', document: '88213456', address: 'USME', priority: 'normal' },
-    { id: 1000020, name: 'VANESSA RAMOS', document: '77213450', address: 'TUNJUELITO', priority: 'alta' },
-    { id: 1000032, name: 'HÉCTOR MORENO', document: '79281345', address: 'ANTONIO NARIÑO', priority: 'normal' },
-    { id: 1000023, name: 'SANDRA PEÑA', document: '71429834', address: 'LA CANDELARIA', priority: 'baja' },
-    { id: 1000009, name: 'NATALIA SUÁREZ', document: '80913427', address: 'BARRIOS UNIDOS', priority: 'normal' },
-    { id: 1000010, name: 'OSCAR BELTRÁN', document: '77439821', address: 'RAFAEL URIBE URIBE', priority: 'alta' },
-    { id: 1000019, name: 'MELISSA DÍAZ', document: '87213456', address: 'ENGATIVÁ', priority: 'normal' },
-    { id: 1000033, name: 'JORGE BERMÚDEZ', document: '88209341', address: 'SANTA FE', priority: 'baja' },
-    { id: 1000022, name: 'CAROLINA PÉREZ', document: '74321890', address: 'SUBA', priority: 'alta' },
-    { id: 1000036, name: 'ANDREA CASTILLO', document: '76450981', address: 'USAQUÉN', priority: 'normal' },
-    { id: 1000015, name: 'GERMÁN VILLALBA', document: '79318426', address: 'TEUSAQUILLO', priority: 'normal' },
-    { id: 1000030, name: 'ISABEL REYES', document: '80123987', address: 'CHAPINERO', priority: 'alta' },
-    { id: 1000038, name: 'CAMILO HERRERA', document: '72345981', address: 'BOSA', priority: 'baja' },
-    { id: 1000018, name: 'MAURICIO QUINTERO', document: '89120345', address: 'KENNEDY', priority: 'normal' },
-    { id: 1000016, name: 'LUISA MERCADO', document: '83201479', address: 'CIUDAD BOLÍVAR', priority: 'alta' },
-    { id: 1000017, name: 'JUANITA ARIAS', document: '75489320', address: 'SANTA FE', priority: 'normal' },
-    { id: 1000037, name: 'ALEJANDRA RIVERA', document: '80123765', address: 'SAN CRISTÓBAL', priority: 'baja' },
-    { id: 1000007, name: 'DAVID MONSALVE', document: '78345012', address: 'USAQUÉN', priority: 'alta' },
-    { id: 1000027, name: 'NORA SERRANO', document: '90213478', address: 'FONTIBÓN', priority: 'normal' },
-    { id: 1000031, name: 'LUIS HERRERA', document: '76490231', address: 'KENNEDY', priority: 'alta' },
-    { id: 1000026, name: 'CÉSAR JIMÉNEZ', document: '87419230', address: 'ENGATIVÁ', priority: 'baja' },
-    { id: 1000012, name: 'ANA MARÍA MEJÍA', document: '84123095', address: 'RAFAEL URIBE URIBE', priority: 'normal' },
-
-  ];
-  
+  morningNurses: Nurse[] = [];
+  afternoonNurses: Nurse[] = [];
+  nightNurses: Nurse[] = [];
+  allNurses: Nurse[] = [];
+  patients: Patient[] = [];
   visits: Visit[] = [];
   optimizedRoutes: any = {};
   
@@ -166,22 +113,272 @@ export class CronogramaComponent implements OnInit {
   
   draggedVisit: any = null;
 
-  constructor(private router: Router) {
-
+  constructor(private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService) {
     this.nextDay = new Date(this.currentDate);
     this.nextDay.setDate(this.nextDay.getDate() + 1);
   }
 
-  ngOnInit() {
-    this.generateTimeSlots();
-    this.loadOptimizedRoutes();
-    this.initializeVisits();
+  isLoading: boolean = false;
+  loadingProgress: number = 0;
+  loadingProgressText: string = 'Inicializando...';
 
-  // Verificar si venimos de registrar un paciente
+  ngOnInit() {
+  
+    if (this.optimizacionData.getBorrador()) {
+    // Set loading state
+    this.isLoading = true;
+    this.loadingProgress = 10;
+    this.loadingProgressText = 'Inicializando componentes...';
+
+    // Generate time slots (existing code)
+    this.generateTimeSlots();
+    this.loadingProgress = 20;
+    this.loadingProgressText = 'Generando franjas horarias...';
+    this.fetchInitialData();
+ 
+    this.simulateLoading(() => {
+      this.loadOptimizedRoutesBorrador();
+    });
+    this.editMode = true;
+  } else {
+      this.generateTimeSlots();
+      // en la función Load Optimized toutes debería cargar desde la bd
+      this.loadOptimizedRoutes();
+      // this.initializeVisits();
+  }
+
+  // Check if navigating from patient registration
   const navigation = this.router.getCurrentNavigation();
   if (navigation?.extras?.state && navigation.extras.state['newPatient']) {
     const newPatient = navigation.extras.state['newPatient'];
     this.scheduleNewPatient(newPatient);
+  }
+}
+
+fetchInitialData() {
+    // Fetch nurses and patients from OptimizationDataService
+    const allEnfermeras = this.optimizacionData.getAllEnfermeras();
+    const allPacientes = this.optimizacionData.getAllPacientes();
+    
+    // Process nurses
+    this.allNurses = [];
+    if (allEnfermeras.dataEnfermerasManana) {
+      this.morningNurses = allEnfermeras.dataEnfermerasManana.map((n: any) => ({
+        id: n.numeroIdentificacion,
+        name: (n.nombre + " " + n.apellido) || 'Unknown',
+        shift: 'morning',
+        address: n.direccion || '',
+        latitude: n.latitud,
+        longitude: n.longitud,
+      }));
+      this.allNurses.push(...this.morningNurses);
+    }
+    if (allEnfermeras.dataEnfermerasTarde) {
+      this.afternoonNurses = allEnfermeras.dataEnfermerasTarde.map((n: any) => ({
+        id: n.numeroIdentificacion,
+        name: n.name || 'Unknown',
+        shift: 'afternoon',
+        address: n.direccion || '',
+        latitude: n.latitud,
+        longitude: n.longitud,
+      }));
+      this.allNurses.push(...this.afternoonNurses);
+    }
+    if (allEnfermeras.dataEnfermerasNoche) {
+      this.nightNurses = allEnfermeras.dataEnfermerasNoche.map((n: any) => ({
+        id: n.numeroIdentificacion,
+        name: n.name || 'Unknown',
+        shift: 'night',
+        address: n.direccion || '',
+        latitude: n.latitud,
+        longitude: n.longitud,
+      }));
+      this.allNurses.push(...this.nightNurses);
+    }
+
+    if (!this.allNurses.length) {
+      this.showToastMessage('Error', 'No se encontraron datos de enfermeras', 'error');
+    }
+
+    this.loadingProgress = 40;
+    this.loadingProgressText = 'Enfermeras cargadas...';
+
+    // Process patients
+    this.patients = [];
+    const patientSources = [
+      allPacientes.dataPacientesManana,
+      allPacientes.dataPacientesTarde,
+      allPacientes.dataPacientesNoche,
+    ];
+    patientSources.forEach((source) => {
+      if (source) {
+        const mappedPatients = source.map((p: any) => ({
+          id: p.numero_identificacion,
+          name: p.nombre || 'Unknown',
+          document: p.numero_identificacion,
+          address: p.direccion || '',
+          latitude: p.latitud,
+          longitude: p.longitu
+        }));
+        this.patients.push(...mappedPatients);
+      }
+    });
+
+    if (!this.patients.length) {
+      this.showToastMessage('Error', 'No se encontraron datos de pacientes', 'error');
+    }
+
+    this.loadingProgress = 60;
+    this.loadingProgressText = 'Pacientes cargados...';
+
+    // Fetch optimized routes or load from draft
+    this.simulateLoading(() => {
+      if (this.optimizacionData.getBorrador()) {
+        this.loadOptimizedRoutesBorrador();
+      } else {
+        this.loadOptimizedRoutes();
+      }
+      this.initializeVisits();
+    });
+  }
+
+getNurses(): Observable<Nurse[]> {
+  return this.nursesService.findAll(0, 50).pipe(
+    map((nurses: any[]) =>
+      nurses.map((nurse) => ({
+        ...nurse,
+        shift: this.getShiftName(nurse.tipoTurnoId),
+      }))
+    )
+  );
+}
+
+getPatients(): Observable<Patient[]> {
+  return this.patientsService.findAll(0, 50).pipe(
+    map((patients: any[]) => patients.map((patient) => ({ ...patient })))
+  );
+}
+
+simulateLoading(callback: () => void) {
+  // First check if response is immediately available
+  const respuestaManana = this.optimizacionData.getRespuestaManana();
+  
+  if (respuestaManana && respuestaManana.rutas) {
+    // If response is already available, still show a brief loading animation
+    let progress = 30;
+    const interval = setInterval(() => {
+      this.loadingProgress = progress;
+      
+      if (progress === 30) {
+        this.loadingProgressText = 'Procesando rutas optimizadas...';
+      } else if (progress === 60) {
+        this.loadingProgressText = 'Generando cronograma...';
+      } else if (progress === 80) {
+        this.loadingProgressText = 'Finalizando...';
+      }
+      
+      progress += 20;
+      
+      if (progress > 100) {
+        clearInterval(interval);
+        callback();
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+      }
+    }, 400);
+  } else {
+    // Response not yet available - poll for it
+    this.loadingProgress = 30;
+    this.loadingProgressText = 'Esperando datos de optimización...';
+    
+    const maxWaitTime = 30000; // 30 seconds maximum wait time
+    const checkInterval = 500; // check every 500ms
+    let elapsedTime = 0;
+    let lastProgressUpdate = Date.now();
+    
+    const waitForResponse = setInterval(() => {
+      const response = this.optimizacionData.getRespuestaManana();
+      elapsedTime += checkInterval;
+      
+      // Update progress based on elapsed time
+      const currentTime = Date.now();
+      if (currentTime - lastProgressUpdate > 1000) { // Update progress every second
+        // Increment progress slowly until 80%
+        if (this.loadingProgress < 80) {
+          this.loadingProgress += 2;
+          
+          // Update text based on progress
+          if (this.loadingProgress > 30 && this.loadingProgress <= 50) {
+            this.loadingProgressText = 'Calculando rutas óptimas...';
+          } else if (this.loadingProgress > 50 && this.loadingProgress <= 70) {
+            this.loadingProgressText = 'Procesando respuesta...';
+          } else if (this.loadingProgress > 70) {
+            this.loadingProgressText = 'Casi listo...';
+          }
+        }
+        lastProgressUpdate = currentTime;
+      }
+      
+      if (response && response.rutas) {
+        // Response received
+        clearInterval(waitForResponse);
+        console.log("Datos de optimización recibidos");
+        
+        // Jump to almost complete
+        this.loadingProgress = 80;
+        this.loadingProgressText = 'Generando cronograma...';
+        
+        // Simulate final loading steps
+        setTimeout(() => {
+          this.loadingProgress = 90;
+          this.loadingProgressText = 'Finalizando...';
+          
+          setTimeout(() => {
+            this.loadingProgress = 100;
+            callback();
+            
+            // Hide loading overlay after a small delay
+            setTimeout(() => {
+              this.isLoading = false;
+            }, 500);
+          }, 500);
+        }, 500);
+      } else if (elapsedTime >= maxWaitTime) {
+        // Timeout after waiting too long
+        clearInterval(waitForResponse);
+        console.error("Tiempo de espera agotado para datos de optimización");
+        
+        this.loadingProgress = 100;
+        this.loadingProgressText = 'Error: Tiempo de espera agotado';
+        
+        setTimeout(() => {
+          this.isLoading = false;
+          // Show error message to user
+          this.showToastMessage( 'Error',
+            'Error al procesar datos de optimización',
+            'error'
+          );}, 1000);
+      }
+    }, checkInterval);
+  }
+}
+
+// Modified loadOptimizedRoutesBorrador to handle errors
+loadOptimizedRoutesBorrador() {
+  try {
+    const respuestaManana = this.optimizacionData.getRespuestaManana();
+    
+    if (respuestaManana && respuestaManana.rutas) {
+      this.optimizedRoutes = respuestaManana.rutas;
+      console.log("Rutas cargadas en cronograma: ", this.optimizedRoutes);
+      // Initialize visits or other post-processing if needed
+      this.initializeVisits();
+    } else {
+      throw new Error("Formato de respuesta inválido");
+    }
+  } catch (error) {
+    console.error("Error al cargar rutas optimizadas:", error);
   }
 }
 
@@ -266,221 +463,9 @@ private scheduleNewPatient(patientData: any) {
     return null;
   }
   
-
   loadOptimizedRoutes() {
-    // Esto simularía la carga del JSON desde el backend
-    this.optimizedRoutes = {  
-      "1000001": [
-            {
-                "paciente": "1000001",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:00"
-            },
-            {
-                "paciente": "1000008",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:45"
-            },
-            {
-                "paciente": "1000011",
-                "hora_inicio": "07:45",
-                "hora_fin": "08:45"
-            },
-            {
-                "paciente": "1000024",
-                "hora_inicio": "08:45",
-                "hora_fin": "09:00"
-            },
-            {
-                "paciente": "1000024",
-                "hora_inicio": "09:00",
-                "hora_fin": "10:00"
-            },
-            {
-                "paciente": "1000021",
-                "hora_inicio": "10:00",
-                "hora_fin": "10:30"
-            },
-            {
-                "paciente": "1000034",
-                "hora_inicio": "10:30",
-                "hora_fin": "11:45"
-            },
-            {
-                "paciente": "1000029",
-                "hora_inicio": "11:45",
-                "hora_fin": "12:30"
-            }
-        ],
-        "1000002": [
-            {
-                "paciente": "1000002",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:00"
-            },
-            {
-                "paciente": "1000014",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:45"
-            },
-            {
-                "paciente": "1000028",
-                "hora_inicio": "07:45",
-                "hora_fin": "08:00"
-            },
-            {
-                "paciente": "1000040",
-                "hora_inicio": "08:00",
-                "hora_fin": "08:30"
-            },
-            {
-                "paciente": "1000013",
-                "hora_inicio": "08:30",
-                "hora_fin": "08:45"
-            },
-            {
-                "paciente": "1000035",
-                "hora_inicio": "08:45",
-                "hora_fin": "09:00"
-            }
-        ],
-        "1000003": [
-            {
-                "paciente": "1000003",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:00"
-            },
-            {
-                "paciente": "1000020",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:30"
-            },
-            {
-                "paciente": "1000032",
-                "hora_inicio": "07:30",
-                "hora_fin": "08:00"
-            },
-            {
-                "paciente": "1000023",
-                "hora_inicio": "08:00",
-                "hora_fin": "08:30"
-            },
-            {
-                "paciente": "1000009",
-                "hora_inicio": "08:30",
-                "hora_fin": "09:30"
-            },
-            {
-                "paciente": "1000010",
-                "hora_inicio": "09:30",
-                "hora_fin": "10:00"
-            },
-            {
-                "paciente": "1000019",
-                "hora_inicio": "10:00",
-                "hora_fin": "11:00"
-            },
-            {
-                "paciente": "1000033",
-                "hora_inicio": "11:00",
-                "hora_fin": "12:00"
-            },
-            {
-                "paciente": "1000022",
-                "hora_inicio": "12:00",
-                "hora_fin": "12:30"
-            }
-        ],
-        "1000004": [
-            {
-                "paciente": "1000004",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:00"
-            },
-            {
-                "paciente": "1000036",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:30"
-            },
-            {
-                "paciente": "1000015",
-                "hora_inicio": "07:30",
-                "hora_fin": "08:00"
-            },
-            {
-                "paciente": "1000030",
-                "hora_inicio": "08:00",
-                "hora_fin": "08:30"
-            },
-            {
-                "paciente": "1000038",
-                "hora_inicio": "08:30",
-                "hora_fin": "09:00"
-            },
-            {
-                "paciente": "1000018",
-                "hora_inicio": "09:00",
-                "hora_fin": "09:45"
-            },
-            {
-                "paciente": "1000016",
-                "hora_inicio": "09:45",
-                "hora_fin": "10:15"
-            },
-            {
-                "paciente": "1000017",
-                "hora_inicio": "10:15",
-                "hora_fin": "11:00"
-            },
-            {
-                "paciente": "1000040",
-                "hora_inicio": "10:00",
-                "hora_fin": "11:30"
-            }
-        ],
-        "1000005": [
-            {
-                "paciente": "1000005",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:00"
-            },
-            {
-                "paciente": "1000037",
-                "hora_inicio": "07:00",
-                "hora_fin": "07:45"
-            },
-            {
-                "paciente": "1000006",
-                "hora_inicio": "07:45",
-                "hora_fin": "08:30"
-            },
-            {
-                "paciente": "1000007",
-                "hora_inicio": "08:30",
-                "hora_fin": "09:30"
-            },
-            {
-                "paciente": "1000027",
-                "hora_inicio": "09:30",
-                "hora_fin": "10:15"
-            },
-            {
-                "paciente": "1000031",
-                "hora_inicio": "10:15",
-                "hora_fin": "10:45"
-            },
-            {
-                "paciente": "1000026",
-                "hora_inicio": "10:45",
-                "hora_fin": "11:30"
-            },
-            {
-                "paciente": "1000012",
-                "hora_inicio": "11:30",
-                "hora_fin": "11:45"
-            }
-        ]
-    }
+    // Tratar de cargar las visitas de hoy desde la bd
+    // en caso de no haber visitas, se deja en blanco el cronograma
 }
 
   
@@ -495,27 +480,26 @@ private scheduleNewPatient(patientData: any) {
       this.timeSlots.push(newTime);
     }
   }
-  
+
   initializeVisits() {
     // Limpiar visitas existentes
     this.visits = [];
-    
     // Convertir las rutas optimizadas en visitas
     for (const nurseId in this.optimizedRoutes) {
       if (this.optimizedRoutes.hasOwnProperty(nurseId)) {
         const nurseVisits = this.optimizedRoutes[nurseId];
-        const nurse = this.allNurses.find(n => n.id === parseInt(nurseId));
-        
+        const nurse = this.allNurses.find(n => n.id == parseInt(nurseId));
+
         if (nurse) {
           nurseVisits.forEach((visit: any, index: number) => {
             // El primer paciente es la ubicación de la enfermera
             if (index === 0 && visit.esEnfermera) {
               // No crear visita para la ubicación de la enfermera
+              console.log("Sale por la tangente");
               return;
             }
             
-            const patient = this.patients.find(p => p.id === parseInt(visit.paciente));
-            
+            const patient = this.patients.find(p => p.id == parseInt(visit.paciente));
             if (patient) {
               const duration = this.calculateDuration(visit.hora_inicio, visit.hora_fin);
               
@@ -532,6 +516,8 @@ private scheduleNewPatient(patientData: any) {
                 originalNurseId: nurse.id,
                 originalTime: visit.hora_inicio
               };
+
+              console.log("Nueva visita:", newVisit);
               
               this.visits.push(newVisit);
             }
@@ -539,13 +525,7 @@ private scheduleNewPatient(patientData: any) {
         }
       }
     }
-    
-    // Agregar algunas visitas existentes (simulando datos previos)
-    this.visits.push(
-      { id: 1001, patientId: 1000001, patientName: 'BLANCA VILLAMIL', nurseId: 1000050, 
-        procedure: 'CADA 12', startTime: '13:00', duration: 30, date: new Date(this.currentDate) },
-      // ... más visitas de ejemplo
-    );
+    console.log("Visitas finales:", this.visits);
   }
 
   calculateDuration(startTime: string, endTime: string): number {
@@ -628,13 +608,24 @@ private scheduleNewPatient(patientData: any) {
     }
     return null;
   }
-  
+
   isVisitStart(nurse: Nurse, time: Date): boolean {
-    const visit = this.getVisitInCell(nurse, time);
-    if (!visit) return false;
-    
-    const timeStr = this.formatTime(time);
-    return visit.startTime === timeStr;
+    const slotTime = this.formatTime(time); // Ej: "09:00"
+    return this.visits.some(visit => {
+      const visitTime = visit.startTime; // Ej: "09:26"
+      const visitMinutes = this.timeToMinutes(visitTime);
+      const slotMinutes = this.timeToMinutes(slotTime);
+      return (
+        visit.nurseId === nurse.id &&
+        visit.date.getTime() === this.currentDate.getTime() &&
+        Math.abs(visitMinutes - slotMinutes) < 15 // Tolerancia de 15 minutos
+      );
+    });
+  }
+  
+  timeToMinutes(time: string): number {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
   }
 
   getVisitWidth(visit: Visit | null): number {
@@ -967,6 +958,12 @@ private scheduleNewPatient(patientData: any) {
       visit.isOptimizedSuggestion = false;
     });
     
+    if(this.optimizacionData.getBorrador()){
+     //Se debe cargar a la bd 
+    }
+    else{
+      //Se deben actualizar los campos porque en teoría ya existen
+    }
     this.editMode = false;
     this.showToastMessage('Cronograma confirmado', 'El cronograma ha sido confirmado y es ahora oficial', 'success');
     
@@ -1136,4 +1133,7 @@ private scheduleNewPatient(patientData: any) {
   copyScheduleToNextDay() {
     // Aquí iría el código para copiar el cronograma al siguiente día
   }
+
+
+
 }

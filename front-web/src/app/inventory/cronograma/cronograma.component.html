@@ -1,7 +1,20 @@
 <div class="container">
+  <!-- Updated Loading Overlay with Progress Bar -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="loading-container">
+      <div class="spinner-text">
+        <i class="fas fa-sync-alt fa-spin"></i>
+        <span>Cargando cronograma...</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" [style.width.%]="loadingProgress"></div>
+      </div>
+      <div class="progress-text">{{ loadingProgressText }}</div>
+    </div>
+  </div>
   <div class="header">
     <h2 class="title-center">Cronograma de Visitas Domiciliarias</h2>
-    
+
     <!-- Modo de edición y confirmación -->
     <div class="mode-controls">
       <div *ngIf="!editMode" class="view-mode-info">
@@ -10,7 +23,7 @@
           <i class="fas fa-edit"></i> Editar Cronograma
         </button>
       </div>
-      
+
       <div *ngIf="editMode" class="edit-mode-controls">
         <div class="edit-mode-info">
           <i class="fas fa-exclamation-triangle"></i> Modo edición - Puedes ajustar las asignaciones antes de confirmar
@@ -23,7 +36,7 @@
         </button>
       </div>
     </div>
-    
+
     <div class="action-buttons">
       <button class="add-emergency-btn" (click)="openEmergencyModal()" *ngIf="editMode">
         <i class="fas fa-plus-circle"></i> Agregar Urgencia
@@ -35,7 +48,7 @@
         <i class="fas fa-copy"></i> Mantener asignación para {{ nextDay | date:'dd/MM/yyyy' }}
       </button>
     </div>
-    
+
     <div class="date-navigation">
       <button class="nav-btn" (click)="changeDate(-1)">
         <i class="fas fa-chevron-left"></i>
@@ -45,11 +58,12 @@
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
-    
+
     <!-- Mensajes de ayuda -->
     <div class="help-messages" *ngIf="editMode">
       <div class="help-tip">
-        <i class="fas fa-info-circle"></i> Puedes arrastrar las visitas para ajustar su horario (hasta 1 hora antes/después)
+        <i class="fas fa-info-circle"></i> Puedes arrastrar las visitas para ajustar su horario (hasta 1 hora
+        antes/después)
       </div>
       <div class="help-tip">
         <i class="fas fa-info-circle"></i> Haz clic en una visita para eliminarla
@@ -59,8 +73,8 @@
       </div>
     </div>
   </div>
-<!---------------------------- Cronograma ---------------------------->
-   <div class="schedule-container">
+  <!---------------------------- Cronograma ---------------------------->
+  <div class="schedule-container">
     <div class="time-header">
       <div class="nurse-header">Enfermera</div>
       <div class="time-slots">
@@ -76,31 +90,24 @@
         <div *ngFor="let nurse of morningNurses" class="nurse-row">
           <div class="nurse-name">{{ nurse.name }}</div>
           <div class="time-cells">
-            <div *ngFor="let time of timeSlots" class="time-cell"
-                 [class.morning-shift]="isMorningShift(time)"
-                 [class.occupied]="isCellOccupied(nurse, time)"
-                 [class.other-shift]="!isNurseInShift(nurse, time)"
-                 [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)"
-                 (dragover)="allowDrop($event)"
-                 (drop)="drop($event, nurse, time)"
-                 (click)="cellClicked(nurse, time)">
-      
+            <div *ngFor="let time of timeSlots" class="time-cell" [class.morning-shift]="isMorningShift(time)"
+              [class.occupied]="isCellOccupied(nurse, time)" [class.other-shift]="!isNurseInShift(nurse, time)"
+              [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)" (dragover)="allowDrop($event)"
+              (drop)="drop($event, nurse, time)" (click)="cellClicked(nurse, time)">
+
               <div *ngIf="isVisitStart(nurse, time) && getVisitInCell(nurse, time) as visit" class="visit-block"
-                   [style.width.%]="getVisitWidth(visit)"
-                   [style.background-color]="getVisitColor(visit)"
-                   draggable="true"
-                   (dragstart)="drag($event, visit)"
-                   [title]="getVisitTooltip(visit)">
+                [style.width.%]="getVisitWidth(visit)" [style.background-color]="getVisitColor(visit)" draggable="true"
+                (dragstart)="drag($event, visit)" [title]="getVisitTooltip(visit)">
                 <div class="visit-info">
                   <strong>{{ visit.patientName }}</strong>
                   <div>{{ visit.procedure }}</div>
                   <div>{{ visit.duration }} min</div>
                 </div>
               </div>
-              
+
               <!-- Indicador de sugerencia optimizada -->
-              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)" 
-                   class="optimized-indicator" title="Sugerencia de asignación optimizada">
+              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)"
+                class="optimized-indicator" title="Sugerencia de asignación optimizada">
                 <i class="fas fa-lightbulb"></i>
               </div>
             </div>
@@ -114,31 +121,24 @@
         <div *ngFor="let nurse of afternoonNurses" class="nurse-row">
           <div class="nurse-name">{{ nurse.name }}</div>
           <div class="time-cells">
-            <div *ngFor="let time of timeSlots" class="time-cell"
-                 [class.afternoon-shift]="isAfternoonShift(time)"
-                 [class.occupied]="isCellOccupied(nurse, time)"
-                 [class.other-shift]="!isNurseInShift(nurse, time)"
-                 [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)"
-                 (dragover)="allowDrop($event)"
-                 (drop)="drop($event, nurse, time)"
-                 (click)="cellClicked(nurse, time)">
-              
+            <div *ngFor="let time of timeSlots" class="time-cell" [class.afternoon-shift]="isAfternoonShift(time)"
+              [class.occupied]="isCellOccupied(nurse, time)" [class.other-shift]="!isNurseInShift(nurse, time)"
+              [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)" (dragover)="allowDrop($event)"
+              (drop)="drop($event, nurse, time)" (click)="cellClicked(nurse, time)">
+
               <div *ngIf="isVisitStart(nurse, time) && getVisitInCell(nurse, time) as visit" class="visit-block"
-                 [style.width.%]="getVisitWidth(visit)"
-                 [style.background-color]="getVisitColor(visit)"
-                 draggable="true"
-                 (dragstart)="drag($event, visit)"
-                 [title]="getVisitTooltip(visit)">
-              <div class="visit-info">
-                <strong>{{ visit.patientName }}</strong>
-                <div>{{ visit.procedure }}</div>
-                <div>{{ visit.duration }} min</div>
+                [style.width.%]="getVisitWidth(visit)" [style.background-color]="getVisitColor(visit)" draggable="true"
+                (dragstart)="drag($event, visit)" [title]="getVisitTooltip(visit)">
+                <div class="visit-info">
+                  <strong>{{ visit.patientName }}</strong>
+                  <div>{{ visit.procedure }}</div>
+                  <div>{{ visit.duration }} min</div>
+                </div>
               </div>
-            </div>
-              
+
               <!-- Indicador de sugerencia optimizada -->
-              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)" 
-                   class="optimized-indicator" title="Sugerencia de asignación optimizada">
+              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)"
+                class="optimized-indicator" title="Sugerencia de asignación optimizada">
                 <i class="fas fa-lightbulb"></i>
               </div>
             </div>
@@ -152,31 +152,24 @@
         <div *ngFor="let nurse of nightNurses" class="nurse-row">
           <div class="nurse-name">{{ nurse.name }}</div>
           <div class="time-cells">
-            <div *ngFor="let time of timeSlots" class="time-cell"
-                 [class.night-shift]="isNightShift(time)"
-                 [class.occupied]="isCellOccupied(nurse, time)"
-                 [class.other-shift]="!isNurseInShift(nurse, time)"
-                 [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)"
-                 (dragover)="allowDrop($event)"
-                 (drop)="drop($event, nurse, time)"
-                 (click)="cellClicked(nurse, time)">
-              
-                 <div *ngIf="isVisitStart(nurse, time) && getVisitInCell(nurse, time) as visit" class="visit-block"
-                 [style.width.%]="getVisitWidth(visit)"
-                 [style.background-color]="getVisitColor(visit)"
-                 draggable="true"
-                 (dragstart)="drag($event, visit)"
-                 [title]="getVisitTooltip(visit)">
-              <div class="visit-info">
-                <strong>{{ visit.patientName }}</strong>
-                <div>{{ visit.procedure }}</div>
-                <div>{{ visit.duration }} min</div>
+            <div *ngFor="let time of timeSlots" class="time-cell" [class.night-shift]="isNightShift(time)"
+              [class.occupied]="isCellOccupied(nurse, time)" [class.other-shift]="!isNurseInShift(nurse, time)"
+              [class.optimized-suggestion]="isOptimizedSuggestion(nurse, time)" (dragover)="allowDrop($event)"
+              (drop)="drop($event, nurse, time)" (click)="cellClicked(nurse, time)">
+
+              <div *ngIf="isVisitStart(nurse, time) && getVisitInCell(nurse, time) as visit" class="visit-block"
+                [style.width.%]="getVisitWidth(visit)" [style.background-color]="getVisitColor(visit)" draggable="true"
+                (dragstart)="drag($event, visit)" [title]="getVisitTooltip(visit)">
+                <div class="visit-info">
+                  <strong>{{ visit.patientName }}</strong>
+                  <div>{{ visit.procedure }}</div>
+                  <div>{{ visit.duration }} min</div>
+                </div>
               </div>
-            </div>
-              
+
               <!-- Indicador de sugerencia optimizada -->
-              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)" 
-                   class="optimized-indicator" title="Sugerencia de asignación optimizada">
+              <div *ngIf="editMode && isOptimizedSuggestion(nurse, time) && !isCellOccupied(nurse, time)"
+                class="optimized-indicator" title="Sugerencia de asignación optimizada">
                 <i class="fas fa-lightbulb"></i>
               </div>
             </div>
@@ -196,30 +189,30 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <form class="modal-form" (ngSubmit)="addEmergencyVisit()">
       <div class="form-group">
         <label>Paciente: <span class="required">*</span></label>
         <select [(ngModel)]="emergencyVisit.patientId" name="patient" required class="form-input">
           <option value="">Seleccione un paciente</option>
-          <option *ngFor="let patient of patients" [value]="patient.id">{{ patient.name }} - {{ patient.document }}</option>
+          <option *ngFor="let patient of patients" [value]="patient.id">{{ patient.name }} - {{ patient.document }}
+          </option>
         </select>
       </div>
-      
+
       <div class="form-group">
         <label>Procedimiento: <span class="required">*</span></label>
-        <input type="text" [(ngModel)]="emergencyVisit.procedure" name="procedure" required class="form-input" 
-               placeholder="Ej: URGENCIA" value="URGENCIA">
+        <input type="text" [(ngModel)]="emergencyVisit.procedure" name="procedure" required class="form-input"
+          placeholder="Ej: URGENCIA" value="URGENCIA">
       </div>
-      
+
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
             <label>Hora: <span class="required">*</span></label>
             <input type="time" [(ngModel)]="emergencyVisit.time" name="time" required class="form-input"
-                   [min]="getMinTimeForNurse(emergencyVisit.nurseId)" 
-                   [max]="getMaxTimeForNurse(emergencyVisit.nurseId)"
-                   step="900"> <!-- 15 minutos -->
+              [min]="getMinTimeForNurse(emergencyVisit.nurseId)" [max]="getMaxTimeForNurse(emergencyVisit.nurseId)"
+              step="900"> <!-- 15 minutos -->
           </div>
         </div>
         <div class="form-column">
@@ -233,25 +226,25 @@
           </div>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label>Enfermera: <span class="required">*</span></label>
         <select [(ngModel)]="emergencyVisit.nurseId" name="nurse" required class="form-input"
-                (change)="updateTimeLimits()">
+          (change)="updateTimeLimits()">
           <option value="">Seleccione una enfermera</option>
           <option *ngFor="let nurse of getAvailableNursesForEmergency()" [value]="nurse.id">
             {{ nurse.name }} ({{ getShiftName(nurse.shift) }})
           </option>
         </select>
       </div>
-      
+
       <div class="form-group" *ngIf="emergencyVisit.nurseId">
         <label>Horario disponible:</label>
         <div class="available-slots">
           {{ getShiftTimeRange(emergencyVisit.nurseId) }}
         </div>
       </div>
-      
+
       <div class="form-actions">
         <button type="button" class="cancel-btn" (click)="closeEmergencyModal()">
           <i class="fas fa-times"></i> Cancelar
@@ -273,20 +266,20 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <form class="modal-form" (ngSubmit)="addNewPatient()">
       <div class="form-group">
         <label>Nombre completo: <span class="required">*</span></label>
-        <input type="text" [(ngModel)]="newPatient.name" name="name" required class="form-input" 
-               placeholder="Nombre y apellidos">
+        <input type="text" [(ngModel)]="newPatient.name" name="name" required class="form-input"
+          placeholder="Nombre y apellidos">
       </div>
-      
+
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
             <label>Documento: <span class="required">*</span></label>
             <input type="text" [(ngModel)]="newPatient.document" name="document" required class="form-input"
-                   placeholder="Número de documento">
+              placeholder="Número de documento">
           </div>
         </div>
         <div class="form-column">
@@ -302,18 +295,18 @@
           </div>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label>Dirección: <span class="required">*</span></label>
         <input type="text" [(ngModel)]="newPatient.address" name="address" required class="form-input"
-               placeholder="Dirección completa">
+          placeholder="Dirección completa">
       </div>
-      
+
       <div class="form-group">
         <label>Barrio/Localidad: <span class="required">*</span></label>
         <input type="text" [(ngModel)]="newPatient.neighborhood" name="neighborhood" required class="form-input">
       </div>
-      
+
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
@@ -330,13 +323,13 @@
           </div>
         </div>
       </div>
-      
+
       <div class="form-columns">
         <div class="form-column">
           <div class="form-group">
             <label>Hora de inicio: <span class="required">*</span></label>
             <input type="time" [(ngModel)]="newPatient.startTime" name="startTime" required class="form-input"
-                   step="900"> <!-- 15 minutos -->
+              step="900"> <!-- 15 minutos -->
           </div>
         </div>
         <div class="form-column">
@@ -350,12 +343,12 @@
           </div>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label>Días de tratamiento: <span class="required">*</span></label>
         <input type="number" [(ngModel)]="newPatient.days" name="days" required class="form-input" min="1">
       </div>
-      
+
       <div class="form-group">
         <label>Prioridad:</label>
         <select [(ngModel)]="newPatient.priority" name="priority" class="form-input">
@@ -364,7 +357,7 @@
           <option value="urgent">Urgente</option>
         </select>
       </div>
-      
+
       <div class="form-actions">
         <button type="button" class="cancel-btn" (click)="closeNewPatientModal()">
           <i class="fas fa-times"></i> Cancelar
@@ -379,13 +372,11 @@
 
 <!-- Toast notifications -->
 <div class="toast-container" [class.show]="showToast">
-  <div class="toast" [class.success]="toastType === 'success'" 
-                    [class.error]="toastType === 'error'"
-                    [class.warning]="toastType === 'warning'">
+  <div class="toast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'"
+    [class.warning]="toastType === 'warning'">
     <div class="toast-icon">
       <i class="fas" [class.fa-check-circle]="toastType === 'success'"
-                  [class.fa-exclamation-circle]="toastType === 'error'"
-                  [class.fa-info-circle]="toastType === 'warning'"></i>
+        [class.fa-exclamation-circle]="toastType === 'error'" [class.fa-info-circle]="toastType === 'warning'"></i>
     </div>
     <div class="toast-content">
       <div class="toast-title">{{ toastTitle }}</div>

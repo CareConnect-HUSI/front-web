@@ -40,6 +40,7 @@ const routes: Routes = [
   { path: 'stock', component: StockComponent },
   { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' },
   { path: 'detalle-asignacion', component: DetalleAsignacionComponent },
+  { path: '**', redirectTo: '/ver-pacientes', pathMatch: 'full' } // Redirigir a la página de pacientes si la ruta no se encuentra
 
 ];
 
