@@ -18,10 +18,10 @@
       <p>{{ nombrePaciente }}</p>
     </div>
 
-    <!-- Tabla de seguimiento -->
+    <!-- Sección Tratamientos -->
     <div class="info-section">
       <div class="section-header">
-        <h3 class="section-title">Registro de tratamientos</h3>
+        <h3 class="section-title">Tratamientos</h3>
         <div class="section-actions">
           <button class="action-btn" (click)="addMedication()">
             <i class="fas fa-plus"></i> Agregar nuevo tratamiento
@@ -33,13 +33,13 @@
         <table class="info-table medication-table">
           <thead>
             <tr>
-              <th>Tratamiento</th>
+              <th>Nombre</th>
               <th>Dosis</th>
               <th>Frecuencia</th>
-              <th>Hora tentativa</th>
-              <th>Días de tratamiento</th>
-              <th>Fecha de inicio</th>
-              <th>Fecha de fin</th>
+              <th>Hora</th>
+              <th>Días</th>
+              <th>Inicio</th>
+              <th>Fin</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -48,7 +48,7 @@
               <td>{{ item.nombre }}</td>
               <td>{{ item.dosis }}</td>
               <td>{{ item.frecuencia }}</td>
-              <td>{{ item.hora }}</td>
+              <td>{{ item.hora?.slice(0, 5) }}</td>
               <td>{{ item.diasTratamiento }}</td>
               <td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
               <td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
@@ -56,8 +56,36 @@
                 <button class="action-btn small" (click)="openEditModal(item, i)">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button class="action-btn small delete" (click)="confirmDelete(i)">
-                  <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sección Procedimientos -->
+    <div class="info-section">
+      <div class="section-header">
+        <h3 class="section-title">Procedimientos</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Hora</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of procedimientos; let i = index">
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.hora?.slice(0, 5) }}</td>
+              <td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <button class="action-btn small" (click)="openEditModal(item, i)">
+                  <i class="fas fa-edit"></i>
                 </button>
               </td>
             </tr>
@@ -76,170 +104,33 @@
     </div>
   </div>
 
-  <!-- Modal para Agregar Tratamiento -->
-  <div *ngIf="showAddModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Agregar Tratamiento</h3>
-        <button class="close-btn" (click)="closeAddModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <form class="modal-form" (ngSubmit)="saveMedication()">
-        <!-- Fila: Nombre y Dosis -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre:</label>
-            <select [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
-              <option *ngFor="let medicamento of listaTratamientos" [value]="medicamento.name">
-                {{ medicamento.name }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Fila: Frecuencia y Hora -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Frecuencia:</label>
-            <select
-              [(ngModel)]="currentMedication.frecuencia"
-              name="frecuencia"
-              required
-              class="form-input"
-            >
-              <option value="Cada 6h">Cada 6 horas</option>
-              <option value="Cada 8h">Cada 8 horas</option>
-              <option value="Cada 12h">Cada 12 horas</option>
-              <option value="Cada 24h">Cada 24 horas</option>
-              <option value="Cada 12h">Cada 48 horas</option>
-              <option value="Cada 24h">Cada 72 horas</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Hora:</label>
-            <input
-              type="time"
-              [(ngModel)]="currentMedication.hora"
-              name="hora"
-              required
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Fila: Cantidad -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Cantidad:</label>
-            <input
-              type="number"
-              [(ngModel)]="currentMedication.cantidad"
-              name="cantidad"
-              min="1"
-              required
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Fila: Fechas -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Fecha de Inicio:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaInicio"
-              name="fechaInicio"
-              required
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Fecha de Fin:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaFin"
-              name="fechaFin"
-              (change)="calculateDays(currentMedication)"
-              required
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Días de tratamiento -->
-        <div class="form-group">
-          <label>Días de Tratamiento:</label>
-          <input
-            type="number"
-            [(ngModel)]="currentMedication.diasTratamiento"
-            name="diasTratamiento"
-            disabled
-            class="form-input"
-          />
-        </div>
-
-        <!-- Botones -->
-        <div class="form-actions">
-          <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancelar</button>
-          <button type="submit" class="save-btn">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal para Editar Tratamiento -->
+  <!-- Modal para Editar (Tratamiento o Procedimiento) -->
   <div *ngIf="showEditModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Modificar tratamiento</h3>
+        <h3>Modificar {{ currentMedication?.tipoActividadId === 1 ? 'Tratamiento' : 'Procedimiento' }}</h3>
         <button class="close-btn" (click)="closeEditModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
       <form class="modal-form" (ngSubmit)="updateTreatment()">
-        <!-- Fila: Nombre y Dosis -->
         <div class="form-row">
           <div class="form-group">
-          <label>Nombre:</label>
-          <input
-            type="text"
-            [(ngModel)]="currentMedication.nombre"
-            name="nombre"
-            readonly
-            class="form-input readonly"
-          />
-        </div>
+            <label>Nombre:</label>
+            <input type="text" [(ngModel)]="currentMedication.nombre" name="nombre" readonly class="form-input readonly" />
+          </div>
 
-          <div class="form-group">
+          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
             <label>Dosis:</label>
-              <input
-                type="number"
-                [(ngModel)]="currentMedication.dosis"
-                name="dosis"
-                min="1"
-                step="1"
-                required
-                class="form-input"
-              />
+            <input type="number" [(ngModel)]="currentMedication.dosis" name="dosis" min="1" required class="form-input" />
           </div>
         </div>
 
-        <!-- Fila: Frecuencia y Hora -->
         <div class="form-row">
-          <div class="form-group">
+          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
             <label>Frecuencia:</label>
-            <select
-              [(ngModel)]="currentMedication.frecuencia"
-              name="frecuencia"
-              required
-              class="form-input"
-            >
+            <select [(ngModel)]="currentMedication.frecuencia" name="frecuencia" required class="form-input">
               <option value="6">Cada 6 horas</option>
               <option value="8">Cada 8 horas</option>
               <option value="12">Cada 12 horas</option>
@@ -251,59 +142,106 @@
 
           <div class="form-group">
             <label>Hora:</label>
-            <input
-              type="time"
-              [(ngModel)]="currentMedication.hora"
-              name="hora"
-              required
-              class="form-input"
-            />
+            <input type="time" [(ngModel)]="currentMedication.hora" name="hora" required class="form-input" />
           </div>
         </div>
 
-        <!-- Fila: Fechas -->
         <div class="form-row">
           <div class="form-group">
             <label>Fecha de Inicio:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaInicio"
-              name="fechaInicio"
-              required
-              class="form-input"
-            />
+            <input type="date" [(ngModel)]="currentMedication.fechaInicio" name="fechaInicio" required class="form-input" />
           </div>
 
-          <div class="form-group">
+          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
             <label>Fecha de Fin:</label>
-            <input
-              type="date"
-              [(ngModel)]="currentMedication.fechaFin"
-              name="fechaFin"
-              (change)="calculateDays(currentMedication)"
-              required
-              class="form-input"
-            />
+            <input type="date" [(ngModel)]="currentMedication.fechaFin" name="fechaFin"
+              (change)="calculateDays(currentMedication)" required class="form-input" />
           </div>
         </div>
 
-        <!-- Días de tratamiento -->
-        <div class="form-group">
+        <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
           <label>Días de Tratamiento:</label>
-          <input
-            type="number"
-            [(ngModel)]="currentMedication.diasTratamiento"
-            name="diasTratamiento"
-            disabled
-            class="form-input"
-          />
+          <input type="number" [(ngModel)]="currentMedication.diasTratamiento" name="diasTratamiento" disabled class="form-input" />
         </div>
 
         <input type="hidden" [(ngModel)]="currentMedication.actividadId" name="actividadId" />
 
-        <!-- Botones -->
         <div class="form-actions">
           <button type="button" class="cancel-btn" (click)="closeEditModal()">Cancelar</button>
+          <button type="submit" class="save-btn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Tratamiento -->
+  <div *ngIf="showAddModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Agregar Tratamiento</h3>
+        <button class="close-btn" (click)="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="saveMedication()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre:</label>
+            <select [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
+              <option *ngFor="let medicamento of listaTratamientos" [value]="medicamento.name">
+                {{ medicamento.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Frecuencia:</label>
+            <select [(ngModel)]="currentMedication.frecuencia" name="frecuencia" required class="form-input">
+              <option value="6">Cada 6 horas</option>
+              <option value="8">Cada 8 horas</option>
+              <option value="12">Cada 12 horas</option>
+              <option value="24">Cada 24 horas</option>
+              <option value="48">Cada 48 horas</option>
+              <option value="72">Cada 72 horas</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Hora:</label>
+            <input type="time" [(ngModel)]="currentMedication.hora" name="hora" required class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Dosis:</label>
+            <input type="number" [(ngModel)]="currentMedication.dosis" name="dosis" min="1" required class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Inicio:</label>
+            <input type="date" [(ngModel)]="currentMedication.fechaInicio" name="fechaInicio" required class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Fin:</label>
+            <input type="date" [(ngModel)]="currentMedication.fechaFin" name="fechaFin"
+              (change)="calculateDays(currentMedication)" required class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Días de Tratamiento:</label>
+          <input type="number" [(ngModel)]="currentMedication.diasTratamiento" name="diasTratamiento" disabled class="form-input" />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancelar</button>
           <button type="submit" class="save-btn">Guardar</button>
         </div>
       </form>

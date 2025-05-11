@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PatientService } from 'src/app/service/patient.service';
+
+interface Localidad {
+  codigo: string;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-patient-info',
@@ -13,11 +19,16 @@ export class PatientInfoComponent implements OnInit {
   treatment: any[] = [];
   historial: any[] = [];
   pacienteId!: number;
+  showAddressModal = false;
+  addressForm!: FormGroup;
+  localidades: { codigo: string, nombre: string }[] = [];
+  barriosFiltrados: { id: number; nombre: string }[] = [];
 
   constructor(
     private patientService: PatientService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -26,8 +37,24 @@ export class PatientInfoComponent implements OnInit {
     if (id) {
       this.loadPatient(id);
     }
+    this.initAddressForm()
+    this.cargarLocalidades(); 
   }
 
+  initAddressForm() {
+    this.addressForm = this.fb.group({
+      tipoVia: ['', Validators.required],
+      numeroVia: ['', Validators.required],
+      letraVia: [''],
+      bis: [''],
+      complemento: [''],
+      numeroPlaca: ['', Validators.required],
+      conjunto: [''],
+      localidad: ['', Validators.required],
+      barrio: ['', Validators.required],
+      complementoDireccion: ['']
+      });
+    }
   loadPatient(id: number) {
     this.patientService.obtenerPacientePorId(id).subscribe({
       next: (data) => {
@@ -137,4 +164,66 @@ export class PatientInfoComponent implements OnInit {
       },
     });
   }  
+  openAddressModal() {
+    this.showAddressModal = true;
+  }
+
+  closeAddressModal() {
+    this.showAddressModal = false;
+  }
+
+  saveAddress() {
+  if (this.addressForm.valid) {
+    const address = this.addressForm.value;
+    let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
+    if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
+    if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
+    if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
+    direccionCompleta += ` # ${address.numeroPlaca}`;
+    if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
+    if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
+    direccionCompleta += `, Bogotá, Colombia`;
+
+    const localidadCodigo = address.localidad;
+    const localidadObj = this.localidades.find(l => l.codigo === localidadCodigo);
+    const nombreLocalidad = localidadObj?.nombre || localidadCodigo;
+
+    this.paciente.direccion = direccionCompleta;
+    this.paciente.localidad = nombreLocalidad;
+    this.paciente.barrio = address.barrio;
+    this.paciente.conjunto = address.conjunto || '';
+
+    this.closeAddressModal();
+  } else {
+    alert('Por favor complete todos los campos obligatorios de la dirección.');
+  }
+}
+
+
+  cargarLocalidades() {
+    this.patientService.getLocalidades().subscribe({
+      next: (localidades: Localidad[]) => {
+        this.localidades = localidades.map(l => ({ codigo: l.codigo, nombre: l.nombre }));
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+      }
+    });
+  }
+
+  onLocalidadChange() {
+    const codigo = this.addressForm.get('localidad')?.value || this.paciente.get('personalInfo.localidad')?.value;
+
+  
+    if (!codigo) return;
+  
+    this.patientService.getBarriosPorLocalidad(codigo).subscribe({
+      next: (barrios: any[]) => {
+        this.barriosFiltrados = barrios.map(b => ({ id: b.id, nombre: b.nombre }));
+      },
+      error: (err: any) => {
+        console.error('Error al cargar barrios:', err);
+      }
+    });
+  }
 }

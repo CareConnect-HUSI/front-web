@@ -77,19 +77,28 @@ export class PatientService {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
   }
 
-
   getTiposActividad(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
   }
   updateTratamiento(id: number, tratamiento: any): Observable<any> {
-    return this.http.put(`http://localhost:8081/actividad-paciente-visita/actualizar/${id}`, tratamiento);
+    return this.http.put(
+      `http://localhost:8081/actividad-paciente-visita/actualizar/${id}`,
+      tratamiento
+    );
   }
-  
+
   getLocalidades() {
     return this.http.get<any[]>(`${this.apiUrl}/localidades`);
   }
-  
+
   getBarriosPorLocalidad(codigoLocalidad: string) {
     return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
-  }  
+  }
+
+  registrarTratamiento(payload: any): Observable<any> {
+    return this.http.post(
+      'http://localhost:8081/actividad-paciente-visita/registrar',
+      payload
+    );
+  }
 }

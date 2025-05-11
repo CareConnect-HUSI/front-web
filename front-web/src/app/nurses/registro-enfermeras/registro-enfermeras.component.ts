@@ -221,24 +221,46 @@ export class RegistroEnfermerasComponent implements OnInit {
   }
 
   loadNurseForEdit(nurse: any) {
-    this.isEditMode = true;
-    this.currentNurseId = nurse.id;
-    this.showForm = true;
+  this.isEditMode = true;
+  this.currentNurseId = nurse.id;
+  this.showForm = true;
 
-    this.nurseForm.patchValue({
-      name: nurse.nombre,
-      lastname: nurse.apellido,
-      identificationType: nurse.tipoIdentificacion?.name || 'CC',
-      identificationNumber: nurse.numeroIdentificacion,
-      address: nurse.direccion,
-      phone: nurse.telefono,
-      localidad: this.localidades.find(l => l.nombre === nurse.localidad)?.codigo || '',
-      barrio: nurse.barrio,
-      turno: nurse.turnoEntity?.name || '',
-      email: nurse.email,
-      password: '********'
-    });
-  }
+  // Buscar código de localidad a partir del barrio actual
+  this.nurseService.getLocalidades().subscribe({
+    next: (localidades: any[]) => {
+      this.localidades = localidades;
+
+      this.nurseService.getBarriosPorNombre(nurse.barrio).subscribe({
+        next: (barrioData: any) => {
+          const localidadCodigo = barrioData.localidad?.codigo || '';
+
+          this.nurseForm.patchValue({
+            name: nurse.nombre,
+            lastname: nurse.apellido,
+            identificationType: nurse.tipoIdentificacion?.name || 'CC',
+            identificationNumber: nurse.numeroIdentificacion,
+            address: nurse.direccion,
+            phone: nurse.telefono,
+            localidad: localidadCodigo,
+            barrio: nurse.barrio,
+            turno: nurse.turnoEntity?.name || '',
+            email: nurse.email,
+            password: '********'
+          });
+
+          this.onLocalidadChange();
+        },
+        error: (err: any) => {
+          console.warn('No se pudo obtener localidad del barrio:', err);
+        }
+      });
+    },
+    error: err => {
+      console.error('Error al cargar localidades:', err);
+    }
+  });
+}
+
 
   toggleStatus(nurse: any) {
     const newStatus = !nurse.activo;

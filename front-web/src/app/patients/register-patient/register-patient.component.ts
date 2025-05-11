@@ -135,7 +135,7 @@ export class RegisterPatientComponent implements OnInit {
       direccionCompleta += `, Bogotá, Colombia`;
 
       this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
-      this.patientForm.get('personalInfo.localidad')?.setValue(address.localidad);
+      this.patientForm.get('personalInfo.localidad')?.setValue(address.nombre);
       this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
       this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
       this.closeAddressModal();
