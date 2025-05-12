@@ -25,7 +25,7 @@ export class PatientService {
     // });
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${limit}`, {
       headers,
     });
   }
