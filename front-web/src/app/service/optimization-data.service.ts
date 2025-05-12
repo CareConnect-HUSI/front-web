@@ -4,7 +4,7 @@ import { catchError, tap, throwError } from 'rxjs';
 
 // Interfaces defined here or in a separate file
 export interface RawNurse {
-  numeroIdentificacion: number;
+  id: number;
   name: string;
   direccion?: string;
   latitud?: number;
@@ -12,7 +12,7 @@ export interface RawNurse {
 }
 
 export interface RawPatient {
-  numero_identificacion: number;
+  id: number;
   name: string;
   direccion?: string;
   latitud?: number;
@@ -187,7 +187,7 @@ export class OptimizationDataService {
     const matrizVentanaTiempo: number[][] = [];
 
     enfermeras.forEach((enfermera: RawNurse) => {
-      ids.push(enfermera.numeroIdentificacion.toString());
+      ids.push(enfermera.id.toString());
       const coordenada = [enfermera.latitud || 0, enfermera.longitud || 0];
       coordenadas.push(coordenada);
       tiempoAtencion.push(0);
@@ -195,7 +195,7 @@ export class OptimizationDataService {
     });
 
     pacientes.forEach((paciente: RawPatient) => {
-      ids.push(paciente.numero_identificacion.toString());
+      ids.push(paciente.id.toString());
       coordenadas.push([paciente.latitud || 0, paciente.longitud || 0]);
 
       const actividades = paciente.actividades || [];
@@ -246,6 +246,174 @@ export class OptimizationDataService {
       }),
       catchError((error) => {
         console.error('Error en la API:', error);
+        return throwError(() => new Error('Error en la API: ' + error.message));
+      })
+    );
+  }
+
+  generarCronogramaTarde() {
+    const horaInicio = '13:00'; // Turno tarde comienza a las 13:00
+    const tipoTurno = 6; // Asumiendo la misma duración de turno (6 horas)
+    const margen = 0.5; // Margen de tiempo para ventanas temporales
+  
+    const enfermeras = this.getInfoEnfermerasTarde() || [];
+    const pacientes = this.getInfoPacientesTarde() || [];
+    const numMaxEnfermeras = enfermeras.length;
+  
+    const timeToHours = (time: string): number => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return hours + minutes / 60;
+    };
+  
+    const ids: string[] = [];
+    const coordenadas: number[][] = [];
+    const tiempoAtencion: number[] = [];
+    const matrizVentanaTiempo: number[][] = [];
+  
+    enfermeras.forEach((enfermera: RawNurse) => {
+      ids.push(enfermera.id.toString());
+      const coordenada = [enfermera.latitud || 0, enfermera.longitud || 0];
+      coordenadas.push(coordenada);
+      tiempoAtencion.push(0);
+      matrizVentanaTiempo.push([0, 6]);
+    });
+  
+    pacientes.forEach((paciente: RawPatient) => {
+      ids.push(paciente.id.toString());
+      coordenadas.push([paciente.latitud || 0, paciente.longitud || 0]);
+  
+      const actividades = paciente.actividades || [];
+      const totalDuracion = actividades.reduce(
+        (sum: number, act: any) => sum + (act.duracionVisita || 0),
+        0
+      );
+      const tempoVisita = totalDuracion / 60;
+      tiempoAtencion.push(tempoVisita);
+  
+      let horaRecomendada: number | null = null;
+      for (const act of actividades) {
+        if (act.hora) {
+          horaRecomendada = timeToHours(act.hora);
+          break;
+        }
+      }
+  
+      if (horaRecomendada !== null) {
+        const horaInicioHours = timeToHours(horaInicio);
+        const diff = horaRecomendada - horaInicioHours;
+        const valorInicial = Math.max(0, diff - margen);
+        const valorFinal = Math.max(0, diff + margen);
+        matrizVentanaTiempo.push([valorInicial, valorFinal]);
+      } else {
+        matrizVentanaTiempo.push([0, 6]);
+      }
+    });
+  
+    const payload = {
+      coordenadas,
+      matrizVentanaTiempo,
+      tiempoAtencion,
+      ids,
+      tipoTurno,
+      numMaxEnfermeras,
+      horaInicio,
+    };
+  
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  
+    console.log('Payload para la API (Tarde):', payload);
+  
+    return this.http.post<any>(`${this.apiUrl}`, payload, { headers }).pipe(
+      tap((response) => {
+        console.log('Respuesta recibida (Tarde):', response);
+        this.setRespuestaTarde(response);
+      }),
+      catchError((error) => {
+        console.error('Error en la API (Tarde):', error);
+        return throwError(() => new Error('Error en la API: ' + error.message));
+      })
+    );
+  }
+
+  generarCronogramaNoche() {
+    const horaInicio = '19:00'; // Turno noche comienza a las 19:00
+    const tipoTurno = 12; // Asumiendo la misma duración de turno (6 horas)
+    const margen = 0.5; // Margen de tiempo para ventanas temporales
+  
+    const enfermeras = this.getInfoEnfermerasNoche() || [];
+    const pacientes = this.getInfoPacientesNoche() || [];
+    const numMaxEnfermeras = enfermeras.length;
+  
+    const timeToHours = (time: string): number => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return hours + minutes / 60;
+    };
+  
+    const ids: string[] = [];
+    const coordenadas: number[][] = [];
+    const tiempoAtencion: number[] = [];
+    const matrizVentanaTiempo: number[][] = [];
+  
+    enfermeras.forEach((enfermera: RawNurse) => {
+      ids.push(enfermera.id.toString());
+      const coordenada = [enfermera.latitud || 0, enfermera.longitud || 0];
+      coordenadas.push(coordenada);
+      tiempoAtencion.push(0);
+      matrizVentanaTiempo.push([0, 6]);
+    });
+  
+    pacientes.forEach((paciente: RawPatient) => {
+      ids.push(paciente.id.toString());
+      coordenadas.push([paciente.latitud || 0, paciente.longitud || 0]);
+  
+      const actividades = paciente.actividades || [];
+      const totalDuracion = actividades.reduce(
+        (sum: number, act: any) => sum + (act.duracionVisita || 0),
+        0
+      );
+      const tempoVisita = totalDuracion / 60;
+      tiempoAtencion.push(tempoVisita);
+  
+      let horaRecomendada: number | null = null;
+      for (const act of actividades) {
+        if (act.hora) {
+          horaRecomendada = timeToHours(act.hora);
+          break;
+        }
+      }
+  
+      if (horaRecomendada !== null) {
+        const horaInicioHours = timeToHours(horaInicio);
+        const diff = horaRecomendada - horaInicioHours;
+        const valorInicial = Math.max(0, diff - margen);
+        const valorFinal = Math.max(0, diff + margen);
+        matrizVentanaTiempo.push([valorInicial, valorFinal]);
+      } else {
+        matrizVentanaTiempo.push([0, 6]);
+      }
+    });
+  
+    const payload = {
+      coordenadas,
+      matrizVentanaTiempo,
+      tiempoAtencion,
+      ids,
+      tipoTurno,
+      numMaxEnfermeras,
+      horaInicio,
+    };
+  
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  
+    console.log('Payload para la API (Noche):', payload);
+  
+    return this.http.post<any>(`${this.apiUrl}`, payload, { headers }).pipe(
+      tap((response) => {
+        console.log('Respuesta recibida (Noche):', response);
+        this.setRespuestaNoche(response);
+      }),
+      catchError((error) => {
+        console.error('Error en la API (Noche):', error);
         return throwError(() => new Error('Error en la API: ' + error.message));
       })
     );

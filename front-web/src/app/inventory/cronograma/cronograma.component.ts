@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { Visita } from 'src/app/model/visit';
 import { NurseService } from 'src/app/service/nurse.service';
 import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 import { PatientService } from 'src/app/service/patient.service';
+import { VisitsService } from 'src/app/service/visits.service';
 
 interface Visit {
   id: number;
   patientId: number;
+  actividadPacienteVisita?: number;
   patientName: string;
   nurseId: number;
   procedure: string;
@@ -25,6 +28,7 @@ interface Visit {
 interface Patient {
   id: number;
   name: string;
+  actividadPacienteVisita: number;
   lastName?: string;
   address: string;
   phone?: string;
@@ -113,11 +117,17 @@ export class CronogramaComponent implements OnInit {
   
   draggedVisit: any = null;
 
-  constructor(private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService) {
+  constructor(private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService, private visitsService: VisitsService) {
     this.nextDay = new Date(this.currentDate);
     this.nextDay.setDate(this.nextDay.getDate() + 1);
   }
 
+  // VISITA : PARA LA BD
+  visitas: Visita[] = [];
+  nuevaVisita: Visita = {
+    actividadPacienteVisitaId: 0,
+    enfermeraId: 0
+  };
   isLoading: boolean = false;
   loadingProgress: number = 0;
   loadingProgressText: string = 'Inicializando...';
@@ -142,9 +152,7 @@ export class CronogramaComponent implements OnInit {
     this.editMode = true;
   } else {
       this.generateTimeSlots();
-      // en la función Load Optimized toutes debería cargar desde la bd
-      this.loadOptimizedRoutes();
-      // this.initializeVisits();
+      this.loadScheduleFromDB();
   }
 
   // Check if navigating from patient registration
@@ -164,7 +172,7 @@ fetchInitialData() {
     this.allNurses = [];
     if (allEnfermeras.dataEnfermerasManana) {
       this.morningNurses = allEnfermeras.dataEnfermerasManana.map((n: any) => ({
-        id: n.numeroIdentificacion,
+        id: n.id,
         name: (n.nombre + " " + n.apellido) || 'Unknown',
         shift: 'morning',
         address: n.direccion || '',
@@ -175,7 +183,7 @@ fetchInitialData() {
     }
     if (allEnfermeras.dataEnfermerasTarde) {
       this.afternoonNurses = allEnfermeras.dataEnfermerasTarde.map((n: any) => ({
-        id: n.numeroIdentificacion,
+        id: n.id,
         name: n.name || 'Unknown',
         shift: 'afternoon',
         address: n.direccion || '',
@@ -186,7 +194,7 @@ fetchInitialData() {
     }
     if (allEnfermeras.dataEnfermerasNoche) {
       this.nightNurses = allEnfermeras.dataEnfermerasNoche.map((n: any) => ({
-        id: n.numeroIdentificacion,
+        id: n.id, //Cambiado desde numeroIdentifica
         name: n.name || 'Unknown',
         shift: 'night',
         address: n.direccion || '',
@@ -213,8 +221,9 @@ fetchInitialData() {
     patientSources.forEach((source) => {
       if (source) {
         const mappedPatients = source.map((p: any) => ({
-          id: p.numero_identificacion,
+          id: p.id,
           name: p.nombre || 'Unknown',
+          actividadPacienteVisita: p.actividades[0].id || 0, //Agregado para obtener el ActiviadPacienteVisita id
           document: p.numero_identificacion,
           address: p.direccion || '',
           latitude: p.latitud,
@@ -223,7 +232,6 @@ fetchInitialData() {
         this.patients.push(...mappedPatients);
       }
     });
-
     if (!this.patients.length) {
       this.showToastMessage('Error', 'No se encontraron datos de pacientes', 'error');
     }
@@ -397,6 +405,7 @@ private scheduleNewPatient(patientData: any) {
     const newVisit: Visit = {
       id: Math.max(0, ...this.visits.map(v => v.id)) + 1,
       patientId: patientData.id,
+      actividadPacienteVisita: patientData.actividadPacienteVisita, //REVISARRR
       patientName: `${patientData.name} ${patientData.lastName || ''}`.trim(),
       nurseId: availableNurseId, // Usamos el ID directamente
       procedure: patientData.procedure || 'Nuevo tratamiento',
@@ -506,6 +515,7 @@ private scheduleNewPatient(patientData: any) {
               const newVisit: Visit = {
                 id: Math.max(0, ...this.visits.map(v => v.id)) + 1,
                 patientId: patient.id,
+                actividadPacienteVisita: patient.actividadPacienteVisita,
                 patientName: patient.name,
                 nurseId: nurse.id,
                 procedure: (patient as any).priority === 'urgent' ? 'URGENCIA' : 'TRATAMIENTO',
@@ -550,8 +560,9 @@ private scheduleNewPatient(patientData: any) {
     this.currentDate.setDate(this.currentDate.getDate() + days);
     this.nextDay = new Date(this.currentDate);
     this.nextDay.setDate(this.nextDay.getDate() + 1);
-    this.generateTimeSlots();
-    this.initializeVisits();
+    // this.generateTimeSlots();
+    // this.initializeVisits();
+    this.loadScheduleFromDB();
   }
   
   // Funciones para determinar turnos
@@ -897,48 +908,7 @@ private scheduleNewPatient(patientData: any) {
   }
 
   addNewPatient() {
-    // Validar campos obligatorios
-    if (!this.newPatient.name || !this.newPatient.document || !this.newPatient.address || 
-        !this.newPatient.procedure || !this.newPatient.startTime || !this.newPatient.duration) {
-      this.showToastMessage('Error', 'Por favor complete todos los campos requeridos', 'error');
-      return;
-    }
-    const availableNurse = this.findAvailableNurse(this.newPatient.startTime, parseInt(this.newPatient.duration, 10));
-    
-    if (!availableNurse) {
-      this.showToastMessage('Error', 'No hay enfermeras disponibles en este horario', 'error');
-      return;
-    }
-
-    // Agregar nuevo paciente
-    const newPatientId = Math.max(0, ...this.patients.map(p => p.id)) + 1;
-    this.patients.push({
-      id: newPatientId,
-      name: this.newPatient.name,
-      document: this.newPatient.document,
-      documentType: this.newPatient.documentType,
-      address: this.newPatient.address,
-      neighborhood: this.newPatient.neighborhood,
-      priority: this.newPatient.priority
-    });
-    
-    // Crear la nueva visita
-    const newVisit: Visit = {
-      id: Math.max(0, ...this.visits.map(v => v.id)) + 1,
-      patientId: newPatientId,
-      patientName: this.newPatient.name,
-      nurseId: availableNurse,
-      procedure: this.newPatient.procedure,
-      startTime: this.newPatient.startTime,
-      duration: parseInt(this.newPatient.duration, 10),
-      date: new Date(this.currentDate),
-      frequency: parseInt(this.newPatient.frequency, 10),
-      days: this.newPatient.days
-    };
-    
-    this.visits.push(newVisit);
-    this.closeNewPatientModal();
-    this.showToastMessage('Paciente registrado', 'El paciente ha sido registrado y la visita agendada exitosamente', 'success');
+    // Ir a registrar paciente
   }
 
 
@@ -946,29 +916,106 @@ private scheduleNewPatient(patientData: any) {
   confirmSchedule() {
     // Validar que no queden sugerencias optimizadas sin asignar
     const unassignedSuggestions = this.hasUnassignedOptimizedSuggestions();
-    
+  
     if (unassignedSuggestions) {
       if (!confirm('Hay sugerencias de asignación optimizada que no han sido asignadas. ¿Deseas continuar sin asignarlas?')) {
         return;
       }
     }
-    
-    // Marcar todas las visitas como no optimizadas (ahora son oficiales)
-    this.visits.forEach(visit => {
-      visit.isOptimizedSuggestion = false;
+
+    // Validar que haya visitas para guardar
+    if (!this.visits.length) {
+      this.showToastMessage('Advertencia', 'No hay visitas para guardar.', 'warning');
+      return;
+    }
+  
+    // Mapear las visitas del frontend (Visit) al formato del backend (Visita)
+    const visitasToSave: Visita[] = this.visits.map((visit: Visit) => {
+      // Convertir la fecha al formato ISO (YYYY-MM-DD)
+      const fechaVisita = visit.date.toISOString().split('T')[0];
+  
+      // Calcular horaFinEjecutada sumando la duración a startTime
+      const startTimeParts = visit.startTime.split(':').map(Number);
+      const startDate = new Date();
+      startDate.setHours(startTimeParts[0], startTimeParts[1], 0, 0);
+      const endDate = new Date(startDate.getTime() + visit.duration * 60000); // Duración en minutos a milisegundos
+  
+      const horaInicioEjecutada = visit.startTime + ':00'; // Agregar segundos (HH:mm:ss)
+      const horaFinEjecutada = this.formatTime(endDate) + ':00'; // Convertir endDate a HH:mm:ss
+  
+      // Usar horaInicioCalculada y horaFinCalculada si están disponibles, o asumir que son iguales a las ejecutadas
+      const horaInicioCalculada = visit.originalTime ? visit.originalTime + ':00' : horaInicioEjecutada;
+      const horaFinCalculada = visit.originalTime
+        ? this.addMinutesToTime(visit.originalTime, visit.duration) + ':00'
+        : horaFinEjecutada;
+  
+      return {
+        actividadPacienteVisitaId: visit.actividadPacienteVisita,
+        enfermeraId: visit.nurseId,
+        fechaVisita: fechaVisita,
+        estado: visit.isEmergency ? 'URGENCIA' : 'PROGRAMADA', // Asignar estado según tipo de visita
+        horaInicioCalculada: horaInicioCalculada,
+        horaFinCalculada: horaFinCalculada
+      };
     });
-    
-    if(this.optimizacionData.getBorrador()){
-     //Se debe cargar a la bd 
-    }
-    else{
-      //Se deben actualizar los campos porque en teoría ya existen
-    }
-    this.editMode = false;
-    this.showToastMessage('Cronograma confirmado', 'El cronograma ha sido confirmado y es ahora oficial', 'success');
-    
-    // Aquí iría el código para enviar al backend
-    // this.sendScheduleToBackend();
+  
+    // Mostrar estado de carga
+    this.isLoading = true;
+    this.loadingProgress = 10;
+    this.loadingProgressText = 'Guardando visitas...';
+  
+    // Enviar todas las visitas al backend usando forkJoin para manejar múltiples solicitudes
+    console.log("Visitas a enviar:", visitasToSave);
+    const saveRequests = visitasToSave.map((visita) =>
+      this.visitsService.createVisit(visita).pipe(
+        catchError((error) => {
+          console.error('Error al guardar visita:', error);
+          this.showToastMessage('Error', 'Error al guardar una visita.', 'error');
+          return of(null); // Continuar con otras solicitudes incluso si una falla
+        })
+      )
+    );
+  
+    forkJoin(saveRequests).subscribe({
+      next: (results) => {
+        // Filtrar resultados exitosos (ignorar los null)
+        const savedVisits = results.filter((result): result is Visita => result !== null);
+        this.visitas.push(...savedVisits); // Agregar las visitas guardadas a la lista
+  
+        // Actualizar estado
+        this.loadingProgress = 100;
+        this.loadingProgressText = 'Visitas guardadas correctamente';
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
+  
+        // Marcar todas las visitas como no optimizadas (ahora son oficiales)
+        this.visits.forEach((visit) => {
+          visit.isOptimizedSuggestion = false;
+        });
+  
+        // Limpiar borrador si existe
+        if (this.optimizacionData.getBorrador()) {
+          this.optimizacionData.setBorrador(false);
+        }
+  
+        // Desactivar modo edición
+        this.editMode = false;
+  
+        // Mostrar notificación de éxito
+        this.showToastMessage(
+          'Cronograma confirmado',
+          `Se guardaron ${savedVisits.length} de ${visitasToSave.length} visitas correctamente.`,
+          savedVisits.length === visitasToSave.length ? 'success' : 'warning'
+        );
+      },
+      error: (error) => {
+        // Error general en el proceso de guardado
+        console.error('Error al guardar el cronograma:', error);
+        this.isLoading = false;
+        this.showToastMessage('Error', 'No se pudo guardar el cronograma.', 'error');
+      }
+    });
   }
 
   hasUnassignedOptimizedSuggestions(): boolean {
@@ -1134,6 +1181,130 @@ private scheduleNewPatient(patientData: any) {
     // Aquí iría el código para copiar el cronograma al siguiente día
   }
 
+  cancelSchedule() {
+    // Mostrar mensaje de confirmación al usuario
+    const confirmCancel = confirm(
+      "Los cambios no guardados se perderán. ¿Está seguro de que desea cancelar?"
+    );
+  
+    if (confirmCancel) {
+      // Si el usuario acepta, proceder con la cancelación
+      if (this.optimizacionData.getBorrador()) {
+        this.setEditMode(false);
+        this.visits = [];
+        // Cargar cronograma desde la base de datos
+        this.loadScheduleFromDB();
+      } else {
+        this.setEditMode(false);
+        this.loadScheduleFromDB();
+      }
+    }
+    // Si el usuario no acepta, no se hace nada y se mantiene el estado actual
+  }
+  
+  // Método auxiliar para cargar el cronograma desde la base de datos (ejemplo)
+  loadScheduleFromDB() {
 
+    // Clear existing visits
+  this.visits = [];
+
+  // Fetch nurses and patients if not already loaded
+  if (!this.allNurses.length || !this.patients.length) {
+    // DEBERÍA CARGAR LA INFO
+  }
+    // Set loading state
+  this.isLoading = true;
+  this.loadingProgress = 10;
+  this.loadingProgressText = 'Cargando visitas desde la base de datos...';
+  const formattedDate = this.formatDateToLocalDate(this.currentDate);
+
+  console.log("Cargando visitas de: ", formattedDate);
+
+  // Fetch visits from the backend
+  this.visitsService.getAllVisits(0, 100, formattedDate).pipe(
+    catchError((error) => {
+      console.error('Error al cargar visitas:', error);
+      this.isLoading = false;
+      this.showToastMessage('Error', 'No se pudieron cargar las visitas.', 'error');
+      return of([]); // Return empty array to continue execution
+    })
+  ).subscribe({
+    next: (backendVisits: Visita[]) => {
+      // Update loading progress
+      this.loadingProgress = 50;
+      this.loadingProgressText = 'Procesando datos de visitas...';
+
+      // Map backend Visita to frontend Visit
+      this.visits = backendVisits.map((visita: Visita) => {
+        // Find patient and nurse to populate additional data
+        const patient = this.patients.find(p => p.actividadPacienteVisita === visita.actividadPacienteVisitaId);
+        const nurse = this.allNurses.find(n => n.id === visita.enfermeraId);
+
+        // Extract start time and duration
+        const startTime = visita.horaInicioEjecutada?.substring(0, 5) || visita.horaInicioCalculada?.substring(0, 5) || '00:00';
+        const endTime = visita.horaFinEjecutada?.substring(0, 5) || visita.horaFinCalculada?.substring(0, 5) || '00:00';
+        const duration = this.calculateDuration(startTime, endTime);
+
+        // Parse date
+        const visitDate = new Date(visita.fechaVisita as string);
+
+        return {
+          id: visita.id || Math.max(0, ...this.visits.map(v => v.id)) + 1,
+          patientId: patient?.id || 0,
+          actividadPacienteVisita: visita.actividadPacienteVisitaId,
+          patientName: patient?.name || 'Desconocido',
+          nurseId: visita.enfermeraId,
+          procedure: visita.estado === 'URGENCIA' ? 'URGENCIA' : 'TRATAMIENTO',
+          startTime: startTime,
+          duration: duration,
+          date: visitDate,
+          isEmergency: visita.estado === 'URGENCIA',
+          isOptimizedSuggestion: false, // Loaded visits are not suggestions
+          originalNurseId: visita.enfermeraId,
+          originalTime: visita.horaInicioCalculada?.substring(0, 5) || startTime
+        } as Visit;
+      });
+
+      // Filter visits for the current date
+      this.visits = this.visits.filter(visit => 
+        visit.date.toDateString() === this.currentDate.toDateString()
+      );
+
+      // Update loading state
+      this.loadingProgress = 100;
+      this.loadingProgressText = 'Visitas cargadas correctamente';
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 500);
+
+      // Show success message
+      this.showToastMessage(
+        'Visitas cargadas',
+        `Se cargaron ${this.visits.length} visitas para el ${this.currentDate.toLocaleDateString()}.`,
+        'success'
+      );
+    },
+    error: (error) => {
+      console.error('Error al procesar visitas:', error);
+      this.isLoading = false;
+      this.showToastMessage('Error', 'Error al procesar los datos de las visitas.', 'error');
+    }
+  });
+  
+  }
+
+  private formatDateToLocalDate(date: Date | string): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date:', date);
+      throw new Error('Invalid date format');
+    }
+  
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(dateObj.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`; // Returns yyyy-MM-dd, e.g., 2025-05-12
+  }
 
 }

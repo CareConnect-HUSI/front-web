@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { NurseService } from 'src/app/service/nurse.service';
 import { OptimizationDataService } from 'src/app/service/optimization-data.service';
 
@@ -157,21 +158,77 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   generarCronograma(): void {
     this.isLoading = true;
-    alert('El cronograma se generará con los pacientes asignados y en los turnos asignados a las enfermeras');
-
+    alert('Los cronogramas se generarán con los pacientes asignados y en los turnos asignados a las enfermeras');
+  
+    // Asignar enfermeras a los turnos en el servicio
     this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
     this.optimizationDataService.setInfoEnfermerasTarde(this.enfermerasTarde);
     this.optimizationDataService.setInfoEnfermerasNoche(this.enfermerasNoche);
-
-
+  
     console.log("Todos a cronograma:", this.optimizationDataService.getAllData());
-
-    this.optimizationDataService.generarCronogramaManana()
-    .subscribe({
-      next: (response) => {
+  
+    // Preparar las solicitudes válidas
+    const solicitudes = [];
+    const mensajes: string[] = [];
+  
+    // Validar turno Mañana
+    const pacientesManana = this.optimizationDataService.getInfoPacientesManana() || [];
+    if (this.enfermerasManana.length === 0 || pacientesManana.length === 0) {
+      mensajes.push('No hay enfermeras o pacientes asignados para el turno Mañana.');
+    } else {
+      solicitudes.push(this.optimizationDataService.generarCronogramaManana());
+    }
+  
+    // Validar turno Tarde
+    const pacientesTarde = this.optimizationDataService.getInfoPacientesTarde() || [];
+    if (this.enfermerasTarde.length === 0 || pacientesTarde.length === 0) {
+      mensajes.push('No hay enfermeras o pacientes asignados para el turno Tarde.');
+    } else {
+      solicitudes.push(this.optimizationDataService.generarCronogramaTarde());
+    }
+  
+    // Validar turno Noche
+    const pacientesNoche = this.optimizationDataService.getInfoPacientesNoche() || [];
+    if (this.enfermerasNoche.length === 0 || pacientesNoche.length === 0) {
+      mensajes.push('No hay enfermeras o pacientes asignados para el turno Noche.');
+    } else {
+      solicitudes.push(this.optimizationDataService.generarCronogramaNoche());
+    }
+  
+    // Si no hay solicitudes válidas, mostrar mensajes y detener el proceso
+    if (solicitudes.length === 0) {
+      this.isLoading = false;
+      alert('No se pueden generar cronogramas:\n' + mensajes.join('\n'));
+      return;
+    }
+  
+    // Ejecutar las solicitudes válidas en paralelo usando forkJoin
+    forkJoin(solicitudes).subscribe({
+      next: (respuestas) => {
+        // Asignar respuestas según las solicitudes enviadas
+        let index = 0;
+        if (this.enfermerasManana.length > 0 && pacientesManana.length > 0) {
+          this.optimizationDataService.setRespuestaManana(respuestas[index]);
+          index++;
+        }
+        if (this.enfermerasTarde.length > 0 && pacientesTarde.length > 0) {
+          this.optimizationDataService.setRespuestaTarde(respuestas[index]);
+          index++;
+        }
+        if (this.enfermerasNoche.length > 0 && pacientesNoche.length > 0) {
+          this.optimizationDataService.setRespuestaNoche(respuestas[index]);
+        }
+  
+        // Marcar como borrador
         this.optimizationDataService.setBorrador(true);
-        
-        // Navigate to cronograma after successful response
+  
+        // Mostrar advertencias si algunos turnos no se procesaron
+        if (mensajes.length > 0) {
+          alert('Advertencia:\n' + mensajes.join('\n'));
+        }
+  
+        // Navegar a la página de cronograma
+        this.isLoading = false;
         this.router.navigate(['/cronograma'], {
           state: { enfermeras: this.enfermeras }
         });
@@ -179,21 +236,16 @@ export class AsignarEnfermerasComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         console.error("Error en optimización:", error);
-        // Show error message to user (using your preferred notification system)
-        alert('Error al generar el cronograma. Por favor, inténtelo de nuevo.');
+        alert('Error al generar los cronogramas. Por favor, inténtelo de nuevo.');
       }
     });
-    this.optimizationDataService.setBorrador(true);
-    
-    setTimeout(() => {
-      this.router.navigate(['/cronograma'], {
-        state: { enfermeras: this.enfermeras }
-      });
-    }, 2000);
   }
 
   volverAPacientes():void{
     this.optimizationDataService.setInfoEnfermerasManana(this.enfermerasManana);
+    this.optimizationDataService.setInfoEnfermerasTarde(this.enfermerasTarde);
+    this.optimizationDataService.setInfoEnfermerasNoche(this.enfermerasNoche);
+
     this.router.navigate(['/asignar-pacientes']);
   }
 }
