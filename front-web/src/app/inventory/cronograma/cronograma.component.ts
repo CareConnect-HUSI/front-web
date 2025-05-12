@@ -88,7 +88,7 @@ export class CronogramaComponent implements OnInit {
   allNurses: Nurse[] = [];
   patients: Patient[] = [];
   visits: Visit[] = [];
-  optimizedRoutes: any = {};
+  optimizedRoutes: { [nurseId: string]: any[] } = {};
   
   // Variables para modales
   showEmergencyModal: boolean = false;
@@ -184,7 +184,7 @@ fetchInitialData() {
     if (allEnfermeras.dataEnfermerasTarde) {
       this.afternoonNurses = allEnfermeras.dataEnfermerasTarde.map((n: any) => ({
         id: n.id,
-        name: n.name || 'Unknown',
+        name: (n.nombre + " " + n.apellido) || 'Unknown',
         shift: 'afternoon',
         address: n.direccion || '',
         latitude: n.latitud,
@@ -195,7 +195,7 @@ fetchInitialData() {
     if (allEnfermeras.dataEnfermerasNoche) {
       this.nightNurses = allEnfermeras.dataEnfermerasNoche.map((n: any) => ({
         id: n.id, //Cambiado desde numeroIdentifica
-        name: n.name || 'Unknown',
+        name: (n.nombre + " " + n.apellido) || 'Unknown',
         shift: 'night',
         address: n.direccion || '',
         latitude: n.latitud,
@@ -203,6 +203,8 @@ fetchInitialData() {
       }));
       this.allNurses.push(...this.nightNurses);
     }
+
+    console.log("Enfermeras cargadas:", this.allNurses);
 
     if (!this.allNurses.length) {
       this.showToastMessage('Error', 'No se encontraron datos de enfermeras', 'error');
@@ -376,19 +378,38 @@ simulateLoading(callback: () => void) {
 loadOptimizedRoutesBorrador() {
   try {
     const respuestaManana = this.optimizacionData.getRespuestaManana();
-    
-    if (respuestaManana && respuestaManana.rutas) {
-      this.optimizedRoutes = respuestaManana.rutas;
-      console.log("Rutas cargadas en cronograma: ", this.optimizedRoutes);
-      // Initialize visits or other post-processing if needed
+    const respuestaTarde = this.optimizacionData.getRespuestaTarde();
+    const respuestaNoche = this.optimizacionData.getRespuestaNoche();
+
+    this.optimizedRoutes = {}; // Reiniciar
+
+    const procesarRutas = (respuesta: any) => {
+      if (respuesta?.rutas && typeof respuesta.rutas === 'object') {
+        Object.entries(respuesta.rutas).forEach(([nurseId, visitas]) => {
+          const visitasFiltradas = (visitas as any[]).slice(1); // Ignorar primer paciente
+          this.optimizedRoutes[nurseId] = visitasFiltradas;
+        });
+      }
+    };
+       
+    console.log("Respuestas mañana:", respuestaManana);
+    procesarRutas(respuestaManana);
+    procesarRutas(respuestaTarde);
+    procesarRutas(respuestaNoche);
+
+    if (Object.keys(this.optimizedRoutes).length > 0) {
+      console.log("Rutas cargadas en cronograma:", this.optimizedRoutes);
       this.initializeVisits();
     } else {
-      throw new Error("Formato de respuesta inválido");
+      throw new Error("Ninguna de las respuestas contiene rutas válidas.");
     }
+
   } catch (error) {
     console.error("Error al cargar rutas optimizadas:", error);
   }
 }
+
+
 
 private scheduleNewPatient(patientData: any) {
   // Buscar enfermera disponible (devuelve el ID directamente)
@@ -499,10 +520,11 @@ private scheduleNewPatient(patientData: any) {
         const nurseVisits = this.optimizedRoutes[nurseId];
         const nurse = this.allNurses.find(n => n.id == parseInt(nurseId));
 
+        console.log("Nurse Visits:", nurseVisits);
         if (nurse) {
           nurseVisits.forEach((visit: any, index: number) => {
             // El primer paciente es la ubicación de la enfermera
-            if (index === 0 && visit.esEnfermera) {
+            if (index == 0 && visit.esEnfermera) {
               // No crear visita para la ubicación de la enfermera
               console.log("Sale por la tangente");
               return;
