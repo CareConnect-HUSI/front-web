@@ -97,6 +97,7 @@ export class PatientInfoComponent implements OnInit {
             dias: actividad.diasTratamiento,
             posologia: `${actividad.frecuencia} veces al día`,
             fechaInicio: actividad.fechaInicio,
+            duracion: actividad.duracionVisita
           }));
 
           this.historial = this.treatment.map((t: any) => ({
@@ -148,6 +149,7 @@ export class PatientInfoComponent implements OnInit {
         id: this.paciente.tipoIdentificacion?.id,
         nombre: this.paciente.tipoIdentificacion?.nombre,
       },
+      duracion: this.paciente.duracion
     };
   
     console.log('Payload final:', payload);

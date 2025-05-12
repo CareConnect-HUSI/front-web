@@ -40,6 +40,7 @@
               <th>Días</th>
               <th>Inicio</th>
               <th>Fin</th>
+              <th>Duración</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -50,10 +51,14 @@
               <td>{{ item.frecuencia }}</td>
               <td>{{ item.hora?.slice(0, 5) }}</td>
               <td>{{ item.diasTratamiento }}</td>
-              <td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
-              <td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.fechaInicio | date : "dd/MM/yyyy" }}</td>
+              <td>{{ item.fechaFin | date : "dd/MM/yyyy" }}</td>
+              <td>{{ item.duracion }}</td>
               <td>
-                <button class="action-btn small" (click)="openEditModal(item, i)">
+                <button
+                  class="action-btn small"
+                  (click)="openEditModal(item, i)"
+                >
                   <i class="fas fa-edit"></i>
                 </button>
               </td>
@@ -75,6 +80,7 @@
               <th>Nombre</th>
               <th>Hora</th>
               <th>Fecha</th>
+              <th>Duración</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -82,9 +88,13 @@
             <tr *ngFor="let item of procedimientos; let i = index">
               <td>{{ item.nombre }}</td>
               <td>{{ item.hora?.slice(0, 5) }}</td>
-              <td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ item.fechaInicio | date : "dd/MM/yyyy" }}</td>
+              <td>{{ item.duracion }}</td>
               <td>
-                <button class="action-btn small" (click)="openEditModal(item, i)">
+                <button
+                  class="action-btn small"
+                  (click)="openEditModal(item, i)"
+                >
                   <i class="fas fa-edit"></i>
                 </button>
               </td>
@@ -98,7 +108,10 @@
     <div *ngIf="showMedicationWarning" class="notification warning">
       <i class="fas fa-exclamation-circle"></i>
       <span>{{ medicationMessage }}</span>
-      <button class="close-notification" (click)="showMedicationWarning = false">
+      <button
+        class="close-notification"
+        (click)="showMedicationWarning = false"
+      >
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -108,7 +121,14 @@
   <div *ngIf="showEditModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Modificar {{ currentMedication?.tipoActividadId === 1 ? 'Tratamiento' : 'Procedimiento' }}</h3>
+        <h3>
+          Modificar
+          {{
+            currentMedication?.tipoActividadId === 1
+              ? "Tratamiento"
+              : "Procedimiento"
+          }}
+        </h3>
         <button class="close-btn" (click)="closeEditModal()">
           <i class="fas fa-times"></i>
         </button>
@@ -118,19 +138,43 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nombre:</label>
-            <input type="text" [(ngModel)]="currentMedication.nombre" name="nombre" readonly class="form-input readonly" />
+            <input
+              type="text"
+              [(ngModel)]="currentMedication.nombre"
+              name="nombre"
+              readonly
+              class="form-input readonly"
+            />
           </div>
 
-          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
+          <div
+            *ngIf="currentMedication?.tipoActividadId === 1"
+            class="form-group"
+          >
             <label>Dosis:</label>
-            <input type="number" [(ngModel)]="currentMedication.dosis" name="dosis" min="1" required class="form-input" />
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.dosis"
+              name="dosis"
+              min="1"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-row">
-          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
+          <div
+            *ngIf="currentMedication?.tipoActividadId === 1"
+            class="form-group"
+          >
             <label>Frecuencia:</label>
-            <select [(ngModel)]="currentMedication.frecuencia" name="frecuencia" required class="form-input">
+            <select
+              [(ngModel)]="currentMedication.frecuencia"
+              name="frecuencia"
+              required
+              class="form-input"
+            >
               <option value="6">Cada 6 horas</option>
               <option value="8">Cada 8 horas</option>
               <option value="12">Cada 12 horas</option>
@@ -142,32 +186,80 @@
 
           <div class="form-group">
             <label>Hora:</label>
-            <input type="time" [(ngModel)]="currentMedication.hora" name="hora" required class="form-input" />
+            <input
+              type="time"
+              [(ngModel)]="currentMedication.hora"
+              name="hora"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Fecha de Inicio:</label>
-            <input type="date" [(ngModel)]="currentMedication.fechaInicio" name="fechaInicio" required class="form-input" />
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaInicio"
+              name="fechaInicio"
+              required
+              class="form-input"
+            />
           </div>
 
-          <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
+          <div
+            *ngIf="currentMedication?.tipoActividadId === 1"
+            class="form-group"
+          >
             <label>Fecha de Fin:</label>
-            <input type="date" [(ngModel)]="currentMedication.fechaFin" name="fechaFin"
-              (change)="calculateDays(currentMedication)" required class="form-input" />
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaFin"
+              name="fechaFin"
+              (change)="calculateDays(currentMedication)"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
-        <div *ngIf="currentMedication?.tipoActividadId === 1" class="form-group">
-          <label>Días de Tratamiento:</label>
-          <input type="number" [(ngModel)]="currentMedication.diasTratamiento" name="diasTratamiento" disabled class="form-input" />
+        <div class="form-row">
+          <div
+            *ngIf="currentMedication?.tipoActividadId === 1"
+            class="form-group"
+          >
+            <label>Días de Tratamiento:</label>
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.diasTratamiento"
+              name="diasTratamiento"
+              disabled
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Duración:</label>
+            <select [(ngModel)]="currentMedication.duracion" name="duracion" class="form-input">
+              <option value="" disabled selected>Seleccionar</option>
+              <option *ngFor="let d of duraciones" [value]="d">
+                {{ d }}min
+              </option>
+            </select>
+          </div>
         </div>
 
-        <input type="hidden" [(ngModel)]="currentMedication.actividadId" name="actividadId" />
+        <input
+          type="hidden"
+          [(ngModel)]="currentMedication.actividadId"
+          name="actividadId"
+        />
 
         <div class="form-actions">
-          <button type="button" class="cancel-btn" (click)="closeEditModal()">Cancelar</button>
+          <button type="button" class="cancel-btn" (click)="closeEditModal()">
+            Cancelar
+          </button>
           <button type="submit" class="save-btn">Guardar</button>
         </div>
       </form>
@@ -188,8 +280,16 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nombre:</label>
-            <select [(ngModel)]="currentMedication.nombre" name="nombre" required class="form-input">
-              <option *ngFor="let medicamento of listaTratamientos" [value]="medicamento.name">
+            <select
+              [(ngModel)]="currentMedication.nombre"
+              name="nombre"
+              required
+              class="form-input"
+            >
+              <option
+                *ngFor="let medicamento of listaTratamientos"
+                [value]="medicamento.name"
+              >
                 {{ medicamento.name }}
               </option>
             </select>
@@ -199,7 +299,12 @@
         <div class="form-row">
           <div class="form-group">
             <label>Frecuencia:</label>
-            <select [(ngModel)]="currentMedication.frecuencia" name="frecuencia" required class="form-input">
+            <select
+              [(ngModel)]="currentMedication.frecuencia"
+              name="frecuencia"
+              required
+              class="form-input"
+            >
               <option value="6">Cada 6 horas</option>
               <option value="8">Cada 8 horas</option>
               <option value="12">Cada 12 horas</option>
@@ -211,37 +316,70 @@
 
           <div class="form-group">
             <label>Hora:</label>
-            <input type="time" [(ngModel)]="currentMedication.hora" name="hora" required class="form-input" />
+            <input
+              type="time"
+              [(ngModel)]="currentMedication.hora"
+              name="hora"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Dosis:</label>
-            <input type="number" [(ngModel)]="currentMedication.dosis" name="dosis" min="1" required class="form-input" />
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.dosis"
+              name="dosis"
+              min="1"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Fecha de Inicio:</label>
-            <input type="date" [(ngModel)]="currentMedication.fechaInicio" name="fechaInicio" required class="form-input" />
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaInicio"
+              name="fechaInicio"
+              required
+              class="form-input"
+            />
           </div>
 
           <div class="form-group">
             <label>Fecha de Fin:</label>
-            <input type="date" [(ngModel)]="currentMedication.fechaFin" name="fechaFin"
-              (change)="calculateDays(currentMedication)" required class="form-input" />
+            <input
+              type="date"
+              [(ngModel)]="currentMedication.fechaFin"
+              name="fechaFin"
+              (change)="calculateDays(currentMedication)"
+              required
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-group">
           <label>Días de Tratamiento:</label>
-          <input type="number" [(ngModel)]="currentMedication.diasTratamiento" name="diasTratamiento" disabled class="form-input" />
+          <input
+            type="number"
+            [(ngModel)]="currentMedication.diasTratamiento"
+            name="diasTratamiento"
+            disabled
+            class="form-input"
+          />
         </div>
 
         <div class="form-actions">
-          <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancelar</button>
+          <button type="button" class="cancel-btn" (click)="closeAddModal()">
+            Cancelar
+          </button>
           <button type="submit" class="save-btn">Guardar</button>
         </div>
       </form>

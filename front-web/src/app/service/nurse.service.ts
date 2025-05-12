@@ -79,4 +79,8 @@ export class NurseService {
   getBarriosPorNombre(nombre: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/nombre/${nombre}`);
   }
+
+  getTiposIdentificacion() {
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
+  }
 }

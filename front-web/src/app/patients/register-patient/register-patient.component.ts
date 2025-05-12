@@ -123,26 +123,31 @@ export class RegisterPatientComponent implements OnInit {
   }
 
   saveAddress() {
-    if (this.addressForm.valid) {
-      const address = this.addressForm.value;
-      let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
-      if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
-      if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
-      if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
-      direccionCompleta += ` # ${address.numeroPlaca}`;
-      if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
-      if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
-      direccionCompleta += `, Bogotá, Colombia`;
+  if (this.addressForm.valid) {
+    const address = this.addressForm.value;
 
-      this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
-      this.patientForm.get('personalInfo.localidad')?.setValue(address.nombre);
-      this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
-      this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
-      this.closeAddressModal();
-    } else {
-      alert('Por favor complete todos los campos obligatorios de la dirección.');
-    }
+    let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
+    if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
+    if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
+    if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
+    direccionCompleta += ` # ${address.numeroPlaca}`;
+    if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
+    if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
+    direccionCompleta += `, Bogotá, Colombia`;
+
+    const nombreLocalidad = this.localidades.find(l => l.codigo === address.localidad)?.nombre || address.localidad;
+  this.patientForm.get('personalInfo.localidad')?.setValue(nombreLocalidad);
+
+
+    this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
+    this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
+    this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
+
+    this.closeAddressModal();
+  } else {
+    alert('Por favor complete todos los campos obligatorios de la dirección.');
   }
+}
 
   get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;

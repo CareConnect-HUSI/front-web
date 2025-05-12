@@ -25,6 +25,8 @@ export class TreatmentsComponent implements OnInit {
   currentMedication: any = {};
   currentIndex: number = -1;
 
+   duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
+
   constructor(
     private route: ActivatedRoute,
     private pacienteService: PatientService,
@@ -48,13 +50,12 @@ export class TreatmentsComponent implements OnInit {
 
     this.pacienteService.obtenerPacientePorId(id).subscribe({
       next: (patient: any) => {
-        console.log('Paciente cargado:', patient);
         this.nombrePaciente = patient.nombre || '';
         this.documentoPaciente = patient.numeroIdentificacion || '';
 
         const actividades = patient.actividades || [];
-        console.log('Actividades crudas recibidas:', actividades);
 
+        console.log('Actividad ejemplo completa:', actividades[0]);
         this.tratamientos = actividades
           .filter((a: any) => a.tipoActividadId === 1)
           .map((actividad: any) => ({
@@ -68,7 +69,10 @@ export class TreatmentsComponent implements OnInit {
             diasTratamiento: actividad.diasTratamiento,
             actividadId: actividad.actividadId,
             tipoActividadId: actividad.tipoActividadId,
+            duracion: actividad.duracionVisita,
           }));
+
+          console.log('Actividad ejemplo completa:', actividades[0]);
 
         this.procedimientos = actividades
           .filter((a: any) => a.tipoActividadId === 2)
@@ -83,6 +87,8 @@ export class TreatmentsComponent implements OnInit {
             diasTratamiento: actividad.diasTratamiento,
             actividadId: actividad.actividadId,
             tipoActividadId: actividad.tipoActividadId,
+            duracion: actividad.duracionVisita,
+
           }));
 
         console.log('Tratamientos:', this.tratamientos);
@@ -173,6 +179,7 @@ export class TreatmentsComponent implements OnInit {
       fechaFin: item.fechaFin,
       diasTratamiento: item.diasTratamiento,
       tipoActividadId: item.tipoActividadId,
+      duracion: item.duracion,
     };
 
     if (isTratamiento) {
@@ -214,6 +221,7 @@ export class TreatmentsComponent implements OnInit {
       diasTratamiento: this.currentMedication.diasTratamiento,
       actividad: { id: selectedActividad.id },
       paciente: { id: this.idPaciente },
+      duracion: this.currentMedication.duracion,
     };
 
     console.log('Payload para registrar tratamiento:', payload);
@@ -250,6 +258,7 @@ export class TreatmentsComponent implements OnInit {
       fechaInicio: this.currentMedication.fechaInicio,
       actividad: { id: this.currentMedication.actividadId },
       paciente: { id: this.idPaciente },
+      duracionVisita: this.currentMedication.duracion,
     };
 
     if (this.currentMedication.tipoActividadId === 1) {
@@ -257,8 +266,10 @@ export class TreatmentsComponent implements OnInit {
       basePayload.frecuencia = parseInt(this.currentMedication.frecuencia);
       basePayload.fechaFin = this.currentMedication.fechaFin;
       basePayload.diasTratamiento = this.currentMedication.diasTratamiento;
+      basePayload.duracionVisita = this.currentMedication.duracion;
     }
 
+    console.log('Payload para actualizar tratamiento:', basePayload);
     this.pacienteService
       .updateTratamiento(this.currentMedication.idRelacion, basePayload)
       .subscribe({

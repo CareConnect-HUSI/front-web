@@ -142,7 +142,7 @@ export class RegistroEnfermerasComponent implements OnInit {
   }
 
   cargarTiposIdentificacion() {
-    this.patientService.getTiposIdentificacion().subscribe({
+    this.nurseService.getTiposIdentificacion().subscribe({
       next: tipos => this.tiposIdentificacion = tipos,
       error: err => console.error('Error al cargar tipos de identificación', err)
     });

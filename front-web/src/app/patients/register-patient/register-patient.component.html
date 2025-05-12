@@ -83,16 +83,13 @@
             >Localidad
             <span class="required-asterisk">*</span>
           </label>
-          <select
-            formControlName="localidad"
-            required
-            (change)="onLocalidadChange()"
-          >
+          <select formControlName="localidad" required>
             <option value="" disabled selected>Seleccione localidad</option>
-            <option *ngFor="let loc of localidades" [value]="loc.codigo">
+            <option *ngFor="let loc of localidades" [value]="loc.nombre">
               {{ loc.nombre }}
             </option>
           </select>
+
         </div>
         <div class="form-group">
           <label
