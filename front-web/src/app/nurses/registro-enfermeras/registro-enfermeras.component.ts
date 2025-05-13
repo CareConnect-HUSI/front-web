@@ -20,17 +20,10 @@ export class RegistroEnfermerasComponent implements OnInit {
   showAddressModal = false;
   addressForm!: FormGroup;
 
-  localidades: Localidad[] = [
-    { codigo: '1', nombre: 'Usaquén' },
-    { codigo: '2', nombre: 'Chapinero' },
-  ];
+  localidades: { codigo: string, nombre: string }[] = [];
+  barriosFiltrados: { id: number; nombre: string }[] = [];
 
-  barriosPorLocalidad: { [key: string]: string[] } = {
-    '1': ['Santa Bárbara', 'Cedritos', 'Toberín', 'Usaquén', 'Calle 170'],
-    '2': ['Chapinero', 'El Lago', 'La Salle', 'Rosales', 'Quinta Camacho'],
-  };
 
-  barriosFiltrados: string[] = [];
   showForm = false;
   isEditMode = false;
   currentNurseId: number | null = null;
@@ -51,7 +44,35 @@ export class RegistroEnfermerasComponent implements OnInit {
     this.initNurseForm();
     this.initAddressForm();
     this.loadNurses();
+    this.cargarLocalidades(); 
   }
+
+  cargarLocalidades() {
+    this.nurseService.getLocalidades().subscribe({
+      next: (localidades: Localidad[]) => {
+        this.localidades = localidades.map(l => ({ codigo: l.codigo, nombre: l.nombre }));
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+      }
+    });
+  }
+
+  onLocalidadChange() {
+    const codigo = this.addressForm.get('localidad')?.value || this.nurseForm.get('localidad')?.value;
+  
+    if (!codigo) return;
+  
+    this.nurseService.getBarriosPorLocalidad(codigo).subscribe({
+      next: (barrios: any[]) => {
+        this.barriosFiltrados = barrios.map(b => ({ id: b.id, nombre: b.nombre }));
+      },
+      error: (err: any) => {
+        console.error('Error al cargar barrios:', err);
+      }
+    });
+  }
+  
 
   initNurseForm() {
     this.nurseForm = this.fb.group({
@@ -65,7 +86,8 @@ export class RegistroEnfermerasComponent implements OnInit {
       barrio: ['', Validators.required],
       turno: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      estado: ['Activo'],
     });
   }
 
@@ -101,12 +123,6 @@ export class RegistroEnfermerasComponent implements OnInit {
     this.showAddressModal = false;
   }
 
-  onLocalidadChange() {
-    const localidadCod = this.addressForm.get('localidad')?.value;
-    this.barriosFiltrados = this.barriosPorLocalidad[localidadCod] || [];
-    this.addressForm.get('barrio')?.reset();
-  }
-
   saveAddress() {
     if (this.addressForm.valid) {
       const address = this.addressForm.value;
@@ -126,7 +142,7 @@ export class RegistroEnfermerasComponent implements OnInit {
   }
 
   cargarTiposIdentificacion() {
-    this.patientService.getTiposIdentificacion().subscribe({
+    this.nurseService.getTiposIdentificacion().subscribe({
       next: tipos => this.tiposIdentificacion = tipos,
       error: err => console.error('Error al cargar tipos de identificación', err)
     });
@@ -205,24 +221,46 @@ export class RegistroEnfermerasComponent implements OnInit {
   }
 
   loadNurseForEdit(nurse: any) {
-    this.isEditMode = true;
-    this.currentNurseId = nurse.id;
-    this.showForm = true;
+  this.isEditMode = true;
+  this.currentNurseId = nurse.id;
+  this.showForm = true;
 
-    this.nurseForm.patchValue({
-      name: nurse.nombre,
-      lastname: nurse.apellido,
-      identificationType: nurse.tipoIdentificacion?.name || 'CC',
-      identificationNumber: nurse.numeroIdentificacion,
-      address: nurse.direccion,
-      phone: nurse.telefono,
-      localidad: this.localidades.find(l => l.nombre === nurse.localidad)?.codigo || '',
-      barrio: nurse.barrio,
-      turno: nurse.turnoEntity?.name || '',
-      email: nurse.email,
-      password: '********'
-    });
-  }
+  // Buscar código de localidad a partir del barrio actual
+  this.nurseService.getLocalidades().subscribe({
+    next: (localidades: any[]) => {
+      this.localidades = localidades;
+
+      this.nurseService.getBarriosPorNombre(nurse.barrio).subscribe({
+        next: (barrioData: any) => {
+          const localidadCodigo = barrioData.localidad?.codigo || '';
+
+          this.nurseForm.patchValue({
+            name: nurse.nombre,
+            lastname: nurse.apellido,
+            identificationType: nurse.tipoIdentificacion?.name || 'CC',
+            identificationNumber: nurse.numeroIdentificacion,
+            address: nurse.direccion,
+            phone: nurse.telefono,
+            localidad: localidadCodigo,
+            barrio: nurse.barrio,
+            turno: nurse.turnoEntity?.name || '',
+            email: nurse.email,
+            password: '********'
+          });
+
+          this.onLocalidadChange();
+        },
+        error: (err: any) => {
+          console.warn('No se pudo obtener localidad del barrio:', err);
+        }
+      });
+    },
+    error: err => {
+      console.error('Error al cargar localidades:', err);
+    }
+  });
+}
+
 
   toggleStatus(nurse: any) {
     const newStatus = !nurse.activo;

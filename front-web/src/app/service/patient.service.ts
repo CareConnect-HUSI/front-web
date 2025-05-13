@@ -40,11 +40,7 @@ export class PatientService {
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(
-      `${this.apiUrl}/registrar-paciente`,
-      JSON.stringify(userData),
-      { headers, responseType: 'text' }
-    );
+    return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
   }
 
   obtenerPacientePorId(id: number): Observable<any> {
@@ -60,6 +56,10 @@ export class PatientService {
       'http://localhost:8081/actividad-paciente-visita/por-documento/' +
         documento
     );
+  }
+
+  getTratamientosPorId(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
   }
 
   updatePaciente(id: number, paciente: any): Observable<any> {
@@ -80,5 +80,25 @@ export class PatientService {
   findActividadPacienteVisitaPorID(id: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
   }
-  
+  updateTratamiento(id: number, tratamiento: any): Observable<any> {
+    return this.http.put(
+      `http://localhost:8081/actividad-paciente-visita/actualizar/${id}`,
+      tratamiento
+    );
+  }
+
+  getLocalidades() {
+    return this.http.get<any[]>(`${this.apiUrl}/localidades`);
+  }
+
+  getBarriosPorLocalidad(codigoLocalidad: string) {
+    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
+  }
+
+  registrarTratamiento(payload: any): Observable<any> {
+    return this.http.post(
+      'http://localhost:8081/actividad-paciente-visita/registrar',
+      payload
+    );
+  }
 }

@@ -41,6 +41,7 @@ export class AsignarPacientesComponent implements OnInit {
     this.pacienteService.findAll(0, 50).subscribe({
       next: (response) => {
         this.todosPacientes = response.content;
+        this.isLoading = false;
         this.clasificarPacientes();
         this.isLoading = false;
         console.log('Pacientes obtenidos:', this.todosPacientes);

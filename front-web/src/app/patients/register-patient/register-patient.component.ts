@@ -26,23 +26,9 @@ export class RegisterPatientComponent implements OnInit {
   listaProcedimientos: any[] = [];
   listaMedicamentos: any[] = [];
 
-  localidades: Localidad[] = [
-    { codigo: '1', nombre: 'Usaquén' }, { codigo: '2', nombre: 'Chapinero' }, { codigo: '3', nombre: 'Santa Fe' },
-    { codigo: '4', nombre: 'San Cristóbal' }, { codigo: '5', nombre: 'Usme' }, { codigo: '6', nombre: 'Tunjuelito' },
-    { codigo: '7', nombre: 'Bosa' }, { codigo: '8', nombre: 'Kennedy' }, { codigo: '9', nombre: 'Fontibón' },
-    { codigo: '10', nombre: 'Engativá' }, { codigo: '11', nombre: 'Suba' }, { codigo: '12', nombre: 'Barrios Unidos' },
-    { codigo: '13', nombre: 'Teusaquillo' }, { codigo: '14', nombre: 'Los Mártires' },
-    { codigo: '15', nombre: 'Antonio Nariño' }, { codigo: '16', nombre: 'Puente Aranda' },
-    { codigo: '17', nombre: 'La Candelaria' }, { codigo: '18', nombre: 'Rafael Uribe Uribe' },
-    { codigo: '19', nombre: 'Ciudad Bolívar' }, { codigo: '20', nombre: 'Sumapaz' }
-  ];
-
-  barriosPorLocalidad: { [key: string]: string[] } = {
-    '1': ['Santa Bárbara', 'Cedritos', 'Toberín', 'Usaquén', 'Calle 170'],
-    '2': ['Chapinero', 'El Lago', 'La Salle', 'Rosales', 'Quinta Camacho']
-  };
-
-  barriosFiltrados: string[] = [];
+  localidades: { codigo: string, nombre: string }[] = [];
+  barriosFiltrados: { id: number; nombre: string }[] = [];
+  
 
   frecuencias: number[] = [72, 48, 24, 12, 8, 6];
   duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
@@ -61,6 +47,7 @@ export class RegisterPatientComponent implements OnInit {
     this.cargarTiposActividad();
     this.cargarProcedimientos();
     this.cargarTratamientos();
+    this.cargarLocalidades(); 
   }
 
   initPatientForm() {
@@ -108,35 +95,59 @@ export class RegisterPatientComponent implements OnInit {
     this.showAddressModal = false;
   }
 
+  cargarLocalidades() {
+    this.patientService.getLocalidades().subscribe({
+      next: (localidades: Localidad[]) => {
+        this.localidades = localidades.map(l => ({ codigo: l.codigo, nombre: l.nombre }));
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+      }
+    });
+  }
+
   onLocalidadChange() {
-    const localidadCod = this.addressForm.get('localidad')?.value;
-    this.barriosFiltrados = this.barriosPorLocalidad[localidadCod] || [];
-    this.addressForm.get('barrio')?.reset();
+    const codigo = this.addressForm.get('localidad')?.value || this.patientForm.get('personalInfo.localidad')?.value;
+
+  
+    if (!codigo) return;
+  
+    this.patientService.getBarriosPorLocalidad(codigo).subscribe({
+      next: (barrios: any[]) => {
+        this.barriosFiltrados = barrios.map(b => ({ id: b.id, nombre: b.nombre }));
+      },
+      error: (err: any) => {
+        console.error('Error al cargar barrios:', err);
+      }
+    });
   }
 
   saveAddress() {
-    if (this.addressForm.valid) {
-      const address = this.addressForm.value;
-      let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
-      if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
-      if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
-      if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
-      direccionCompleta += ` # ${address.numeroPlaca}`;
-      if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
-      if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
-      direccionCompleta += `, Bogotá, Colombia`;
+  if (this.addressForm.valid) {
+    const address = this.addressForm.value;
 
-      this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
-      this.patientForm.get('personalInfo.localidad')?.setValue(
-        this.localidades.find(l => l.codigo === address.localidad)?.nombre
-      );
-      this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
-      this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
-      this.closeAddressModal();
-    } else {
-      alert('Por favor complete todos los campos obligatorios de la dirección.');
-    }
+    let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
+    if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
+    if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
+    if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
+    direccionCompleta += ` # ${address.numeroPlaca}`;
+    if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
+    if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
+    direccionCompleta += `, Bogotá, Colombia`;
+
+    const nombreLocalidad = this.localidades.find(l => l.codigo === address.localidad)?.nombre || address.localidad;
+  this.patientForm.get('personalInfo.localidad')?.setValue(nombreLocalidad);
+
+
+    this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
+    this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
+    this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
+
+    this.closeAddressModal();
+  } else {
+    alert('Por favor complete todos los campos obligatorios de la dirección.');
   }
+}
 
   get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;
@@ -151,7 +162,7 @@ export class RegisterPatientComponent implements OnInit {
       medicamento: ['', Validators.required],
       dosis: ['', [Validators.required, Validators.min(1)]],
       frecuencia: ['', Validators.required],
-      diasTratamiento: [{ value: '', disabled: true }],
+      diasTratamiento: [''],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
       horaInicio: ['', Validators.required],
@@ -172,7 +183,8 @@ export class RegisterPatientComponent implements OnInit {
       fechaInicio: ['', Validators.required],
       fechaFin: ['' ],
       horaInicio: [''],
-      duracion: ['', Validators.required]
+      duracion: ['', Validators.required],
+      duracionVisita: ['', Validators.required]
     });
 
     this.procedimientos.push(procedimientoForm);
@@ -204,7 +216,7 @@ export class RegisterPatientComponent implements OnInit {
     const actividades: any[] = [];
   
     this.tratamiento.controls.forEach(trat => {
-      const t = trat.value;
+      const t = trat.getRawValue();
       actividades.push({
         actividad: { id: Number(t.medicamento) },
         tipoActividad: { id: tipoTratamiento.id },
@@ -213,21 +225,23 @@ export class RegisterPatientComponent implements OnInit {
         diasTratamiento: Number(t.diasTratamiento),
         fechaInicio: t.fechaInicio,
         fechaFin: t.fechaFin,
-        hora: t.horaInicio
+        hora: t.horaInicio,
+        duracionVisita: Number(t.duracion)
       });
     });
   
     this.procedimientos.controls.forEach(proc => {
-      const p = proc.value;
+      const p = proc.getRawValue();
       actividades.push({
         actividad: { id: Number(p.procedimiento) },
         tipoActividad: { id: tipoProcedimiento.id },
         dosis: null,
         frecuencia: Number(p.frecuencia) || null,
-        diasTratamiento: null,
+        diasTratamiento: Number(p.diasTratamiento),
         fechaInicio: p.fechaInicio,
         fechaFin: null,
-        hora: p.horaInicio
+        hora: p.horaInicio,
+        duracionVisita: Number(p.duracion)
       });
     });
   
