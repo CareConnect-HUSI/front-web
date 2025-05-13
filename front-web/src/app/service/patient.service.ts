@@ -25,7 +25,7 @@ export class PatientService {
     // });
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${limit}`, {
       headers,
     });
   }
@@ -75,6 +75,10 @@ export class PatientService {
 
   getTiposActividad(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
+  }
+
+  findActividadPacienteVisitaPorID(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
   }
   updateTratamiento(id: number, tratamiento: any): Observable<any> {
     return this.http.put(

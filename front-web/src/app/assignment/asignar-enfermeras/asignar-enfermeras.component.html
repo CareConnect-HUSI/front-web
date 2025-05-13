@@ -12,157 +12,179 @@
       <p>Gestión de enfermeras por turno</p>
     </div>
   </div>
+  
+  <button class="btn btn-primary" routerLink="/registro-enfermeras">
+    <i class="fas fa-plus-circle"></i> Registrar Nueva Enfermera
+  </button>
 
   <div class="content-container">
     <!-- Filtros y búsqueda -->
     <div class="search-section">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" [(ngModel)]="filtroNombre"
-               (input)="filtrarEnfermeras()"
-               placeholder="Buscar por nombre o documento">
+        <input type="text" [(ngModel)]="filtroNombre" (input)="filtrarEnfermeras()"
+          placeholder="Buscar por nombre o documento">
       </div>
 
       <div class="turno-filters">
-        <button class="turno-filter-btn"
-                [class.active]="filtroTurnoId === 1"
-                (click)="filtrarPorTurno(1)">
+        <button class="turno-filter-btn" [class.active]="filtroTurnoId === 1" (click)="filtrarPorTurno(1)">
           Turno Mañana
         </button>
-        <button class="turno-filter-btn"
-                [class.active]="filtroTurnoId === 2"
-                (click)="filtrarPorTurno(2)">
+        <button class="turno-filter-btn" [class.active]="filtroTurnoId === 2" (click)="filtrarPorTurno(2)">
           Turno Tarde
         </button>
-        <button class="turno-filter-btn"
-                [class.active]="filtroTurnoId === 3"
-                (click)="filtrarPorTurno(3)">
+        <button class="turno-filter-btn" [class.active]="filtroTurnoId === 3" (click)="filtrarPorTurno(3)">
           Turno Noche
         </button>
-        <button class="turno-filter-btn clear"
-                (click)="filtrarPorTurno(null)">
+        <button class="turno-filter-btn clear" (click)="filtrarPorTurno(null)">
           Mostrar Todas
         </button>
       </div>
     </div>
 
     <!-- Lista de enfermeras por turno -->
-    <div class="enfermeras-section">
-      <!-- Turno Mañana -->
-      <div *ngIf="filtroTurnoId === null || filtroTurnoId === 1">
-        <h3 class="section-title">Turno Mañana</h3>
-        <div *ngIf="enfermerasManana.length > 0; else noManana" class="enfermeras-list">
-          <div *ngFor="let enfermera of enfermerasManana; trackBy: trackByEnfermeraId" class="enfermera-card">
-            <div class="enfermera-info">
-              <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
-              <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
-              <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
-            </div>
-            <div class="enfermera-actions">
-              <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-                <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
-              </select>
-              <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
-                <i class="fas fa-user-minus"></i> Remover
-              </button>
-            </div>
+    <div class="enfermeras-section seccion-manana" *ngIf="filtroTurnoId === null || filtroTurnoId === 1">
+      <h3 class="section-title">Turno Mañana</h3>
+      <div *ngIf="enfermerasManana.length > 0; else noManana" class="enfermeras-list">
+        <div *ngFor="let enfermera of enfermerasManana; trackBy: trackByEnfermeraId" class="enfermera-card">
+          <div class="enfermera-info">
+            <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
+            <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
+            <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
+          </div>
+          <div class="enfermera-actions">
+            <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
+            </select>
+            <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
+              <i class="fas fa-user-minus"></i> Remover
+            </button>
           </div>
         </div>
-        <ng-template #noManana>
-          <div class="empty-state">
-            <h4>No hay enfermeras en el turno mañana</h4>
+      </div>
+      <ng-template #noManana>
+        <div class="empty-state">
+          <h4>No hay enfermeras en el turno mañana</h4>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="enfermeras-section seccion-tarde" *ngIf="filtroTurnoId === null || filtroTurnoId === 2">
+      <h3 class="section-title">Turno Tarde</h3>
+      <div *ngIf="enfermerasTarde.length > 0; else noTarde" class="enfermeras-list">
+        <div *ngFor="let enfermera of enfermerasTarde; trackBy: trackByEnfermeraId" class="enfermera-card">
+          <div class="enfermera-info">
+            <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
+            <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
+            <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
           </div>
-        </ng-template>
+          <div class="enfermera-actions">
+            <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
+            </select>
+            <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
+              <i class="fas fa-user-minus"></i> Remover
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noTarde>
+        <div class="empty-state">
+          <h4>No hay enfermeras en el turno tarde</h4>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="enfermeras-section seccion-noche" *ngIf="filtroTurnoId === null || filtroTurnoId === 3">
+      <h3 class="section-title">Turno Noche</h3>
+      <div *ngIf="enfermerasNoche.length > 0; else noNoche" class="enfermeras-list">
+        <div *ngFor="let enfermera of enfermerasNoche; trackBy: trackByEnfermeraId" class="enfermera-card">
+          <div class="enfermera-info">
+            <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
+            <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
+            <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
+          </div>
+          <div class="enfermera-actions">
+            <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
+            </select>
+            <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
+              <i class="fas fa-user-minus"></i> Remover
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noNoche>
+        <div class="empty-state">
+          <h4>No hay enfermeras en el turno noche</h4>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Enfermeras no seleccionadas -->
+    <div class="enfermeras-section seccion-no-seleccionadas">
+      <div class="section-header">
+        <h3 class="section-title">Enfermeras no seleccionadas</h3>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtroNoSeleccionadas" (input)="filtrarEnfermerasNoSeleccionadas()"
+          placeholder="Buscar por nombre o documento">
       </div>
 
-      <!-- Turno Tarde -->
-      <div *ngIf="filtroTurnoId === null || filtroTurnoId === 2">
-        <h3 class="section-title">Turno Tarde</h3>
-        <div *ngIf="enfermerasTarde.length > 0; else noTarde" class="enfermeras-list">
-          <div *ngFor="let enfermera of enfermerasTarde; trackBy: trackByEnfermeraId" class="enfermera-card">
-            <div class="enfermera-info">
-              <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
-              <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
-              <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
-            </div>
-            <div class="enfermera-actions">
-              <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-                <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
-              </select>
-              <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
-                <i class="fas fa-user-minus"></i> Remover
-              </button>
-            </div>
+      <div *ngIf="enfermerasSinTurno.length > 0; else noSinTurno" class="enfermeras-list">
+        <div *ngFor="let enfermera of enfermerasSinTurno; trackBy: trackByEnfermeraId" class="enfermera-card">
+          <div class="enfermera-info">
+            <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
+            <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
+            <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
+          </div>
+          <div class="enfermera-actions">
+            <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="asignarTurno(enfermera)">
+              <option value="" disabled selected>Seleccionar turno</option>
+              <option *ngFor="let turno of turnos" [ngValue]="turno.id">{{ turno.nombre }}</option>
+            </select>
           </div>
         </div>
-        <ng-template #noTarde>
-          <div class="empty-state">
-            <h4>No hay enfermeras en el turno tarde</h4>
-          </div>
-        </ng-template>
       </div>
-
-      <!-- Turno Noche -->
-      <div *ngIf="filtroTurnoId === null || filtroTurnoId === 3">
-        <h3 class="section-title">Turno Noche</h3>
-        <div *ngIf="enfermerasNoche.length > 0; else noNoche" class="enfermeras-list">
-          <div *ngFor="let enfermera of enfermerasNoche; trackBy: trackByEnfermeraId" class="enfermera-card">
-            <div class="enfermera-info">
-              <span class="enfermera-nombre">{{ enfermera.nombre }} {{ enfermera.apellido }}</span>
-              <span class="enfermera-documento">{{ enfermera.numeroIdentificacion }}</span>
-              <span class="enfermera-telefono">{{ enfermera.telefono }}</span>
-            </div>
-            <div class="enfermera-actions">
-              <select class="turno-select" [(ngModel)]="enfermera.turnoId" (change)="cambiarTurno(enfermera)">
-                <option *ngFor="let turno of turnos" [value]="turno.id">{{ turno.nombre }}</option>
-              </select>
-              <button class="action-btn remove" (click)="abrirModalRemover(enfermera)">
-                <i class="fas fa-user-minus"></i> Remover
-              </button>
-            </div>
-          </div>
+      <ng-template #noSinTurno>
+        <div class="empty-state">
+          <h4>No hay enfermeras sin turno asignado</h4>
         </div>
-        <ng-template #noNoche>
-          <div class="empty-state">
-            <h4>No hay enfermeras en el turno noche</h4>
-          </div>
-        </ng-template>
-      </div>
+      </ng-template>
     </div>
   </div>
+</div>
 
-  <!-- Modal de confirmación -->
-  <div *ngIf="mostrarModalRemover" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Confirmar Remoción</h3>
-        <button class="close-btn" (click)="cerrarModalRemover()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>¿Está seguro que desea remover a <strong>{{ enfermeraARemover?.nombre }}</strong> del turno?</p>
-        <div class="form-group">
-          <label>Motivo de remoción:</label>
-          <textarea [(ngModel)]="motivoRemocion" placeholder="Describa el motivo de la remoción"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="cerrarModalRemover()">Cancelar</button>
-        <button class="btn btn-danger" [disabled]="!motivoRemocion" (click)="confirmarRemocion()">Confirmar Remoción</button>
+<!-- Modal de confirmación -->
+<div *ngIf="mostrarModalRemover" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirmar Remoción</h3>
+      <button class="close-btn" (click)="cerrarModalRemover()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>¿Está seguro que desea remover a <strong>{{ enfermeraARemover?.nombre }}</strong> del turno?</p>
+      <div class="form-group">
+        <label>Motivo de remoción:</label>
+        <textarea [(ngModel)]="motivoRemocion" placeholder="Describa el motivo de la remoción"></textarea>
       </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModalRemover()">Cancelar</button>
+      <button class="btn btn-danger" [disabled]="!motivoRemocion" (click)="confirmarRemocion()">Confirmar
+        Remoción</button>
+    </div>
   </div>
+</div>
 
-  <div class="footer-actions">
-    <button class="btn btn-secondary" routerLink="/cronograma">
-      <i class="fas fa-arrow-left"></i> Volver al Cronograma
-    </button>
-    <button class="btn btn-primary" routerLink="/registro-enfermeras">
-      <i class="fas fa-plus-circle"></i> Registrar Nueva Enfermera
-    </button>
-    <button class="btn btn-success" (click)="generarCronograma()" [disabled]="enfermeras.length === 0">
-      <i class="fas fa-calendar-alt"></i> Generar Cronograma
-    </button>
-  </div>
+<div class="footer-actions">
+  <button class="btn btn-secondary" (click)="volverAPacientes()">
+    <i class="fas fa-arrow-left"></i> Volver a los pacientes
+  </button>
+  <button class="btn btn-success" (click)="generarCronograma()" [disabled]="enfermeras.length === 0">
+    <i class="fas fa-calendar-alt"></i> Generar Cronograma
+  </button>
 </div>
