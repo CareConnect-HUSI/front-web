@@ -82,8 +82,6 @@ export class DetalleAsignacionComponent {
     alert('Registro guardado exitosamente');
   }
   goBack() {
-    this.router.navigate(['/nurses-assignment']); // O la ruta a la que quieras volver
-    // Alternativa genérica que vuelve a la página anterior:
-    // this.location.back();
+    this.router.navigate(['/nurses-assignment/1']);
   }
 }

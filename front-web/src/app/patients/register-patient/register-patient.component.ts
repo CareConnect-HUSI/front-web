@@ -162,7 +162,7 @@ export class RegisterPatientComponent implements OnInit {
       medicamento: ['', Validators.required],
       dosis: ['', [Validators.required, Validators.min(1)]],
       frecuencia: ['', Validators.required],
-      diasTratamiento: [{ value: '', disabled: true }],
+      diasTratamiento: [''],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
       horaInicio: ['', Validators.required],
@@ -183,7 +183,8 @@ export class RegisterPatientComponent implements OnInit {
       fechaInicio: ['', Validators.required],
       fechaFin: ['' ],
       horaInicio: [''],
-      duracion: ['', Validators.required]
+      duracion: ['', Validators.required],
+      duracionVisita: ['', Validators.required]
     });
 
     this.procedimientos.push(procedimientoForm);
@@ -215,7 +216,7 @@ export class RegisterPatientComponent implements OnInit {
     const actividades: any[] = [];
   
     this.tratamiento.controls.forEach(trat => {
-      const t = trat.value;
+      const t = trat.getRawValue();
       actividades.push({
         actividad: { id: Number(t.medicamento) },
         tipoActividad: { id: tipoTratamiento.id },
@@ -224,21 +225,23 @@ export class RegisterPatientComponent implements OnInit {
         diasTratamiento: Number(t.diasTratamiento),
         fechaInicio: t.fechaInicio,
         fechaFin: t.fechaFin,
-        hora: t.horaInicio
+        hora: t.horaInicio,
+        duracionVisita: Number(t.duracion)
       });
     });
   
     this.procedimientos.controls.forEach(proc => {
-      const p = proc.value;
+      const p = proc.getRawValue();
       actividades.push({
         actividad: { id: Number(p.procedimiento) },
         tipoActividad: { id: tipoProcedimiento.id },
         dosis: null,
         frecuencia: Number(p.frecuencia) || null,
-        diasTratamiento: null,
+        diasTratamiento: Number(p.diasTratamiento),
         fechaInicio: p.fechaInicio,
         fechaFin: null,
-        hora: p.horaInicio
+        hora: p.horaInicio,
+        duracionVisita: Number(p.duracion)
       });
     });
   

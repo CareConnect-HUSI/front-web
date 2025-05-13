@@ -72,6 +72,12 @@
     <div class="info-section">
       <div class="section-header">
         <h3 class="section-title">Procedimientos</h3>
+        <div class="section-actions">
+          <button class="action-btn" (click)="addProcedure()">
+            <i class="fas fa-plus"></i> Agregar nuevo procedimiento
+          </button>
+        </div>
+
       </div>
       <div class="table-responsive">
         <table class="info-table">
@@ -385,4 +391,82 @@
       </form>
     </div>
   </div>
+
+  <!-- Modal para Agregar Procedimiento -->
+<div *ngIf="showAddProcedureModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Agregar Procedimiento</h3>
+      <button class="close-btn" (click)="closeAddProcedureModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form class="modal-form" (ngSubmit)="saveProcedure()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre del procedimiento:</label>
+          <select
+            [(ngModel)]="currentProcedure.actividadId"
+            name="actividadIdProc"
+            required
+            class="form-input"
+          >
+            <option *ngFor="let proc of listaProcedimientos" [value]="proc.id">
+              {{ proc.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha tentativa:</label>
+          <input
+            type="date"
+            [(ngModel)]="currentProcedure.fechaInicio"
+            name="fechaInicioProc"
+            required
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Hora tentativa:</label>
+          <input
+            type="time"
+            [(ngModel)]="currentProcedure.hora"
+            name="horaProc"
+            required
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Duración:</label>
+          <select
+            [(ngModel)]="currentProcedure.duracion"
+            name="duracionProc"
+            required
+            class="form-input"
+          >
+            <option *ngFor="let d of duraciones" [value]="d">
+              {{ d }}min
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="closeAddProcedureModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="save-btn">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 </div>

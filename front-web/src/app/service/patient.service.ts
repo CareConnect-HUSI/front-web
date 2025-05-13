@@ -40,11 +40,7 @@ export class PatientService {
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.post(
-      `${this.apiUrl}/registrar-paciente`,
-      JSON.stringify(userData),
-      { headers, responseType: 'text' }
-    );
+    return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
   }
 
   obtenerPacientePorId(id: number): Observable<any> {

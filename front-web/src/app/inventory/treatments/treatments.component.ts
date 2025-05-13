@@ -21,6 +21,10 @@ export class TreatmentsComponent implements OnInit {
   showAddModal: boolean = false;
   showMedicationWarning: boolean = false;
   medicationMessage: string = '';
+  showAddProcedureModal: boolean = false;
+  currentProcedure: any = {};
+  listaProcedimientos: any[] = [];
+
 
   currentMedication: any = {};
   currentIndex: number = -1;
@@ -137,6 +141,41 @@ export class TreatmentsComponent implements OnInit {
     };
     this.showAddModal = true;
     this.loadListaTratamientos();
+  }
+
+  addProcedure(): void {
+    this.currentProcedure = {
+      actividadId: '',
+      fechaInicio: '',
+      hora: '',
+      duracion: '',
+      tipoActividadId: 2
+    };
+    this.showAddProcedureModal = true;
+    this.loadListaProcedimientos();
+  }
+
+  closeAddProcedureModal(): void {
+    this.showAddProcedureModal = false;
+    this.currentProcedure = {};
+  }
+
+  loadListaProcedimientos(): void {
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (data: any[]) => {
+        this.listaProcedimientos = data.filter(
+          (item) =>
+            item.estado === 'Activo' &&
+            item.tipoActividad?.name?.toUpperCase() === 'PROCEDIMIENTO'
+        );
+      },
+      error: (err) => {
+        console.error('Error al cargar procedimientos:', err);
+        this.listaProcedimientos = [];
+        this.medicationMessage = 'Error al cargar la lista de procedimientos.';
+        this.showMedicationWarning = true;
+      }
+    });
   }
 
   loadListaTratamientos(): void {
@@ -331,6 +370,42 @@ export class TreatmentsComponent implements OnInit {
     if (frecuencia.includes('12')) return 2;
     return 1;
   }
+
+  saveProcedure(): void {
+    if (!this.currentProcedure.actividadId) {
+      this.medicationMessage = 'Debe seleccionar un procedimiento.';
+      this.showMedicationWarning = true;
+      return;
+    }
+
+    const payload = {
+      paciente: { id: this.idPaciente },
+      actividad: { id: this.currentProcedure.actividadId },
+      fechaInicio: this.currentProcedure.fechaInicio,
+      hora: this.currentProcedure.hora?.slice(0, 5),
+      duracionVisita: this.currentProcedure.duracion,
+      tipoActividadId: 2,
+      dosis: null,
+      frecuencia: null,
+      fechaFin: null,
+      diasTratamiento: null
+    };
+
+    this.pacienteService.registrarTratamiento(payload).subscribe({
+      next: () => {
+        this.medicationMessage = 'Procedimiento agregado correctamente.';
+        this.showMedicationWarning = true;
+        this.loadPatientData(this.idPaciente);
+        this.closeAddProcedureModal();
+      },
+      error: (err) => {
+        console.error('Error al agregar procedimiento:', err);
+        this.medicationMessage = 'Error al agregar el procedimiento.';
+        this.showMedicationWarning = true;
+      }
+    });
+  }
+
 
   confirmDelete(index: number): void {
     // const tratamiento = this.inventario[index];

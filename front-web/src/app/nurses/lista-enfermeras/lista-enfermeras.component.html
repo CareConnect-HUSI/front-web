@@ -35,11 +35,6 @@
 
   <div *ngIf="enfermerasFiltradas.length > 0; else noEnfermeras" class="nurses-grid">
     <div *ngFor="let enfermera of enfermerasFiltradas" class="nurse-card">
-      <div class="card-header">
-        <button class="edit-btn" (click)="abrirModalEdicion(enfermera)">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
       <div class="nurse-photo">
         <img [src]="enfermera.imagen || 'assets/images/enfermera.png'" alt="Foto de {{enfermera.nombre}}">
       </div>

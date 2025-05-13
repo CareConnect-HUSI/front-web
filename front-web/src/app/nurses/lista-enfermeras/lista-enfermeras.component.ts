@@ -23,7 +23,7 @@ export class ListaEnfermerasComponent implements OnInit {
 
   enfermeras: any[] = [];
   enfermerasFiltradas: any[] = [];
-  isLoading: boolean = false; // Nueva variable para el estado de carga
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
