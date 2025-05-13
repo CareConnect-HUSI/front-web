@@ -131,6 +131,7 @@ export class CronogramaComponent implements OnInit {
   isLoading: boolean = false;
   loadingProgress: number = 0;
   loadingProgressText: string = 'Inicializando...';
+  private isLoadingSchedule: boolean = false;
 
   ngOnInit() {
   
@@ -153,6 +154,7 @@ export class CronogramaComponent implements OnInit {
   } else {
       this.generateTimeSlots();
       this.loadScheduleFromDB();
+      this.cdr.detectChanges(); // Ensure UI updates
   }
 
   // Check if navigating from patient registration
@@ -1207,76 +1209,129 @@ private scheduleNewPatient(patientData: any) {
   }
   
   // Método auxiliar para cargar el cronograma desde la base de datos (ejemplo)
-  loadScheduleFromDB() {
+  loadScheduleFromDB(){ 
+    if (this.isLoadingSchedule) {
+    console.log('Schedule loading already in progress');
+    return;
+  }
+  this.isLoadingSchedule = true;
   this.isLoading = true;
   this.loadingProgress = 10;
   this.loadingProgressText = 'Cargando datos iniciales...';
 
-  // Initialize nurse arrays
   this.morningNurses = [];
   this.afternoonNurses = [];
   this.nightNurses = [];
+  this.visits = []; // Clear existing visits
 
-  // Convert cargarEnfermeras to return an Observable
-  this.cargarEnfermeras().pipe(
-    concatMap(() => {
-      console.log("Current date:", this.formatDateToLocalDate(this.currentDate));
-      return forkJoin({
-        patients: this.patients.length ? of(this.patients) : this.patientsService.findAll(0, 1000),
-        visits: this.visitsService.getAllVisits(0, 100, this.formatDateToLocalDate(this.currentDate))
-      });
-    })
-  ).subscribe({
-    next: ({ patients, visits }) => {
-      const rawPatients = patients.content || patients;
-      console.log('Raw patients response:', rawPatients);
-      this.patients = rawPatients;
-      console.log('Patients loaded:', this.patients);
-      console.log('Patient IDs:', this.patients.map((p) => p.id));
+  this.cargarEnfermeras()
+    .pipe(
+      concatMap(() => {
+        console.log('Current date:', this.formatDateToLocalDate(this.currentDate));
+        return forkJoin({
+          patients: this.patients.length ? of(this.patients) : this.cargarPacientes(),
+          visits: this.visitsService.getAllVisits(0, 100, this.formatDateToLocalDate(this.currentDate)),
+        });
+      }),
+      concatMap(({ patients, visits }) => {
+        this.patients = patients;
 
-      this.loadingProgress = 50;
-      this.loadingProgressText = 'Cargando visitas...';
+        this.loadingProgress = 50;
+        this.loadingProgressText = 'Cargando visitas...';
 
-      const validVisits = visits.content.filter((visit: Visita) =>
-        visit.actividadPacienteVisitaId !== undefined && visit.fechaVisita !== undefined
-      );
+        const validVisits = visits.content.filter((visit: Visita) =>
+          visit.actividadPacienteVisitaId !== undefined &&
+          visit.fechaVisita !== undefined &&
+          visit.horaInicioCalculada !== undefined &&
+          visit.enfermeraId !== undefined
+        );
 
-      if (validVisits.length === 0) {
-        console.warn('No valid visits found with defined actividadPacienteVisitaId and fechaVisita');
-        this.loadingProgress = 100;
-        this.loadingProgressText = 'No se encontraron visitas válidas';
+        if (validVisits.length === 0) {
+          console.warn('No valid visits found with required fields');
+          this.loadingProgress = 100;
+          this.loadingProgressText = 'No se encontraron visitas válidas';
+          this.isLoading = false;
+          this.isLoadingSchedule = false;
+          this.showToastMessage('Advertencia', 'No se encontraron visitas válidas para cargar', 'warning');
+          return of(null);
+        }
+
+        console.log('Valid visits:', validVisits);
+
+        this.classifyNursesByShift(validVisits);
+
+        this.loadingProgress = 75;
+        this.loadingProgressText = 'Clasificando enfermeras...';
+
+        const visitInfoRequests = validVisits.map((visit: Visita) =>
+          this.visitsService.getActividadVisitaPacienteById(visit.actividadPacienteVisitaId!).pipe(
+            map((response) => ({
+              visit,
+              actividad: response,
+            })),
+            catchError((error) => {
+              console.warn(`Failed to fetch actividad for visit ${visit.id}:`, error);
+              return of({
+                visit,
+                actividad: null,
+              });
+            })
+          )
+        );
+
+        return forkJoin(visitInfoRequests);
+      })
+    )
+    .subscribe({
+      next: (results) => {
+        if (!results) return;
+
+        this.visits = results
+          .filter((result) => result.actividad !== null)
+          .map((result) => {
+            const { visit, actividad } = result;
+            const patient = this.patients.find((p) => p.id === (actividad?.pacienteId ?? 0));
+            const duration = actividad?.duracionVisita ?? 30;
+            return {
+              id: visit.id,
+              patientId: actividad?.pacienteId ?? 0,
+              actividadPacienteVisita: visit.actividadPacienteVisitaId,
+              patientName: patient ? patient.name : 'Unknown',
+              nurseId: visit.enfermeraId,
+              procedure: visit.estado === 'URGENCIA' ? 'URGENCIA' : 'TRATAMIENTO',
+              startTime: visit.horaInicioCalculada!.split(':').slice(0, 2).join(':'),
+              duration: duration,
+              date: new Date(this.currentDate),
+              isEmergency: visit.estado === 'URGENCIA',
+              isOptimizedSuggestion: false,
+            } as Visit;
+          });
+
+        this.loadingProgress = 90;
+        this.loadingProgressText = 'Finalizando carga de visitas...';
+
+        console.log('Transformed visits:', this.visits);
+      },
+      error: (error) => {
+        console.error('Error cargando datos iniciales:', error);
+        this.loadingProgressText = 'Error cargando datos iniciales';
         this.isLoading = false;
-        this.showToastMessage('Advertencia', 'No se encontraron visitas válidas para cargar', 'warning');
-        return;
-      }
-
-      console.log('Valid visits:', validVisits);
-
-      // Classify nurses based on valid visits
-      this.classifyNursesByShift(validVisits);
-
-      console.log("this.visits:", this.visits);
-    
-
-      this.loadingProgress = 75;
-      this.loadingProgressText = 'Clasificando enfermeras...';
-    },
-    error: (error) => {
-      console.error('Error cargando datos iniciales:', error);
-      this.loadingProgressText = 'Error cargando datos iniciales';
-      this.isLoading = false;
-      this.showToastMessage('Error', 'No se pudieron cargar pacientes o visitas', 'error');
-    },
-    complete: () => {
-      this.isLoading = false;
-      this.loadingProgress = 100;
-      this.loadingProgressText = 'Carga completa';
-      console.log('Morning nurses:', this.morningNurses);
-      console.log('Afternoon nurses:', this.afternoonNurses);
-      console.log('Night nurses:', this.nightNurses);
-    }
-  });
-  }
+        this.isLoadingSchedule = false;
+        this.showToastMessage('Error', 'No se pudieron cargar pacientes o visitas', 'error');
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.isLoadingSchedule = false;
+        this.loadingProgress = 100;
+        this.loadingProgressText = 'Carga completa';
+        console.log('Morning nurses:', this.morningNurses);
+        console.log('Afternoon nurses:', this.afternoonNurses);
+        console.log('Night nurses:', this.nightNurses);
+        console.log('Final visits after loadScheduleFromDB:', this.visits);
+        this.cdr.detectChanges();
+      },
+    });
+  } 
 
   classifyNursesByShift(visits: Visita[]): void {
     const morning: Nurse[] = [];
@@ -1332,7 +1387,6 @@ private scheduleNewPatient(patientData: any) {
   
   
   cargarEnfermeras(): Observable<Nurse[]> {
-    this.isLoading = true;
     return this.nursesService.findAll(0, 100).pipe(
       map((response) => {
         const nurses = (response.content || response).map((e: any) => ({
@@ -1357,24 +1411,45 @@ private scheduleNewPatient(patientData: any) {
         return throwError(() => error);
       }),
       finalize(() => {
-        this.isLoading = false;
       })
     );
   }
-  cargarPacientes(){
+  cargarPacientes(): Observable<Patient[]> {
     this.isLoading = true;
-
-    this.patientsService.findAll(0, 50).subscribe({
-      next: (response) => {
-        this.patients = response.content;
-        this.isLoading = false;
+    return this.patientsService.findAll(0, 50).pipe(
+      map((response) => {
+        const patients = (response.content || response).map((p: any) => ({
+          id: p.id,
+          name: p.nombre || 'Unknown', // Map nombre to name
+          lastName: p.apellido || '',
+          document: p.numero_identificacion || '',
+          documentType: p.tipo_identificacion || 'CC',
+          address: p.direccion || '',
+          phone: p.telefono || '',
+          email: p.email || '',
+          relativeName: p.nombre_familiar || '',
+          relativeRelationship: p.relacion_familiar || '',
+          relativePhone: p.telefono_familiar || '',
+          neighborhood: p.barrio || '',
+          complex: p.complejo || '',
+          latitude: p.latitud ?? 0,
+          longitude: p.longitud ?? 0,
+          priority: p.prioridad || 'normal',
+          actividadPacienteVisita: p.actividades?.[0]?.id || 0, // Map actividad if available
+        })) as Patient[];
+        this.patients = patients;
         console.log('Pacientes obtenidos:', this.patients);
-      },
-      error: (err) => {
+        return patients;
+      }),
+      catchError((error) => {
+        console.error('Error al obtener pacientes:', error);
+        this.showToastMessage('Error', 'No se pudieron cargar los pacientes', 'error');
         this.isLoading = false;
-        console.error('Error al obtener pacientes:', err);
-      },
-    });
+        return throwError(() => error);
+      }),
+      finalize(() => {
+      })
+    );
   }
   
 
