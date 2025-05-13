@@ -13,6 +13,9 @@
       <p>Pacientes a atender hoy (7:00 AM - 7:00 AM del día siguiente)</p>
     </div>
   </div>
+  <button class="btn btn-primary" (click)="navegarARegistroPaciente()">
+    <i class="fas fa-plus-circle"></i> Registrar Nuevo Paciente
+  </button>
 
   <div class="content-container">
     <!-- Pacientes programados para hoy -->
@@ -153,9 +156,6 @@
   <div class="footer-actions">
     <button class="btn btn-secondary" routerLink="/cronograma">
       <i class="fas fa-arrow-left"></i> Volver al Cronograma
-    </button>
-    <button class="btn btn-primary" (click)="navegarARegistroPaciente()">
-      <i class="fas fa-plus-circle"></i> Registrar Nuevo Paciente
     </button>
     <button class="btn btn-success" [disabled]="pacientesAsignados.length === 0" (click)="navegarSiguiente()">
       <i class="fas fa-user-nurse"></i> Asignar Enfermeras

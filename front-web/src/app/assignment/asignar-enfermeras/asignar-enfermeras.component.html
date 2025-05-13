@@ -12,6 +12,10 @@
       <p>Gestión de enfermeras por turno</p>
     </div>
   </div>
+  
+  <button class="btn btn-primary" routerLink="/registro-enfermeras">
+    <i class="fas fa-plus-circle"></i> Registrar Nueva Enfermera
+  </button>
 
   <div class="content-container">
     <!-- Filtros y búsqueda -->
@@ -179,9 +183,6 @@
 <div class="footer-actions">
   <button class="btn btn-secondary" (click)="volverAPacientes()">
     <i class="fas fa-arrow-left"></i> Volver a los pacientes
-  </button>
-  <button class="btn btn-primary" routerLink="/registro-enfermeras">
-    <i class="fas fa-plus-circle"></i> Registrar Nueva Enfermera
   </button>
   <button class="btn btn-success" (click)="generarCronograma()" [disabled]="enfermeras.length === 0">
     <i class="fas fa-calendar-alt"></i> Generar Cronograma
