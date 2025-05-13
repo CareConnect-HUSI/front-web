@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { Visita } from 'src/app/model/visit';
 import { NurseService } from 'src/app/service/nurse.service';
 import { OptimizationDataService } from 'src/app/service/optimization-data.service';
@@ -117,7 +117,7 @@ export class CronogramaComponent implements OnInit {
   
   draggedVisit: any = null;
 
-  constructor(private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService, private visitsService: VisitsService) {
+  constructor(private cdr: ChangeDetectorRef , private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService, private visitsService: VisitsService) {
     this.nextDay = new Date(this.currentDate);
     this.nextDay.setDate(this.nextDay.getDate() + 1);
   }
@@ -246,7 +246,7 @@ fetchInitialData() {
       if (this.optimizacionData.getBorrador()) {
         this.loadOptimizedRoutesBorrador();
       } else {
-        this.loadOptimizedRoutes();
+        // this.loadOptimizedRoutes(); // REVISAR
       }
       this.initializeVisits();
     });
@@ -392,7 +392,6 @@ loadOptimizedRoutesBorrador() {
       }
     };
        
-    console.log("Respuestas mañana:", respuestaManana);
     procesarRutas(respuestaManana);
     procesarRutas(respuestaTarde);
     procesarRutas(respuestaNoche);
@@ -493,11 +492,6 @@ private scheduleNewPatient(patientData: any) {
     return null;
   }
   
-  loadOptimizedRoutes() {
-    // Tratar de cargar las visitas de hoy desde la bd
-    // en caso de no haber visitas, se deja en blanco el cronograma
-}
-
   
   generateTimeSlots() {
     this.timeSlots = [];
@@ -523,10 +517,7 @@ private scheduleNewPatient(patientData: any) {
         console.log("Nurse Visits:", nurseVisits);
         if (nurse) {
           nurseVisits.forEach((visit: any, index: number) => {
-            // El primer paciente es la ubicación de la enfermera
             if (index == 0 && visit.esEnfermera) {
-              // No crear visita para la ubicación de la enfermera
-              console.log("Sale por la tangente");
               return;
             }
             
@@ -924,15 +915,6 @@ private scheduleNewPatient(patientData: any) {
     }
   });
   }
-  
-  closeNewPatientModal() {
-    this.showNewPatientModal = false;
-  }
-
-  addNewPatient() {
-    // Ir a registrar paciente
-  }
-
 
   // Funciones para confirmar cronograma
   confirmSchedule() {
@@ -1226,94 +1208,175 @@ private scheduleNewPatient(patientData: any) {
   
   // Método auxiliar para cargar el cronograma desde la base de datos (ejemplo)
   loadScheduleFromDB() {
-
-    // Clear existing visits
-  this.visits = [];
-
-  // Fetch nurses and patients if not already loaded
-  if (!this.allNurses.length || !this.patients.length) {
-    // DEBERÍA CARGAR LA INFO
-  }
-    // Set loading state
   this.isLoading = true;
   this.loadingProgress = 10;
-  this.loadingProgressText = 'Cargando visitas desde la base de datos...';
-  const formattedDate = this.formatDateToLocalDate(this.currentDate);
+  this.loadingProgressText = 'Cargando datos iniciales...';
 
-  console.log("Cargando visitas de: ", formattedDate);
+  // Initialize nurse arrays
+  this.morningNurses = [];
+  this.afternoonNurses = [];
+  this.nightNurses = [];
 
-  // Fetch visits from the backend
-  this.visitsService.getAllVisits(0, 100, formattedDate).pipe(
-    catchError((error) => {
-      console.error('Error al cargar visitas:', error);
-      this.isLoading = false;
-      this.showToastMessage('Error', 'No se pudieron cargar las visitas.', 'error');
-      return of([]); // Return empty array to continue execution
+  // Convert cargarEnfermeras to return an Observable
+  this.cargarEnfermeras().pipe(
+    concatMap(() => {
+      console.log("Current date:", this.formatDateToLocalDate(this.currentDate));
+      return forkJoin({
+        patients: this.patients.length ? of(this.patients) : this.patientsService.findAll(0, 1000),
+        visits: this.visitsService.getAllVisits(0, 100, this.formatDateToLocalDate(this.currentDate))
+      });
     })
   ).subscribe({
-    next: (backendVisits: Visita[]) => {
-      // Update loading progress
+    next: ({ patients, visits }) => {
+      const rawPatients = patients.content || patients;
+      console.log('Raw patients response:', rawPatients);
+      this.patients = rawPatients;
+      console.log('Patients loaded:', this.patients);
+      console.log('Patient IDs:', this.patients.map((p) => p.id));
+
       this.loadingProgress = 50;
-      this.loadingProgressText = 'Procesando datos de visitas...';
+      this.loadingProgressText = 'Cargando visitas...';
 
-      // Map backend Visita to frontend Visit
-      this.visits = backendVisits.map((visita: Visita) => {
-        // Find patient and nurse to populate additional data
-        const patient = this.patients.find(p => p.actividadPacienteVisita === visita.actividadPacienteVisitaId);
-        const nurse = this.allNurses.find(n => n.id === visita.enfermeraId);
-
-        // Extract start time and duration
-        const startTime = visita.horaInicioEjecutada?.substring(0, 5) || visita.horaInicioCalculada?.substring(0, 5) || '00:00';
-        const endTime = visita.horaFinEjecutada?.substring(0, 5) || visita.horaFinCalculada?.substring(0, 5) || '00:00';
-        const duration = this.calculateDuration(startTime, endTime);
-
-        // Parse date
-        const visitDate = new Date(visita.fechaVisita as string);
-
-        return {
-          id: visita.id || Math.max(0, ...this.visits.map(v => v.id)) + 1,
-          patientId: patient?.id || 0,
-          actividadPacienteVisita: visita.actividadPacienteVisitaId,
-          patientName: patient?.name || 'Desconocido',
-          nurseId: visita.enfermeraId,
-          procedure: visita.estado === 'URGENCIA' ? 'URGENCIA' : 'TRATAMIENTO',
-          startTime: startTime,
-          duration: duration,
-          date: visitDate,
-          isEmergency: visita.estado === 'URGENCIA',
-          isOptimizedSuggestion: false, // Loaded visits are not suggestions
-          originalNurseId: visita.enfermeraId,
-          originalTime: visita.horaInicioCalculada?.substring(0, 5) || startTime
-        } as Visit;
-      });
-
-      // Filter visits for the current date
-      this.visits = this.visits.filter(visit => 
-        visit.date.toDateString() === this.currentDate.toDateString()
+      const validVisits = visits.content.filter((visit: Visita) =>
+        visit.actividadPacienteVisitaId !== undefined && visit.fechaVisita !== undefined
       );
 
-      // Update loading state
-      this.loadingProgress = 100;
-      this.loadingProgressText = 'Visitas cargadas correctamente';
-      setTimeout(() => {
+      if (validVisits.length === 0) {
+        console.warn('No valid visits found with defined actividadPacienteVisitaId and fechaVisita');
+        this.loadingProgress = 100;
+        this.loadingProgressText = 'No se encontraron visitas válidas';
         this.isLoading = false;
-      }, 500);
+        this.showToastMessage('Advertencia', 'No se encontraron visitas válidas para cargar', 'warning');
+        return;
+      }
 
-      // Show success message
-      this.showToastMessage(
-        'Visitas cargadas',
-        `Se cargaron ${this.visits.length} visitas para el ${this.currentDate.toLocaleDateString()}.`,
-        'success'
-      );
+      console.log('Valid visits:', validVisits);
+
+      // Classify nurses based on valid visits
+      this.classifyNursesByShift(validVisits);
+
+      console.log("this.visits:", this.visits);
+    
+
+      this.loadingProgress = 75;
+      this.loadingProgressText = 'Clasificando enfermeras...';
     },
     error: (error) => {
-      console.error('Error al procesar visitas:', error);
+      console.error('Error cargando datos iniciales:', error);
+      this.loadingProgressText = 'Error cargando datos iniciales';
       this.isLoading = false;
-      this.showToastMessage('Error', 'Error al procesar los datos de las visitas.', 'error');
+      this.showToastMessage('Error', 'No se pudieron cargar pacientes o visitas', 'error');
+    },
+    complete: () => {
+      this.isLoading = false;
+      this.loadingProgress = 100;
+      this.loadingProgressText = 'Carga completa';
+      console.log('Morning nurses:', this.morningNurses);
+      console.log('Afternoon nurses:', this.afternoonNurses);
+      console.log('Night nurses:', this.nightNurses);
     }
   });
-  
   }
+
+  classifyNursesByShift(visits: Visita[]): void {
+    const morning: Nurse[] = [];
+    const afternoon: Nurse[] = [];
+    const night: Nurse[] = [];
+  
+    visits.forEach((visit: Visita) => {
+      if (!visit.enfermeraId || !visit.horaInicioCalculada) {
+        console.warn(`Visit ${visit.id} missing enfermeraId or horaInicioCalculada`);
+        return;
+      }
+  
+      const nurse = this.allNurses.find((n) => n.id === visit.enfermeraId);
+      if (!nurse) {
+        console.warn(`Nurse with ID ${visit.enfermeraId} not found for visit ${visit.id}`);
+        return;
+      }
+  
+      const [hours, minutes] = visit.horaInicioCalculada.split(':').map(Number);
+      const timeInHours = hours + minutes / 60;
+  
+      if (timeInHours >= 7 && timeInHours < 13) {
+        if (!morning.some((n) => n.id === nurse.id)) {
+          morning.push(nurse);
+        }
+      } else if (timeInHours >= 13 && timeInHours < 19) {
+        if (!afternoon.some((n) => n.id === nurse.id)) {
+          afternoon.push(nurse);
+        }
+      } else {
+        if (!night.some((n) => n.id === nurse.id)) {
+          night.push(nurse);
+        }
+      }
+    });
+  
+    // Assign new array references
+    this.morningNurses = [...morning];
+    this.afternoonNurses = [...afternoon];
+    this.nightNurses = [...night];
+
+  
+    // Trigger change detection
+    this.cdr.detectChanges();
+  
+    console.log('Classified nurses:', {
+      morning: this.morningNurses,
+      afternoon: this.afternoonNurses,
+      night: this.nightNurses,
+    });
+  }
+
+  
+  
+  cargarEnfermeras(): Observable<Nurse[]> {
+    this.isLoading = true;
+    return this.nursesService.findAll(0, 100).pipe(
+      map((response) => {
+        const nurses = (response.content || response).map((e: any) => ({
+          id: e.id,
+          name: e.nombre || 'Unknown', // Map nombre to name
+          lastName: e.apellido || '',
+          numeroIdentificacion: e.numeroIdentificacion || '',
+          phone: e.telefono || '',
+          shiftId: e.turnoEntity?.id ?? null,
+          latitude: e.latitud ?? 0,
+          longitude: e.longitud ?? 0,
+          shift: this.getShiftName(e.turnoEntity?.id),
+        })) as Nurse[];
+        this.allNurses = nurses;
+        console.log("Enfermeras cargadas", this.allNurses);
+        return nurses;
+      }),
+      catchError((error) => {
+        console.error('Error al cargar enfermeras', error);
+        this.showToastMessage('Error', 'No se pudieron cargar las enfermeras', 'error');
+        this.isLoading = false;
+        return throwError(() => error);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    );
+  }
+  cargarPacientes(){
+    this.isLoading = true;
+
+    this.patientsService.findAll(0, 50).subscribe({
+      next: (response) => {
+        this.patients = response.content;
+        this.isLoading = false;
+        console.log('Pacientes obtenidos:', this.patients);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error al obtener pacientes:', err);
+      },
+    });
+  }
+  
 
   private formatDateToLocalDate(date: Date | string): string {
     const dateObj = typeof date === 'string' ? new Date(date) : date;

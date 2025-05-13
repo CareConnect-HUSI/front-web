@@ -76,5 +76,9 @@ export class PatientService {
   getTiposActividad(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
   }
+
+  findActividadPacienteVisitaPorID(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
+  }
   
 }

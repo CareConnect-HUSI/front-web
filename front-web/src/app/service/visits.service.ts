@@ -8,27 +8,36 @@ import { Visita } from '../model/visit';
   providedIn: 'root'
 })
 export class VisitsService {
-  private readonly apiUrl = 'http://localhost:8082/visitas'; // URL del backend
+  private readonly apiUrl = 'http://localhost:8082'; // URL del backend
 
   constructor(private http: HttpClient) {}
 
   // Crear una nueva visita (POST /visitas)
   createVisit(visita: Visita): Observable<Visita> {
-    return this.http.post<Visita>(this.apiUrl, visita).pipe(
+    return this.http.post<Visita>(`${this.apiUrl}/visitas`, visita).pipe(
       catchError(this.handleError)
     );
   }
 
   // Obtener visitas por ID de paciente (GET /visitas/paciente/{idPaciente})
   getVisitsByPaciente(idPaciente: number): Observable<Visita[]> {
-    return this.http.get<Visita[]>(`${this.apiUrl}/paciente/${idPaciente}`).pipe(
+    return this.http.get<Visita[]>(`${this.apiUrl}/visitas/paciente/${idPaciente}`).pipe(
       catchError(this.handleError)
     );
   }
 
-  getAllVisits(page: number, size: number, currentDate: String): Observable<Visita[]> {
-    return this.http.get<Visita[]>(`${this.apiUrl}?page=${page}&size=${size}&${currentDate}`);
+  getAllVisits(page: number, size: number, currentDate: String): Observable<{ content: Visita[] }> {
+    return this.http.get<{ content: Visita[] }>(`${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`).pipe(
+      catchError(this.handleError)
+    );
   }
+
+  getActividadVisitaPacienteById(id: number){
+    return this.http.get<any>(`${this.apiUrl}/actividad-paciente-visita/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
 
   // Manejo de errores
   private handleError(error: HttpErrorResponse): Observable<never> {
