@@ -51,4 +51,10 @@ export class VisitsService {
     }
     return throwError(() => new Error(errorMessage));
   }
+
+    updateVisit(id: number, visita: Partial<Visita>): Observable<Visita> {
+    return this.http.put<Visita>(`${this.apiUrl}/visitas/${id}`, visita).pipe(
+      catchError(this.handleError)
+    );
+  }
 }

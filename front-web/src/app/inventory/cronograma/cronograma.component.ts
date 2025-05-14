@@ -604,15 +604,19 @@ private scheduleNewPatient(patientData: any) {
   }
   
   
-  getShiftName(shift?: string): string {
-    if (!shift) return 'Sin turno';
-    switch(shift) {
-      case 'morning': return 'Mañana';
-      case 'afternoon': return 'Tarde';
-      case 'night': return 'Noche';
-      default: return shift;
+  getShiftName(shiftId?: number): string {
+  switch (shiftId) {
+      case 1:
+        return 'morning';
+      case 2:
+        return 'afternoon';
+      case 3:
+        return 'night';
+      default:
+        return 'unknown';
     }
   }
+
   
   // Funciones para manejar las celdas y visitas
   isCellOccupied(nurse: any, time: Date): boolean {
@@ -721,64 +725,57 @@ private scheduleNewPatient(patientData: any) {
   }
   
   drop(event: DragEvent, nurse: Nurse, time: Date) {
-    if (!this.editMode || !this.draggedVisit) return;
-    
-    event.preventDefault();
-    const timeStr = this.formatTime(time);
-    
-    // Validar que no se pueda mover más de 1 hora antes o después
-    const originalTime = new Date(this.draggedVisit.date);
-    originalTime.setHours(parseInt(this.draggedVisit.startTime.split(':')[0]));
-    originalTime.setMinutes(parseInt(this.draggedVisit.startTime.split(':')[1]));
-    
-    const newTime = new Date(time);
-    const timeDiff = Math.abs(newTime.getTime() - originalTime.getTime()) / (1000 * 60); // Diferencia en minutos
-    
-    if (timeDiff > 60) {
-      this.showToastMessage('Error', 'Solo puedes mover la visita hasta 1 hora antes o después de su horario original', 'error');
-      return;
-    }
-    
-    // Validar que la enfermera esté en turno
-    if (!this.isNurseInShift(nurse, time)) {
-      this.showToastMessage('Error', 'No puedes asignar la visita a una enfermera que no está en turno a esa hora', 'error');
-      return;
-    }
-    
-    // Validar que no haya superposición
-    const duration = this.draggedVisit.duration;
-    const endTime = this.addMinutesToTime(timeStr, duration);
-    
-    for (let i = 0; i < this.visits.length; i++) {
-      if (this.visits[i].nurseId === nurse.id && 
-          this.visits[i].date.toDateString() === this.currentDate.toDateString() &&
-          this.visits[i].id !== this.draggedVisit.id) {
-        
-        const existingStart = this.visits[i].startTime;
-        const existingEnd = this.addMinutesToTime(this.visits[i].startTime, this.visits[i].duration);
-        
-        if (this.isTimeOverlap(timeStr, endTime, existingStart, existingEnd)) {
-          this.showToastMessage('Error', 'No puedes asignar dos visitas a la misma enfermera en el mismo horario', 'error');
-          return;
-        }
-      }
-    }
-    
-    // Actualizar la visita
-    this.draggedVisit.nurseId = nurse.id;
-    this.draggedVisit.startTime = timeStr;
-    this.draggedVisit.date = new Date(this.currentDate);
-    
-    // Si era una sugerencia optimizada, marcarla como modificada
-    if (this.draggedVisit.isOptimizedSuggestion) {
-      this.draggedVisit.isOptimizedSuggestion = false;
-    }
-    
-    // Resetear la visita arrastrada
-    this.draggedVisit = null;
-    
-    this.showToastMessage('Visita movida', 'La visita ha sido reasignada correctamente', 'success');
+  if (!this.editMode || !this.draggedVisit) return;
+
+  event.preventDefault();
+
+  const newTimeStr = this.formatTime(time);
+  const newTime = new Date(this.currentDate);
+  const [newHour, newMin] = newTimeStr.split(':').map(Number);
+  newTime.setHours(newHour, newMin, 0, 0);
+
+  const originalTimeStr = this.draggedVisit.originalTime!;
+  const [origHour, origMin] = originalTimeStr.split(':').map(Number);
+  const originalTime = new Date(this.currentDate);
+  originalTime.setHours(origHour, origMin, 0, 0);
+
+  const diffMinutes = Math.abs(newTime.getTime() - originalTime.getTime()) / 60000;
+
+  if (diffMinutes > 60) {
+    this.showToastMessage('Error', 'Solo puedes mover la visita hasta 1 hora antes o después de su horario ideal', 'error');
+    return;
   }
+
+  if (!this.isNurseInShift(nurse, newTime)) {
+    this.showToastMessage('Error', 'La enfermera no está en turno a esa hora', 'error');
+    return;
+  }
+
+  const duration = this.draggedVisit.duration;
+  const newEndTimeStr = this.addMinutesToTime(newTimeStr, duration);
+
+  const hasConflict = this.visits.some(visit =>
+    visit.id !== this.draggedVisit!.id &&
+    visit.nurseId === nurse.id &&
+    visit.date.toDateString() === this.currentDate.toDateString() &&
+    this.isTimeOverlap(newTimeStr, newEndTimeStr, visit.startTime, this.addMinutesToTime(visit.startTime, visit.duration))
+  );
+
+  if (hasConflict) {
+    this.showToastMessage('Error', 'La enfermera ya tiene una visita en ese horario', 'error');
+    return;
+  }
+
+  this.draggedVisit.nurseId = nurse.id;
+  this.draggedVisit.startTime = newTimeStr;
+  this.draggedVisit.date = new Date(this.currentDate);
+  this.draggedVisit.isOptimizedSuggestion = false;
+
+  this.draggedVisit = null;
+  this.showToastMessage('Visita movida', 'La visita fue reasignada correctamente', 'success');
+}
+
+
   
   cellClicked(nurse: Nurse, time: Date) {
     if (!this.editMode) return;
@@ -790,7 +787,6 @@ private scheduleNewPatient(patientData: any) {
         this.showToastMessage('Visita eliminada', `La visita de ${visit.patientName} ha sido eliminada`, 'success');
       }
     } else {
-      // Si es un espacio vacío, abrir modal de urgencia
       this.emergencyVisit = {
         patientId: this.patients[0]?.id || null,
         procedure: 'URGENCIA',
@@ -801,8 +797,6 @@ private scheduleNewPatient(patientData: any) {
       this.showEmergencyModal = true;
     }
   }
-  
-  // Funciones para manejar modales
   
   // Funciones para manejar modales
   openEmergencyModal() {
@@ -1304,6 +1298,11 @@ private scheduleNewPatient(patientData: any) {
               date: new Date(this.currentDate),
               isEmergency: visit.estado === 'URGENCIA',
               isOptimizedSuggestion: false,
+              originalTime: (visit.horaInicioCalculada || visit.horaInicioEjecutada || '')
+              .split(':')
+              .slice(0, 2)
+              .join(':'),
+              originalNurseId: visit.enfermeraId     
             } as Visit;
           });
 
@@ -1467,4 +1466,65 @@ private scheduleNewPatient(patientData: any) {
     return `${year}-${month}-${day}`; // Returns yyyy-MM-dd, e.g., 2025-05-12
   }
 
+  public actualizarVisitasEditadas() {
+  const visitasModificadas: Visita[] = this.visits
+    .filter((visit) =>
+      visit.id &&
+      (visit.nurseId !== visit.originalNurseId || visit.startTime !== visit.originalTime)
+    )
+    .map((visit) => ({
+      id: visit.id!,
+      enfermeraId: visit.nurseId,
+      horaInicioCalculada: visit.startTime + ':00',
+      horaFinCalculada: this.addMinutesToTime(visit.startTime, visit.duration) + ':00'
+    }));
+
+  if (!visitasModificadas.length) {
+    this.showToastMessage('Sin cambios', 'No se detectaron visitas modificadas.', 'warning');
+    this.editMode = false;
+    return;
+  }
+
+  this.isLoading = true;
+  this.loadingProgress = 10;
+  this.loadingProgressText = 'Actualizando visitas modificadas...';
+
+  const updateRequests = visitasModificadas
+    .filter(visit => visit.id !== undefined)
+    .map((visit) =>
+      this.visitsService.updateVisit(visit.id as number, {
+        enfermeraId: visit.enfermeraId,
+        horaInicioCalculada: visit.horaInicioCalculada,
+        horaFinCalculada: visit.horaFinCalculada
+      }).pipe(
+        catchError((error) => {
+          console.error('Error al actualizar visita:', error);
+          this.showToastMessage('Error', `Error al actualizar visita con ID ${visit.id}.`, 'error');
+          return of(null);
+        })
+      )
+    );
+
+  forkJoin(updateRequests).subscribe({
+    next: (results) => {
+      const actualizadas = results.filter(r => r !== null).length;
+
+      this.showToastMessage('Visitas actualizadas', `Se actualizaron ${actualizadas} visitas.`, 'success');
+
+      // Actualiza valores originales
+      this.visits.forEach((visit) => {
+        visit.originalNurseId = visit.nurseId;
+        visit.isOptimizedSuggestion = false;
+      });
+
+      this.isLoading = false;
+      this.editMode = false;
+    },
+    error: (error) => {
+      console.error('Error al actualizar visitas:', error);
+      this.showToastMessage('Error', 'Hubo un problema al actualizar las visitas.', 'error');
+      this.isLoading = false;
+    }
+  });
+}
 }

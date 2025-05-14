@@ -28,9 +28,10 @@
         <div class="edit-mode-info">
           <i class="fas fa-exclamation-triangle"></i> Modo edición - Puedes ajustar las asignaciones antes de confirmar
         </div>
-        <button class="confirm-btn" (click)="confirmSchedule()">
+        <button class="confirm-btn" (click)="editMode ? actualizarVisitasEditadas() : confirmSchedule()">
           <i class="fas fa-check-circle"></i> Confirmar Cronograma
         </button>
+
         <button class="cancel-edit-btn" (click)="cancelSchedule()">
           <i class="fas fa-times"></i> Cancelar
         </button>
@@ -233,7 +234,7 @@
           (change)="updateTimeLimits()">
           <option value="">Seleccione una enfermera</option>
           <option *ngFor="let nurse of getAvailableNursesForEmergency()" [value]="nurse.id">
-            {{ nurse.name }} ({{ getShiftName(nurse.shift) }})
+            {{ nurse.name }} ({{ getShiftName(+nurse.shift) }})
           </option>
         </select>
       </div>
