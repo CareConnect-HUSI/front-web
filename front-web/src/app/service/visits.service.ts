@@ -57,4 +57,7 @@ export class VisitsService {
       catchError(this.handleError)
     );
   }
+  getVisitasByEnfermeraId(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/visitas/enfermera/${id}`);
+  }
 }

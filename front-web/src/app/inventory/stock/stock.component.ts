@@ -81,7 +81,7 @@ export class StockComponent implements OnInit {
           )
           .map((item) => ({
             ...item,
-            name: item.nombre || item.name, // Ensure compatibility with template
+            name: item.nombre || item.name,
           }));
 
         // Mostrar mensaje si no hay medicamentos disponibles
@@ -111,7 +111,6 @@ export class StockComponent implements OnInit {
           usado: 0,
         }));
         this.isLoading = false;
-        // Reload medicamentos to update filtering based on new inventory
         this.loadMedicamentos();
       },
       error: (err) => {
@@ -177,7 +176,6 @@ export class StockComponent implements OnInit {
 
   saveMedication(): void {
 
-     // Validate required fields
      if (!this.currentMedication.id) {
       this.medicationMessage = 'Por favor, seleccione un medicamento.';
       this.showMedicationWarning = true;
@@ -206,7 +204,7 @@ export class StockComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al agregar medicamento:', err);
-        this.isLoading = false; // Hide loading spinner on error
+        this.isLoading = false;
         this.medicationMessage = err.error || 'Error al agregar el medicamento. Intente de nuevo.';
         this.showMedicationWarning = true;
       },
@@ -221,7 +219,6 @@ export class StockComponent implements OnInit {
     }
     this.closeAddModal();
     this.closeEditModal();
-    // Reload medicamentos to update filtering based on updated inventory
     this.loadMedicamentos();
   }
 

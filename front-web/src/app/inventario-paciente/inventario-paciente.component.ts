@@ -15,7 +15,7 @@ export class InventarioComponent implements OnInit {
   actividades: any[] = [];
   inventarioPorPaciente: { [key: number]: any[] } = {};
   page: number = 0;
-  size: number = 10;
+  size: number = 6;
   isLoading: boolean = false;
   totalPacientes: number = 0;
 
