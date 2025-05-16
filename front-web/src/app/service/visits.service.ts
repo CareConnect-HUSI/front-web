@@ -14,6 +14,7 @@ export class VisitsService {
 
   // Crear una nueva visita (POST /visitas)
   createVisit(visita: Visita): Observable<Visita> {
+    console.log('VISITA EN EL SERVICIOOOOO:', visita);
     return this.http.post<Visita>(`${this.apiUrl}/visitas`, visita).pipe(
       catchError(this.handleError)
     );

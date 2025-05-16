@@ -28,9 +28,15 @@
         <div class="edit-mode-info">
           <i class="fas fa-exclamation-triangle"></i> Modo edición - Puedes ajustar las asignaciones antes de confirmar
         </div>
-        <button class="confirm-btn" (click)="editMode ? actualizarVisitasEditadas() : confirmSchedule()">
-          <i class="fas fa-check-circle"></i> Confirmar Cronograma
-        </button>
+          <!-- Confirmar si todas son nuevas -->
+          <button class="confirm-btn" *ngIf="editMode && visitasSonNuevas" (click)="confirmSchedule()">
+            <i class="fas fa-check-circle"></i> Confirmar Cronograma
+          </button>
+
+          <!-- Actualizar si ya tienen IDs -->
+          <button class="confirm-btn" *ngIf="editMode && visitasYaGuardadas" (click)="actualizarVisitasEditadas()">
+            <i class="fas fa-check-circle"></i> Actualizar Visitas
+          </button>
 
         <button class="cancel-edit-btn" (click)="cancelSchedule()">
           <i class="fas fa-times"></i> Cancelar

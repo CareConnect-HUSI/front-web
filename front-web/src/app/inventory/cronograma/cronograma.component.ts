@@ -251,6 +251,7 @@ fetchInitialData() {
         // this.loadOptimizedRoutes(); // REVISAR
       }
       this.initializeVisits();
+      console.log('Visitas generadas:', this.visits);
     });
   }
 
@@ -980,7 +981,18 @@ private scheduleNewPatient(patientData: any) {
       next: (results) => {
         // Filtrar resultados exitosos (ignorar los null)
         const savedVisits = results.filter((result): result is Visita => result !== null);
-        this.visitas.push(...savedVisits); // Agregar las visitas guardadas a la lista
+        savedVisits.forEach(saved => {
+        const match = this.visits.find(v =>
+          v.actividadPacienteVisita === saved.actividadPacienteVisitaId &&
+          this.formatDateToLocalDate(v.date) === saved.fechaVisita &&
+          v.nurseId === saved.enfermeraId &&
+          v.startTime + ':00' === saved.horaInicioCalculada
+        );
+        if (match) {
+          match.id = saved.id!;
+        }
+      });
+
   
         // Actualizar estado
         this.loadingProgress = 100;
@@ -1527,4 +1539,14 @@ private scheduleNewPatient(patientData: any) {
     }
   });
 }
+
+  get visitasSonNuevas(): boolean {
+   return this.visits.every(v => !v.id);
+  }
+
+  get visitasYaGuardadas(): boolean {
+    return this.visits.some(v => !!v.id);
+  }
+
+
 }
