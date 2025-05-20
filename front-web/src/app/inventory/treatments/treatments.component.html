@@ -371,17 +371,35 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Días de Tratamiento:</label>
-          <input
-            type="number"
-            [(ngModel)]="currentMedication.diasTratamiento"
-            name="diasTratamiento"
-            disabled
-            class="form-input"
-          />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Días de Tratamiento:</label>
+            <input
+              type="number"
+              [(ngModel)]="currentMedication.diasTratamiento"
+              name="diasTratamiento"
+              disabled
+              class="form-input"
+            />
+          </div>
+        
+          <div class="form-group">
+            <label>Duración:</label>
+            <select
+              [(ngModel)]="currentMedication.duracion"
+              name="duracion"
+              required
+              class="form-input"
+            >
+              <option value="" disabled selected>Seleccionar</option>
+              <option *ngFor="let d of duraciones" [value]="d">
+                {{ d }}min
+              </option>
+            </select>
+          </div>
         </div>
 
+        
         <div class="form-actions">
           <button type="button" class="cancel-btn" (click)="closeAddModal()">
             Cancelar

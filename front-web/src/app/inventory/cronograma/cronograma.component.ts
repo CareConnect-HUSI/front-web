@@ -117,7 +117,7 @@ export class CronogramaComponent implements OnInit {
   
   draggedVisit: any = null;
 
-  constructor(private cdr: ChangeDetectorRef , private router: Router, private optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService, private visitsService: VisitsService) {
+  constructor(private cdr: ChangeDetectorRef , private router: Router, public optimizacionData: OptimizationDataService, private nursesService: NurseService, private patientsService: PatientService, private visitsService: VisitsService) {
     this.nextDay = new Date(this.currentDate);
     this.nextDay.setDate(this.nextDay.getDate() + 1);
   }
@@ -434,7 +434,8 @@ private scheduleNewPatient(patientData: any) {
       procedure: patientData.procedure || 'Nuevo tratamiento',
       startTime: patientData.preferredTime,
       duration: patientData.duration,
-      date: new Date(this.currentDate)
+      date: new Date(this.currentDate.setHours(0, 0, 0, 0))
+
     };
     
     this.visits.push(newVisit);
@@ -537,7 +538,7 @@ private scheduleNewPatient(patientData: any) {
                 procedure: (patient as any).priority === 'urgent' ? 'URGENCIA' : 'TRATAMIENTO',
                 startTime: visit.hora_inicio,
                 duration: duration,
-                date: new Date(this.currentDate),
+                date: new Date(this.currentDate.setHours(0, 0, 0, 0)),
                 isOptimizedSuggestion: true,
                 originalNurseId: nurse.id,
                 originalTime: visit.hora_inicio
@@ -1307,7 +1308,7 @@ private scheduleNewPatient(patientData: any) {
               procedure: visit.estado === 'URGENCIA' ? 'URGENCIA' : 'TRATAMIENTO',
               startTime: visit.horaInicioCalculada!.split(':').slice(0, 2).join(':'),
               duration: duration,
-              date: new Date(this.currentDate),
+              date: new Date(this.currentDate.setHours(0, 0, 0, 0)),
               isEmergency: visit.estado === 'URGENCIA',
               isOptimizedSuggestion: false,
               originalTime: (visit.horaInicioCalculada || visit.horaInicioEjecutada || '')

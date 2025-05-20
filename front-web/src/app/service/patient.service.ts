@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class PatientService {
-  private apiUrl = 'http://localhost:8081/pacientes';
+  private apiUrl = 'http://localhost:8000/pacientes';
+  private apiUrlActividad ='http://localhost:8000/actividad-paciente-visita';
 
   constructor(private http: HttpClient) {}
 
@@ -52,10 +53,7 @@ export class PatientService {
   }
 
   findActividadesPorDocumento(documento: string): Observable<any[]> {
-    return this.http.get<any[]>(
-      'http://localhost:8081/actividad-paciente-visita/por-documento/' +
-        documento
-    );
+    return this.http.get<any[]>(`${this.apiUrlActividad}/listar/por-documento/${documento}`);
   }
 
   getTratamientosPorId(id: number): Observable<any[]> {
@@ -63,10 +61,7 @@ export class PatientService {
   }
 
   updatePaciente(id: number, paciente: any): Observable<any> {
-    return this.http.put(
-      `http://localhost:8081/pacientes/actualizar-paciente/${id}`,
-      paciente
-    );
+    return this.http.put(`${this.apiUrl}/actualizar-paciente/${id}`, paciente);
   }
 
   getTiposIdentificacion() {
@@ -81,10 +76,7 @@ export class PatientService {
     return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
   }
   updateTratamiento(id: number, tratamiento: any): Observable<any> {
-    return this.http.put(
-      `http://localhost:8081/actividad-paciente-visita/actualizar/${id}`,
-      tratamiento
-    );
+    return this.http.put(`${this.apiUrlActividad}/actualizar/${id}`, tratamiento);
   }
 
   getLocalidades() {
@@ -96,9 +88,6 @@ export class PatientService {
   }
 
   registrarTratamiento(payload: any): Observable<any> {
-    return this.http.post(
-      'http://localhost:8081/actividad-paciente-visita/registrar',
-      payload
-    );
+    return this.http.post(`${this.apiUrlActividad}/registrar`, payload);
   }
 }

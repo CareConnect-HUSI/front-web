@@ -8,13 +8,13 @@ import { Visita } from '../model/visit';
   providedIn: 'root'
 })
 export class VisitsService {
-  private readonly apiUrl = 'http://localhost:8082'; // URL del backend
+  private readonly apiUrl = 'http://localhost:8000'; // URL del backend
 
   constructor(private http: HttpClient) {}
 
   // Crear una nueva visita (POST /visitas)
   createVisit(visita: Visita): Observable<Visita> {
-    console.log('VISITA EN EL SERVICIOOOOO:', visita);
+    console.log('SERVICEEEEE:', visita); 
     return this.http.post<Visita>(`${this.apiUrl}/visitas`, visita).pipe(
       catchError(this.handleError)
     );
@@ -28,6 +28,7 @@ export class VisitsService {
   }
 
   getAllVisits(page: number, size: number, currentDate: String): Observable<{ content: Visita[] }> {
+    console.log('🔍 URL de visitas:', `${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`);
     return this.http.get<{ content: Visita[] }>(`${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`).pipe(
       catchError(this.handleError)
     );
@@ -61,4 +62,4 @@ export class VisitsService {
   getVisitasByEnfermeraId(id: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/visitas/enfermera/${id}`);
   }
-}
+} 

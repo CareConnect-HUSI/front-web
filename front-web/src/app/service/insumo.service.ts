@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/internal/Observable';
   providedIn: 'root'
 })
 export class InsumoService {
-   private apiUrl = 'http://localhost:8081/insumos';
+   private apiUrl = 'http://localhost:8000/insumos';
   
     constructor(private http: HttpClient) {}
     

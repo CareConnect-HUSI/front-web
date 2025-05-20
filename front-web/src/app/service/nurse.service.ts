@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class NurseService {
-  private apiUrl = 'http://localhost:8088/enfermeras';
+  private apiUrl = 'http://localhost:8000/enfermeras';
 
   constructor(private http: HttpClient) {}
 
@@ -67,13 +67,11 @@ export class NurseService {
   }
 
   getLocalidades() {
-    return this.http.get<any[]>('http://localhost:8088/enfermeras/localidades');
+    return this.http.get<any[]>(`${this.apiUrl}/localidades`);
   }
 
   getBarriosPorLocalidad(codigoLocalidad: string) {
-    return this.http.get<string[]>(
-      `http://localhost:8088/enfermeras/barrios/${codigoLocalidad}`
-    );
+    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
   }
 
   getBarriosPorNombre(nombre: string): Observable<any> {

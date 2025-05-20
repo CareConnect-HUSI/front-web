@@ -138,6 +138,7 @@ export class TreatmentsComponent implements OnInit {
       diasTratamiento: 0,
       usado: 0,
       tipoActividadId: 1,
+      duracion: 0,
     };
     this.showAddModal = true;
     this.loadListaTratamientos();
@@ -260,8 +261,9 @@ export class TreatmentsComponent implements OnInit {
       diasTratamiento: this.currentMedication.diasTratamiento,
       actividad: { id: selectedActividad.id },
       paciente: { id: this.idPaciente },
-      duracion: this.currentMedication.duracion,
+      duracionVisita: this.currentMedication.duracion
     };
+
 
     console.log('Payload para registrar tratamiento:', payload);
 
@@ -380,16 +382,13 @@ export class TreatmentsComponent implements OnInit {
 
     const payload = {
       paciente: { id: this.idPaciente },
-      actividad: { id: this.currentProcedure.actividadId },
+      actividad: { id: Number(this.currentProcedure.actividadId) },
       fechaInicio: this.currentProcedure.fechaInicio,
       hora: this.currentProcedure.hora?.slice(0, 5),
-      duracionVisita: this.currentProcedure.duracion,
-      tipoActividadId: 2,
-      dosis: null,
-      frecuencia: null,
-      fechaFin: null,
-      diasTratamiento: null
+      duracionVisita: Number(this.currentProcedure.duracion)
     };
+
+    console.log('Payload para procedimiento:', payload);
 
     this.pacienteService.registrarTratamiento(payload).subscribe({
       next: () => {
@@ -405,7 +404,6 @@ export class TreatmentsComponent implements OnInit {
       }
     });
   }
-
 
   confirmDelete(index: number): void {
     // const tratamiento = this.inventario[index];

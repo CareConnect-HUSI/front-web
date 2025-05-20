@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/internal/Observable';
   providedIn: 'root',
 })
 export class StockService {
-  private apiUrl = 'http://localhost:8087/actividad';
+  private apiUrl = 'http://localhost:8000/actividad';
 
   constructor(private http: HttpClient) {}
 

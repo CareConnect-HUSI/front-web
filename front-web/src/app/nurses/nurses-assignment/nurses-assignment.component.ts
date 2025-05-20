@@ -44,7 +44,7 @@ export class NursesAssignmentComponent implements OnInit {
 
   ngOnInit() {
     this.enfermeraId = this.route.snapshot.paramMap.get('id');
-    this.enfermeraNombre = `Enfermera ${this.enfermeraId}`;
+    this.enfermeraNombre = this.route.snapshot.paramMap.get('nombre') || 'Enfermera Desconocida';
 
     if (this.enfermeraId) {
       this.visitaService.getVisitasByEnfermeraId(this.enfermeraId).subscribe(visitas => {
