@@ -103,12 +103,14 @@ export class StockComponent implements OnInit {
   }
 
   loadInventario(id: number) {
-    this.insumoService.getMedicamentosPorPaciente(id).subscribe({
+    this.insumoService.getInventarioCompletoPorPaciente(id).subscribe({
       next: (data: any[]) => {
-        this.inventario = data.map((act) => ({
-          nombre: act.nombre,
-          cantidad: act.cantidad,
-          usado: 0,
+        this.inventario = data.map(item => ({
+          idInsumo: item.id,
+          nombre: item.nombre,
+          cantidad: item.cantidadTotal,
+          usado: item.cantidadUsada,
+          disponible: item.cantidadDisponible
         }));
         this.isLoading = false;
         this.loadMedicamentos();
@@ -116,12 +118,12 @@ export class StockComponent implements OnInit {
       error: (err) => {
         console.error('Error al cargar inventario:', err);
         this.isLoading = false;
-        this.medicationMessage =
-          'Error al cargar el inventario. Intente de nuevo.';
+        this.medicationMessage = 'Error al cargar el inventario. Intente de nuevo.';
         this.showMedicationWarning = true;
       },
     });
   }
+
 
   isLowStock(item: any): boolean {
     return item.cantidad - item.usado <= item.cantidad * 0.3;
@@ -212,14 +214,31 @@ export class StockComponent implements OnInit {
   }
 
   updateMedication(): void {
-    if (this.isEditing) {
-      this.inventario[this.currentIndex] = { ...this.currentMedication };
-    } else {
-      this.inventario.push({ ...this.currentMedication });
+    if (!this.currentMedication.idInsumo) {
+      alert('No se encontró el ID del insumo para actualizar');
+      return;
     }
-    this.closeAddModal();
-    this.closeEditModal();
-    this.loadMedicamentos();
+
+    this.isLoading = true;
+
+    this.insumoService.updateCantidadMedicamento(
+      this.currentMedication.idInsumo,
+      this.currentMedication.cantidad
+    ).subscribe({
+      next: () => {
+        this.closeEditModal();
+        this.loadInventario(this.idPaciente);
+        this.medicationMessage = 'Cantidad actualizada correctamente.';
+        this.showMedicationWarning = true;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al actualizar medicamento:', err);
+        this.isLoading = false;
+        this.medicationMessage = 'Error al actualizar la cantidad.';
+        this.showMedicationWarning = true;
+      }
+    });
   }
 
   addMedication() {

@@ -19,4 +19,11 @@ export class InsumoService {
       return this.http.post<any>(`${this.apiUrl}/agregar`, medicamento, { headers });
     }
     
+    getInventarioCompletoPorPaciente(id: number) {
+      return this.http.get<any[]>(`${this.apiUrl}/inventario-paciente/${id}`);
+    }
+
+    updateCantidadMedicamento(id: number, cantidad: number) {
+      return this.http.put(`http://localhost:8081/insumos/actualizar/${id}?cantidad=${cantidad}`, {});
+    }
 }

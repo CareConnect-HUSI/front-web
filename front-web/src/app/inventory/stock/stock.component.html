@@ -34,6 +34,8 @@
           <thead>
             <tr>
               <th>Medicamento</th>
+              <th>Cantidad Total</th>
+              <th>Cantidad Usada</th>
               <th>Cantidad Disponible</th>
               <th>Acciones</th>
             </tr>
@@ -41,9 +43,9 @@
           <tbody>
             <tr *ngFor="let item of inventario; let i = index">
               <td>{{ item.nombre }}</td>
-              <td [class.low-stock]="isLowStock(item)">
-                {{ item.cantidad - item.usado }}
-              </td>
+              <td>{{ item.cantidad }}</td>
+              <td>{{ item.usado }}</td>
+              <td>{{ item.disponible }}</td>
               <td>
                 <button class="action-btn small" (click)="openEditModal(item, i)">
                   <i class="fas fa-edit"></i>

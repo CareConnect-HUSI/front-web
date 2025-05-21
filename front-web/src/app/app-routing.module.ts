@@ -40,7 +40,7 @@ const routes: Routes = [
   { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
   { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
   { path: 'stock', component: StockComponent },
-  { path: '', redirectTo: 'cronograma', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'detalle-asignacion', component: DetalleAsignacionComponent },
   { path: 'treatments/:id', component: TreatmentsComponent},
   { path: '**', component: PageNotFoundComponent }
