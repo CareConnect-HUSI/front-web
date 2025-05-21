@@ -18,6 +18,7 @@ export class NursesAssignmentComponent implements OnInit {
   fechaEspecifica = '';
   asignacionesFiltradas: any[] = [];
   asignaciones: any[] = [];
+  isLoading: boolean = false;
 
  meses = [
     { value: '1', nombre: 'Enero' },
@@ -44,7 +45,8 @@ export class NursesAssignmentComponent implements OnInit {
 
   ngOnInit() {
     this.enfermeraId = this.route.snapshot.paramMap.get('id');
-    this.enfermeraNombre = this.route.snapshot.paramMap.get('nombre') || 'Enfermera Desconocida';
+
+    this.isLoading = true; 
 
     if (this.enfermeraId) {
       this.visitaService.getVisitasByEnfermeraId(this.enfermeraId).subscribe(visitas => {
@@ -62,6 +64,7 @@ export class NursesAssignmentComponent implements OnInit {
               detalles: `Actividad ${actividad.actividadId}`,
               fecha: new Date(visita.fechaVisita),
               hora: visita.horaInicioEjecutada? this.formatHora(visita.horaInicioCalculada) : '00:00',
+              horaFin: visita.horaFinEjecutada? this.formatHora(visita.horaInicioCalculada) : ' ',
               estado: visita.estado ?? 'PROGRAMADA'
             };
           })
@@ -71,6 +74,7 @@ export class NursesAssignmentComponent implements OnInit {
           this.asignaciones = completadas;
           this.asignaciones.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
           this.asignacionesFiltradas = [...this.asignaciones];
+          this.isLoading = false;
         });
       });
     }

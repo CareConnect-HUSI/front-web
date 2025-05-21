@@ -22,5 +22,7 @@ export class HeaderComponent {
   logout() {
     console.log("Cerrar sesión");
     this.router.navigate(['/login']);
+    localStorage.removeItem('token');
+    localStorage.removeItem('email');
   }
 }

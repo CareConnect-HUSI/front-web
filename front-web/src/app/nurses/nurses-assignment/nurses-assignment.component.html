@@ -1,6 +1,14 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando Asignación...</span>
+    </div>
+  </div>
+  
     <div class="header">
-      <h2 class="title-center">Asignaciones de {{ enfermeraNombre }}</h2>
+      <h2 class="title-center">Asignaciones</h2>
       <div class="search-filter-container">
         <!-- Filtro por nombre/documento de paciente -->
         <div class="search-box">
@@ -36,12 +44,12 @@
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Hora</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
             <th>Paciente</th>
             <th>Documento</th>
             <th>Dirección</th>
             <th>Estado</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -51,17 +59,12 @@
               [class.pendiente]="asignacion.estado === 'Pendiente'">
             <td>{{ asignacion.fecha | date:'dd/MM/yyyy' }}</td>
             <td>{{ asignacion.hora }}</td>
+            <td>{{ asignacion.horaFin }}</td>
             <td>{{ asignacion.paciente }}</td>
             <td>{{ asignacion.documento }}</td>
             <td>{{ asignacion.direccion }}</td>
             <td>
               <span class="estado-badge">{{ asignacion.estado }}</span>
-            </td>
-            
-            <td>
-              <button class="details-btn" (click)="verDetalles(asignacion)">
-                <i class="fas fa-eye"></i> Ver
-              </button>
             </td>
           </tr>
         </tbody>
