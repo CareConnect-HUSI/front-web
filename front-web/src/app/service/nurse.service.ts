@@ -23,7 +23,10 @@ export class NurseService {
     //   'Content-Type': 'application/json'
     // });
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`, {
       headers,
@@ -39,7 +42,10 @@ export class NurseService {
       });
     }
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.post(
       `${this.apiUrl}/registrar-enfermera`,
@@ -50,6 +56,7 @@ export class NurseService {
 
   updateEnfermera(id: number, enfermeraData: any): Observable<any> {
     const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     if (!token) {
       console.error('No hay token disponible.');
@@ -58,27 +65,31 @@ export class NurseService {
       });
     }
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
-
     return this.http.put(`${this.apiUrl}/${id}`, enfermeraData, { headers });
   }
 
   getLocalidades() {
-    return this.http.get<any[]>(`${this.apiUrl}/localidades`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/localidades`, { headers });
   }
 
   getBarriosPorLocalidad(codigoLocalidad: string) {
-    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`, {
+      headers});
   }
 
   getBarriosPorNombre(nombre: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/nombre/${nombre}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any>(`${this.apiUrl}/nombre/${nombre}`, { headers });
   }
 
   getTiposIdentificacion() {
-    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`, { headers });
   }
 }

@@ -24,7 +24,9 @@ export class StockService {
     //   'Content-Type': 'application/json'
     // });
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+      const token = localStorage.getItem('token');
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<any>(`${this.apiUrl}/ver-actividades`, { headers });
   }
 
@@ -39,7 +41,10 @@ export class StockService {
       usuarioRegistra: 'admin', // Ajusta según autenticación
     };
 
-    return this.http.post(`${this.apiUrl}/registrar-actividad`, actividad).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post(`${this.apiUrl}/registrar-actividad`, actividad, {headers}).pipe(
       catchError((error) => {
         console.error('Error al registrar actividad:', error);
         return throwError(
@@ -63,13 +68,17 @@ export class StockService {
     //     Authorization: `Bearer ${token}`,
     //     'Content-Type': 'application/json',
     //   });
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.patch(`${this.apiUrl}/eliminar/${id}`,{}, { headers });
   }
 
   getListaMedicamentos(): Observable<any[]> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any[]>(`${this.apiUrl}/ver-actividades`, { headers });
   }
 }

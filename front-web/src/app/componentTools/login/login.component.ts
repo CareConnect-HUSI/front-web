@@ -28,6 +28,10 @@ export class LoginComponent {
         localStorage.setItem('email', response.email);
         this.router.navigate(['/cronograma']);
         this.isLoading = false;
+
+        //Guardar token en el local storage
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('email', response.email);
       },
       (error) => {
         this.isLoading = false;

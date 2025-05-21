@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Visita } from '../model/visit';
@@ -14,28 +14,34 @@ export class VisitsService {
 
   // Crear una nueva visita (POST /visitas)
   createVisit(visita: Visita): Observable<Visita> {
-    console.log('SERVICEEEEE:', visita); 
-    return this.http.post<Visita>(`${this.apiUrl}/visitas`, visita).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<Visita>(`${this.apiUrl}/visitas`, visita, {headers}).pipe(
       catchError(this.handleError)
     );
   }
 
   // Obtener visitas por ID de paciente (GET /visitas/paciente/{idPaciente})
   getVisitsByPaciente(idPaciente: number): Observable<Visita[]> {
-    return this.http.get<Visita[]>(`${this.apiUrl}/visitas/paciente/${idPaciente}`).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<Visita[]>(`${this.apiUrl}/visitas/paciente/${idPaciente}`, {headers}).pipe(
       catchError(this.handleError)
     );
   }
 
   getAllVisits(page: number, size: number, currentDate: String): Observable<{ content: Visita[] }> {
-    console.log('🔍 URL de visitas:', `${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`);
-    return this.http.get<{ content: Visita[] }>(`${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<{ content: Visita[] }>(`${this.apiUrl}/visitas?page=${page}&size=${size}&fechaVisita=${currentDate}`, {headers}).pipe(
       catchError(this.handleError)
     );
   }
 
   getActividadVisitaPacienteById(id: number){
-    return this.http.get<any>(`${this.apiUrl}/actividad-paciente-visita/${id}`).pipe(
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any>(`${this.apiUrl}/actividad-paciente-visita/${id}`, {headers}).pipe(
       catchError(this.handleError)
     );
   }
@@ -54,12 +60,16 @@ export class VisitsService {
     return throwError(() => new Error(errorMessage));
   }
 
-    updateVisit(id: number, visita: Partial<Visita>): Observable<Visita> {
-    return this.http.put<Visita>(`${this.apiUrl}/visitas/${id}`, visita).pipe(
+  updateVisit(id: number, visita: Partial<Visita>): Observable<Visita> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<Visita>(`${this.apiUrl}/visitas/${id}`, visita, {headers}).pipe(
       catchError(this.handleError)
     );
   }
   getVisitasByEnfermeraId(id: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/visitas/enfermera/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/visitas/enfermera/${id}`, {headers});
   }
 } 

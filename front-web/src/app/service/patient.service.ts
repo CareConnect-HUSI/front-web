@@ -24,8 +24,11 @@ export class PatientService {
     //   'Authorization': `Bearer ${token}`,
     //   'Content-Type': 'application/json'
     // });
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    
     return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${limit}`, {
       headers,
     });
@@ -39,55 +42,81 @@ export class PatientService {
       });
     }
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
   }
 
   obtenerPacientePorId(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get(`${this.apiUrl}/${id}`, { headers });
   }
 
   updateEstado(id: string, estado: string): Observable<any> {
-    return this.http.put(`/api/pacientes/${id}/estado`, { estado });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put(`/api/pacientes/${id}/estado`, { estado }, { headers });
   }
 
   findActividadesPorDocumento(documento: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrlActividad}/listar/por-documento/${documento}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrlActividad}/listar/por-documento/${documento}`, { headers });
   }
 
   getTratamientosPorId(id: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`, { headers });
   }
 
   updatePaciente(id: number, paciente: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/actualizar-paciente/${id}`, paciente);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put(`${this.apiUrl}/actualizar-paciente/${id}`, paciente, { headers });
   }
 
   getTiposIdentificacion() {
-    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-identificacion`, { headers });
   }
 
   getTiposActividad(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/tipos-actividad`, { headers });
   }
 
   findActividadPacienteVisitaPorID(id: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/listar/${id}`, {headers});
   }
   updateTratamiento(id: number, tratamiento: any): Observable<any> {
-    return this.http.put(`${this.apiUrlActividad}/actualizar/${id}`, tratamiento);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put(`${this.apiUrlActividad}/actualizar/${id}`, tratamiento, { headers });
   }
 
   getLocalidades() {
-    return this.http.get<any[]>(`${this.apiUrl}/localidades`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>(`${this.apiUrl}/localidades`, { headers });
   }
 
   getBarriosPorLocalidad(codigoLocalidad: string) {
-    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<string[]>(`${this.apiUrl}/barrios/${codigoLocalidad}`, { headers });
   }
 
   registrarTratamiento(payload: any): Observable<any> {
-    return this.http.post(`${this.apiUrlActividad}/registrar`, payload);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post(`${this.apiUrlActividad}/registrar`, payload, { headers });
   }
 }

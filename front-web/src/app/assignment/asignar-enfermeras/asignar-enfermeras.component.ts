@@ -26,11 +26,11 @@ export class AsignarEnfermerasComponent implements OnInit {
   enfermerasManana: any[] = [];
   enfermerasTarde: any[] = [];
   enfermerasNoche: any[] = [];
-  enfermerasSinTurno: any[] = []; // Nueva lista para enfermeras sin turno
+  enfermerasSinTurno: any[] = [];
 
 
   filtroNombre: string = '';
-  filtroNoSeleccionadas: string = ''; // Nuevo filtro para búsqueda de no seleccionadas
+  filtroNoSeleccionadas: string = '';
   filtroTurnoId: number | null = null;
 
   mostrarModalRemover: boolean = false;
@@ -51,16 +51,17 @@ export class AsignarEnfermerasComponent implements OnInit {
     this.isLoading = true;
     this.nurseService.findAll(0, 100).subscribe({
       next: (response) => {
-        this.enfermeras = (response.content || response).map((e: any) => ({
-          id: e.id,
-          nombre: e.nombre,
-          apellido: e.apellido || '',
-          numeroIdentificacion: e.numeroIdentificacion,
-          telefono: e.telefono || '',
-          turnoId: e.turnoEntity?.id ?? null,
-          latitud: e.latitud,
-          longitud: e.longitud
-        }));
+        this.enfermeras = (response.content || response).filter((e: { rolEntity: { name: string; }; }) => e.rolEntity?.name === 'Enfermera').map((e: { id: any; nombre: any; apellido: any; numeroIdentificacion: any; telefono: any; turnoEntity: { id: any; }; latitud: any; longitud: any; }) => ({
+        id: e.id,
+        nombre: e.nombre,
+        apellido: e.apellido || '',
+        numeroIdentificacion: e.numeroIdentificacion,
+        telefono: e.telefono || '',
+        turnoId: e.turnoEntity?.id ?? null,
+        latitud: e.latitud,
+        longitud: e.longitud
+      }));
+
         this.actualizarListasPorTurno();
         this.isLoading = false;
       },
@@ -69,6 +70,7 @@ export class AsignarEnfermerasComponent implements OnInit {
         console.error('Error al cargar enfermeras', error);
       }
     });
+    console.log('Enfermeras:', this.enfermeras);
   }
   
 
