@@ -129,29 +129,6 @@
 	background-color: #f5f8ff;
   }
   
-  /* Estilos para los estados */
-  .estado-badge {
-	padding: 4px 8px;
-	border-radius: 12px;
-	font-size: 12px;
-	font-weight: 500;
-  }
-  
-  .completado .estado-badge {
-	background-color: #e6f7e6;
-	color: #2e7d32;
-  }
-  
-  .en-proceso .estado-badge {
-	background-color: #fff8e1;
-	color: #ff8f00;
-  }
-  
-  .pendiente .estado-badge {
-	background-color: #ffebee;
-	color: #c62828;
-  }
-  
   /* Botones de acción */
   .details-btn {
 	background: #e6f0ff;
@@ -353,29 +330,6 @@
 	background-color: #f5f8ff;
   }
   
-  /* Estilos para los estados */
-  .estado-badge {
-	padding: 4px 8px;
-	border-radius: 12px;
-	font-size: 12px;
-	font-weight: 500;
-  }
-  
-  .completado .estado-badge {
-	background-color: #e6f7e6;
-	color: #2e7d32;
-  }
-  
-  .en-proceso .estado-badge {
-	background-color: #fff8e1;
-	color: #ff8f00;
-  }
-  
-  .pendiente .estado-badge {
-	background-color: #ffebee;
-	color: #c62828;
-  }
-  
   /* Botones de acción */
   .details-btn {
 	background: #e6f0ff;
@@ -478,3 +432,33 @@
 	  font-size: 14px;
 	}
   }}
+.badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline;
+  text-align: center;
+  min-width: 100px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-transform: uppercase;
+}
+
+.badge.completado {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.badge.en-proceso {
+  background-color: #fdf3d0;
+  color: #dfab10;
+  border: 1.5px solid #ffe792;
+}
+
+.badge.pendiente {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1.5px solid #bbdefb;
+}

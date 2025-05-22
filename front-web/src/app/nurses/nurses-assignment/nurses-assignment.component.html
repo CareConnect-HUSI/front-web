@@ -53,10 +53,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let asignacion of asignacionesFiltradas" 
-              [class.completado]="asignacion.estado === 'Completado'"
-              [class.en-proceso]="asignacion.estado === 'En proceso'"
-              [class.pendiente]="asignacion.estado === 'Pendiente'">
+          <tr *ngFor="let asignacion of asignacionesFiltradas">
             <td>{{ asignacion.fecha | date:'dd/MM/yyyy' }}</td>
             <td>{{ asignacion.hora }}</td>
             <td>{{ asignacion.horaFin }}</td>
@@ -64,7 +61,14 @@
             <td>{{ asignacion.documento }}</td>
             <td>{{ asignacion.direccion }}</td>
             <td>
-              <span class="estado-badge">{{ asignacion.estado }}</span>
+              <span class="badge"
+                    [ngClass]="{
+                      'completado': asignacion.estado === 'COMPLETADA',
+                      'en-proceso': asignacion.estado === 'EN PROCESO',
+                      'pendiente': asignacion.estado === 'PROGRAMADA'
+                    }">
+                {{ asignacion.estado }}
+              </span>
             </td>
           </tr>
         </tbody>
