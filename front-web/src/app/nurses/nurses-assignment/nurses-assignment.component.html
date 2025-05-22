@@ -64,7 +64,7 @@
               <span class="badge"
                     [ngClass]="{
                       'completado': asignacion.estado === 'COMPLETADA',
-                      'en-proceso': asignacion.estado === 'EN PROCESO',
+                      'en-proceso': asignacion.estado === 'EN_PROGRESO',
                       'pendiente': asignacion.estado === 'PROGRAMADA'
                     }">
                 {{ asignacion.estado }}
