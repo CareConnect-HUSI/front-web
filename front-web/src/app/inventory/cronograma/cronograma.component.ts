@@ -825,7 +825,7 @@ private scheduleNewPatient(patientData: any) {
       procedure: 'URGENCIA',
       time: this.formatTime(now),
       duration: 30,
-      nurseId: defaultNurse
+      nurseId: this.allNurses[0]?.id || null
     };
     this.showEmergencyModal = true;
   }
@@ -837,6 +837,15 @@ private scheduleNewPatient(patientData: any) {
   
   addEmergencyVisit() {
     // Validar campos obligatorios
+    console.log(">>> Se está ejecutando addEmergencyVisit");
+
+
+    console.log('emergencyVisit:', this.emergencyVisit);
+    console.log('typeof nurseId:', typeof this.emergencyVisit.nurseId);
+    console.log('typeof patientId:', typeof this.emergencyVisit.patientId);
+    console.log('Enfermeras:', this.allNurses.map(n => n.id));
+    console.log('Pacientes:', this.patients.map(p => p.id));
+
     if (!this.emergencyVisit.patientId || !this.emergencyVisit.procedure || 
         !this.emergencyVisit.time || !this.emergencyVisit.nurseId) {
       this.showToastMessage('Error', 'Por favor complete todos los campos requeridos', 'error');
@@ -884,20 +893,47 @@ private scheduleNewPatient(patientData: any) {
     }
   
     // Crear y agregar la nueva urgencia
-    const newVisit: Visit = {
-      id: Math.max(0, ...this.visits.map(v => v.id)) + 1,
-      patientId: patient.id,
-      patientName: patient.name,
-      nurseId: nurse.id,
-      procedure: this.emergencyVisit.procedure,
-      startTime: this.emergencyVisit.time,
-      duration: duration,
-      date: new Date(this.currentDate),
-      isEmergency: true
+    const newVisit: Visita = {
+      actividadPacienteVisitaId: patient.actividadPacienteVisita,
+      enfermeraId: nurse.id,
+      fechaVisita: this.formatDateToLocalDate(this.currentDate),
+      estado: 'URGENCIA',
+      horaInicioCalculada: this.emergencyVisit.time + ':00',
+      horaFinCalculada: this.addMinutesToTime(this.emergencyVisit.time, this.emergencyVisit.duration) + ':00'
     };
-  
-    this.visits.push(newVisit);
+    console.log("Nueva urgencia:", newVisit);
+
+    this.visitsService.createVisit(newVisit).subscribe({
+  next: (response) => {
+    // AÑADE ESTA LÍNEA:
+    this.visits.push({
+      id: response.id ?? 0, // Asegúrate de que siempre sea un número
+      patientId: patient.id,
+      actividadPacienteVisita: patient.actividadPacienteVisita,
+      patientName: `${patient.name} ${patient.lastName ?? ''}`.trim(),
+      nurseId: nurse.id,
+      procedure: 'URGENCIA',
+      startTime: this.emergencyVisit.time,
+      duration: this.emergencyVisit.duration,
+      date: new Date(this.currentDate.setHours(0, 0, 0, 0)),
+      isEmergency: true,
+      isOptimizedSuggestion: false,
+      originalNurseId: nurse.id,
+      originalTime: this.emergencyVisit.time
+    });
+
+    this.showToastMessage('Urgencia guardada', 'La urgencia fue registrada en el sistema.', 'success');
     this.closeEmergencyModal();
+  },
+  error: (error) => {
+    console.error('Error al guardar la urgencia:', error);  
+    this.showToastMessage('Error', 'Error al guardar la urgencia. Inténtalo de nuevo.', 'error');
+  }
+    });
+
+    this.closeEmergencyModal();
+    
+
     this.showToastMessage('Urgencia agregada', 'La visita de urgencia ha sido programada correctamente', 'success');
   }
   openNewPatientModal() {

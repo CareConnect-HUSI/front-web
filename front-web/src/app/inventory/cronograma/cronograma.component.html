@@ -82,6 +82,7 @@
   </div>
   <!---------------------------- Cronograma ---------------------------->
   <div class="schedule-container">
+    <div class="scroll-wrapper">
     <div class="time-header">
       <div class="nurse-header">Enfermera</div>
       <div class="time-slots">
@@ -185,6 +186,7 @@
       </div>
     </div>
   </div>
+  </div>
 </div>
 
 <!-- Modal para Urgencias mejorado -->
@@ -202,7 +204,7 @@
         <label>Paciente: <span class="required">*</span></label>
         <select [(ngModel)]="emergencyVisit.patientId" name="patient" required class="form-input">
           <option value="">Seleccione un paciente</option>
-          <option *ngFor="let patient of patients" [value]="patient.id">{{ patient.name }} - {{ patient.document }}
+          <option *ngFor="let patient of patients" [ngValue]="patient.id">{{ patient.name }} - {{ patient.document }}
           </option>
         </select>
       </div>
@@ -239,8 +241,8 @@
         <select [(ngModel)]="emergencyVisit.nurseId" name="nurse" required class="form-input"
           (change)="updateTimeLimits()">
           <option value="">Seleccione una enfermera</option>
-          <option *ngFor="let nurse of getAvailableNursesForEmergency()" [value]="nurse.id">
-            {{ nurse.name }} ({{ getShiftName(+nurse.shift) }})
+          <option *ngFor="let nurse of getAvailableNursesForEmergency()" [ngValue]="nurse.id">
+            {{ nurse.name }} {{ nurse.lastName }}
           </option>
         </select>
       </div>

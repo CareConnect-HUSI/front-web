@@ -11,19 +11,6 @@ export class NurseService {
   constructor(private http: HttpClient) {}
 
   findAll(page: number, limit: number): Observable<any> {
-    // const token = localStorage.getItem('token');
-
-    // if (!token) {
-    //   console.error('No hay token disponible.');
-    //   return new Observable();
-    // }
-
-    // const headers = new HttpHeaders({
-    //   'Authorization': `Bearer ${token}`,
-    //   'Content-Type': 'application/json'
-    // });
-
-    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -34,25 +21,27 @@ export class NurseService {
   }
 
   registrarEnfermera(userData: any): Observable<any> {
-    if (!userData || typeof userData !== 'object' || !userData.nombre) {
-      return new Observable((observer) => {
-        observer.error({
-          error: { error: 'Datos inválidos: falta el campo nombre' },
-        });
+  if (!userData || typeof userData !== 'object' || !userData.nombre) {
+    return new Observable((observer) => {
+      observer.error({
+        error: { error: 'Datos inválidos: falta el campo nombre' },
       });
-    }
-
-    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
-    return this.http.post(
-      `${this.apiUrl}/registrar-enfermera`,
-      JSON.stringify(userData),
-      { headers, responseType: 'text' }
-    );
+    });
   }
+
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  });
+
+  return this.http.post(
+    `${this.apiUrl}/registrar-enfermera`,
+    userData,
+    { headers }
+  );
+}
+
 
   updateEnfermera(id: number, enfermeraData: any): Observable<any> {
     const token = localStorage.getItem('token');

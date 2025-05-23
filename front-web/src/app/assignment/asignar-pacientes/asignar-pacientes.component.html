@@ -36,7 +36,7 @@
       <div *ngIf="pacientesProgramadosNoAsignados.length > 0; else noProgramados" class="pacientes-list">
         <div *ngFor="let paciente of pacientesProgramadosNoAsignados" class="paciente-card">
           <div class="paciente-info">
-            <span class="paciente-nombre">{{ paciente.nombre }}</span>
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
             <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
             <span class="paciente-horario">
               {{
@@ -65,7 +65,7 @@
       <div *ngIf="pacientesAsignados.length > 0; else noAsignados" class="pacientes-list">
         <div *ngFor="let paciente of pacientesAsignados" class="paciente-card assigned">
           <div class="paciente-info">
-            <span class="paciente-nombre">{{ paciente.nombre }}</span>
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
             <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
             <span class="paciente-horario">
               {{
@@ -106,7 +106,7 @@
       <div *ngIf="pacientesDisponiblesNoAsignados.length > 0; else noDisponibles" class="pacientes-list">
         <div *ngFor="let paciente of pacientesDisponiblesNoAsignados" class="paciente-card">
           <div class="paciente-info">
-            <span class="paciente-nombre">{{ paciente.nombre }}</span>
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
             <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
             <span class="paciente-horario">
               {{

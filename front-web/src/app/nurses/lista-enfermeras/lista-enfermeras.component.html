@@ -7,6 +7,14 @@
     </div>
   </div>
 
+  <mat-paginator
+  *ngIf="enfermeras.length"
+  [length]="length"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  (page)="handlePageEvent($event)">
+</mat-paginator>
+
   <div class="header">
     <h1 class="title-center">Lista de Enfermeras</h1>
     <div class="search-filter-container">

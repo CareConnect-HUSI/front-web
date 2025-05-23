@@ -42,9 +42,11 @@ export class PatientService {
       });
     }
 
-    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
 
     return this.http.post(`${this.apiUrl}/registrar-paciente`, JSON.stringify(userData), { headers, responseType: 'text' });
   }
