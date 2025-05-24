@@ -44,7 +44,6 @@ export class AsignarEnfermerasComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarEnfermeras();
-    console.log('Datos de optimización:', this.optimizationDataService.getAllData());
   }
 
   cargarEnfermeras(): void {
@@ -66,7 +65,6 @@ export class AsignarEnfermerasComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Error al cargar enfermeras', error);
       }
     });
   }
@@ -165,8 +163,6 @@ export class AsignarEnfermerasComponent implements OnInit {
     this.optimizationDataService.setInfoEnfermerasTarde(this.enfermerasTarde);
     this.optimizationDataService.setInfoEnfermerasNoche(this.enfermerasNoche);
   
-    console.log("Todos a cronograma:", this.optimizationDataService.getAllData());
-  
     // Preparar las solicitudes válidas
     const solicitudes = [];
     const mensajes: string[] = [];
@@ -231,7 +227,6 @@ export class AsignarEnfermerasComponent implements OnInit {
       });
     } catch (error) {
       this.isLoading = false;
-      console.error("Error en optimización:", error);
       alert('Error al generar los cronogramas. Por favor, inténtelo de nuevo.');
     }
   }

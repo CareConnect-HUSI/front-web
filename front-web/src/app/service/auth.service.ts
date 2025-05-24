@@ -15,7 +15,7 @@ export class AuthService {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    return this.http.post(`${this.baseUrl}/login`, { headers, email, password }, { headers });
+    return this.http.post(`${this.baseUrl}/login`, { headers, email, password });
   }
 
 }

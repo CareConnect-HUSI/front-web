@@ -206,8 +206,6 @@ fetchInitialData() {
       this.allNurses.push(...this.nightNurses);
     }
 
-    console.log("Enfermeras cargadas:", this.allNurses);
-
     if (!this.allNurses.length) {
       this.showToastMessage('Error', 'No se encontraron datos de enfermeras', 'error');
     }
@@ -251,7 +249,6 @@ fetchInitialData() {
         // this.loadOptimizedRoutes(); // REVISAR
       }
       this.initializeVisits();
-      console.log('Visitas generadas:', this.visits);
     });
   }
 
@@ -336,7 +333,7 @@ simulateLoading(callback: () => void) {
       if (response && response.rutas) {
         // Response received
         clearInterval(waitForResponse);
-        console.log("Datos de optimización recibidos");
+        
         
         // Jump to almost complete
         this.loadingProgress = 80;
@@ -400,7 +397,6 @@ loadOptimizedRoutesBorrador() {
     procesarRutas(respuestaNoche);
 
     if (Object.keys(this.optimizedRoutes).length > 0) {
-      console.log("Rutas cargadas en cronograma:", this.optimizedRoutes);
       this.initializeVisits();
     } else {
       throw new Error("Ninguna de las respuestas contiene rutas válidas.");
@@ -518,7 +514,6 @@ private scheduleNewPatient(patientData: any) {
         const nurseVisits = this.optimizedRoutes[nurseId];
         const nurse = this.allNurses.find(n => n.id == parseInt(nurseId));
 
-        console.log("Nurse Visits:", nurseVisits);
         if (nurse) {
           nurseVisits.forEach((visit: any, index: number) => {
             if (index == 0 && visit.esEnfermera) {
@@ -543,8 +538,6 @@ private scheduleNewPatient(patientData: any) {
                 originalNurseId: nurse.id,
                 originalTime: visit.hora_inicio
               };
-
-              console.log("Nueva visita:", newVisit);
               
               this.visits.push(newVisit);
             }

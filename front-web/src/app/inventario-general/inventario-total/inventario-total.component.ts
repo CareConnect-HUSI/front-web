@@ -60,7 +60,6 @@ export class InventarioTotalComponent {
         this.isLoading = false;
       },
       (error) => {
-        console.error('Error al cargar actividades:', error);
         this.isLoading = false;
       }
     );
@@ -162,7 +161,6 @@ export class InventarioTotalComponent {
 
     this.stockService.registrarActividad(this.nuevoProducto).subscribe({
       next: (response) => {
-        console.log('Actividad registrada:', response);
         this.loadActividades();
         this.filtrarProductos();
         this.toggleFormulario();
@@ -177,7 +175,6 @@ export class InventarioTotalComponent {
         this.mostrarError = true;
         this.mensajeError =
           error.error || 'Error al registrar la actividad';
-        console.error('Error en registrarActividad:', error);
       },
     });
   }
@@ -205,7 +202,6 @@ export class InventarioTotalComponent {
         error: (error) => {
           this.mostrarError = true;
           this.mensajeError = error.message || 'Error al eliminar el producto';
-          console.error('Error en eliminarActividad:', error);
         },
       });
     }

@@ -35,7 +35,6 @@ export class AsignarPacientesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("Datos:", this.optimizationDataService.getAllData())
     this.isLoading = true;
 
     this.pacienteService.findAll(0, 50).subscribe({
@@ -44,12 +43,10 @@ export class AsignarPacientesComponent implements OnInit {
         this.isLoading = false;
         this.clasificarPacientes();
         this.isLoading = false;
-        console.log('Pacientes obtenidos:', this.todosPacientes);
       },
       error: (err) => {
         this.isLoading = false;
         this.todosPacientes = [];
-        console.error('Error al obtener pacientes:', err);
       },
     });
   }
@@ -147,7 +144,6 @@ export class AsignarPacientesComponent implements OnInit {
       this.pacientesAsignados.push({ ...paciente });
       this.actualizarListas();
     }
-    console.log('Pacientes asignados:', this.pacientesAsignados);
   }
 
   abrirModalConfirmacion(paciente: any): void {
@@ -168,15 +164,11 @@ export class AsignarPacientesComponent implements OnInit {
         (p) => p.id === this.pacienteARemover.id
       );
       if (index !== -1) {
-        console.log(
-          `Paciente removido: ${this.pacienteARemover.nombre}. Motivo: ${this.motivoRemocion}`
-        );
         this.pacientesAsignados.splice(index, 1);
         this.cerrarModalConfirmacion();
         this.actualizarListas();
       }
     }
-    console.log('Pacientes asignados:', this.pacientesAsignados);
   }
 
   navegarARegistroPaciente(): void {
@@ -287,16 +279,6 @@ export class AsignarPacientesComponent implements OnInit {
     this.optimizationDataService.setInfoPacientesManana(pacientesManana);
     this.optimizationDataService.setInfoPacientesTarde(pacientesTarde);
     this.optimizationDataService.setInfoPacientesNoche(pacientesNoche);
-
-    console.log('Pacientes asignados por turno:', {
-      Manana: pacientesManana,
-      Tarde: pacientesTarde,
-      Noche: pacientesNoche,
-    });
-    console.log(
-      'Datos en OptimizationDataService:',
-      this.optimizationDataService.getAllData()
-    );
 
     // Navegar a la siguiente pantalla
     this.router.navigate(['/asignar-enfermeras']);
