@@ -24,7 +24,7 @@ export interface RawPatient {
   providedIn: 'root',
 })
 export class OptimizationDataService {
-  private apiUrl = 'http://localhost:8086/rutas';
+  private apiUrl = 'http://localhost:8011/rutas';
 
   constructor(private http: HttpClient) {}
 
