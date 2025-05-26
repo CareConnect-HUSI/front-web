@@ -93,9 +93,9 @@ export class PatientInfoComponent implements OnInit {
         if (data.actividades) {
           this.treatment = data.actividades.map((actividad: any) => ({
             nombre: actividad.nombreActividad,
-            cantidad: `${actividad.dosis} mg`,
+            cantidad: actividad.dosis != null ? `${actividad.dosis} mg` : '-',
             dias: actividad.diasTratamiento,
-            posologia: `${actividad.frecuencia} veces al día`,
+            posologia: actividad.frecuencia != null ? `${actividad.frecuencia} veces al día` : '-',
             fechaInicio: actividad.fechaInicio,
             duracion: actividad.duracionVisita
           }));

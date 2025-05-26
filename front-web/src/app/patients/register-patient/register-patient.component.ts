@@ -182,9 +182,8 @@ export class RegisterPatientComponent implements OnInit {
       diasTratamiento: [''],
       fechaInicio: ['', Validators.required],
       fechaFin: ['' ],
-      horaInicio: [''],
+      horaInicio: ['', Validators.required],
       duracion: ['', Validators.required],
-      duracionVisita: ['', Validators.required]
     });
 
     this.procedimientos.push(procedimientoForm);
