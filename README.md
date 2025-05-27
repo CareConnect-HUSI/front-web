@@ -49,10 +49,8 @@ CareConnect es un sistema para gestionar visitas domiciliarias del Hospital Univ
 3. Iniciar servidor de desarrollo:
 
    ```bash
-   npm run dev
+   ng serve
    ```
-
-   Accede en `http://localhost:5173`.
 
 ## Uso
 
@@ -63,33 +61,12 @@ CareConnect es un sistema para gestionar visitas domiciliarias del Hospital Univ
   - Actualiza inventarios según visitas.
 - **Errores**: Notificaciones para fallos (400, 401, 404).
 
-## Pruebas
+## Autores
 
-Se validó con 105 pruebas de integración (50.5% exitosas, 31.4% errores esperados) y pruebas de carga (e.g., `GET /visitas` en 301 ms). Optimizar `GET /enfermeras` con caché.
-
-## Despliegue
-
-- Compilar: `npm run build`
-- Hospedar en servicios estáticos (Netlify, Vercel).
-- Configurar `VITE_API_BASE_URL` para producción.
-
-## Contribución
-
-1. Haz un fork del repositorio.
-2. Crea una rama: `git checkout -b feature/tu-funcion`.
-3. Commitea: `git commit -m "Descripción"`.
-4. Envía un Pull Request.
-
-## Licencia
-
-MIT License. Ver archivo `LICENSE`.
-
-## Contacto
-
-- Juan David González: juan.gonzalez@javeriana.edu.co
-- Lina María Salamanca: lina.salamanca@javeriana.edu.co
-- Laura Alexandra Rodríguez: laura.rodriguez@javeriana.edu.co
-- Axel Nicolás Caro: axel.caro@javeriana.edu.co
+- Juan David González
+- Lina María Salamanca
+- Laura Alexandra Rodríguez
+- Axel Nicolás Caro
 
 **Pontificia Universidad Javeriana**\
 **Mayo 26, 2025**
