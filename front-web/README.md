@@ -1,94 +1,27 @@
 # FrontWeb
 
-## Descripción
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.12.
 
-CareConnect es un sistema para gestionar visitas domiciliarias del Hospital Universitario San Ignacio. El front-end web (Módulo Administrativo) permite a los administradores planificar visitas, gestionar enfermeras, pacientes e inventarios, integrándose con APIs de optimización de rutas, geocodificación y la app móvil.
+## Development server
 
-## Funcionalidades
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-- Gestión de enfermeras: registro, actualización y consulta.
-- Administración de pacientes: creación y edición con geocodificación.
-- Planificación de visitas: asignación optimizada de rutas.
-- Control de inventarios: seguimiento de insumos médicos.
-- Interfaz responsiva para uso administrativo.
+## Code scaffolding
 
-## Tecnologías
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-- **Framework**: React 18.2.0
-- **Estilos**: Tailwind CSS 3.3.0
-- **Peticiones HTTP**: Axios 1.4.0
-- **Dependencias CDN**:
-  - React: `https://cdn.jsdelivr.net/npm/react@18.2.0`
-  - Axios: `https://cdn.jsdelivr.net/npm/axios@1.4.0`
+## Build
 
-## Requisitos
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-- Node.js 16.x+
-- npm 8.x+
-- Backend de CareConnect activo
-- Archivo `.env` con:
+## Running unit tests
 
-  ```
-  VITE_API_BASE_URL=http://localhost:8080/api
-  ```
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Instalación
+## Running end-to-end tests
 
-1. Clonar repositorio:
+Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
-   ```bash
-   git clone https://github.com/careconnect/web-frontend.git
-   cd web-frontend
-   ```
-2. Instalar dependencias:
+## Further help
 
-   ```bash
-   npm install
-   ```
-3. Iniciar servidor de desarrollo:
-
-   ```bash
-   npm run dev
-   ```
-
-   Accede en `http://localhost:5173`.
-
-## Uso
-
-- **Acceso**: Inicia sesión con credenciales administrativas.
-- **Funciones**:
-  - Gestiona enfermeras y pacientes.
-  - Planifica visitas con rutas optimizadas.
-  - Actualiza inventarios según visitas.
-- **Errores**: Notificaciones para fallos (400, 401, 404).
-
-## Pruebas
-
-Se validó con 105 pruebas de integración (50.5% exitosas, 31.4% errores esperados) y pruebas de carga (e.g., `GET /visitas` en 301 ms). Optimizar `GET /enfermeras` con caché.
-
-## Despliegue
-
-- Compilar: `npm run build`
-- Hospedar en servicios estáticos (Netlify, Vercel).
-- Configurar `VITE_API_BASE_URL` para producción.
-
-## Contribución
-
-1. Haz un fork del repositorio.
-2. Crea una rama: `git checkout -b feature/tu-funcion`.
-3. Commitea: `git commit -m "Descripción"`.
-4. Envía un Pull Request.
-
-## Licencia
-
-MIT License. Ver archivo `LICENSE`.
-
-## Contacto
-
-- Juan David González: juan.gonzalez@javeriana.edu.co
-- Lina María Salamanca: lina.salamanca@javeriana.edu.co
-- Laura Alexandra Rodríguez: laura.rodriguez@javeriana.edu.co
-- Axel Nicolás Caro: axel.caro@javeriana.edu.co
-
-**Pontificia Universidad Javeriana**\
-**Mayo 26, 2025**
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
