@@ -1,183 +1,247 @@
-import { Component} from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { InsumoService } from 'src/app/service/insumo.service';
+import { PatientService } from 'src/app/service/patient.service';
+import { StockService } from 'src/app/service/stock.service';
 
 @Component({
   selector: 'app-stock',
   templateUrl: './stock.component.html',
-  styleUrls: ['./stock.component.css']
+  styleUrls: ['./stock.component.css'],
 })
-export class StockComponent  {
+export class StockComponent implements OnInit {
+  isLoading: boolean = false;
+  idPaciente: number = 0;
   documentoPaciente: string | null = '';
   nombrePaciente: string = '';
-  // Inventario con datos quemados
-  inventario: any[] = [
-    {
-      nombre: 'Paracetamol',
-      dosis: '500 mg',
-      via: 'Oral',
-      frecuencia: 'Cada 8h',
-      cantidad: 30,
-      usado: 12,
-      calendario: [
-        { M: true, T: false, N: true },   // Lunes
-        { M: true, T: true, N: false },   // Martes
-        { M: false, T: true, N: true },   // Miércoles
-        { M: true, T: false, N: false },  // Jueves
-        { M: false, T: true, N: true },   // Viernes
-        { M: true, T: false, N: false },  // Sábado
-        { M: false, T: false, N: true }   // Domingo
-      ]
-    },
-    {
-      nombre: 'Amoxicilina',
-      dosis: '250 mg',
-      via: 'Oral',
-      frecuencia: 'Cada 12h',
-      cantidad: 20,
-      usado: 8,
-      calendario: [
-        { M: true, T: false, N: true },
-        { M: false, T: true, N: false },
-        { M: true, T: false, N: true },
-        { M: false, T: true, N: false },
-        { M: true, T: false, N: true },
-        { M: false, T: false, N: false },
-        { M: true, T: false, N: false }
-      ]
-    },
-    {
-      nombre: 'Omeprazol',
-      dosis: '20 mg',
-      via: 'Oral',
-      frecuencia: 'Cada 24h',
-      cantidad: 15,
-      usado: 5,
-      calendario: [
-        { M: true, T: false, N: false },
-        { M: false, T: true, N: false },
-        { M: false, T: false, N: true },
-        { M: true, T: false, N: false },
-        { M: false, T: true, N: false },
-        { M: false, T: false, N: true },
-        { M: true, T: false, N: false }
-      ]
-    }
-  ];
-  // Variables para modales
+  inventario: any[] = [];
+
+  isEditing: boolean = false;
+  listaMedicamentos: any[] = [];
+
   showEditModal: boolean = false;
-  showDeleteModal: boolean = false;
+  showAddModal: boolean = false;
   showMedicationWarning: boolean = false;
   medicationMessage: string = '';
-  
+
   currentMedication: any = {};
   currentIndex: number = -1;
-  extensionDays: number = 0;
-  medicationToDelete: number = -1;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private insumoService: InsumoService,
+    private stockService: StockService,
+    private pacienteService: PatientService
   ) {}
 
+  ngOnInit(): void {
+    this.isLoading = true;
+    const idParam = this.route.snapshot.paramMap.get('id');
 
-  logAdministration(item: any, day: any, shift: string) {
-    if (!day[shift]) {
-      day[shift] = true;
-      item.usado++;
-      
-      // Aquí podrías agregar lógica para guardar en el backend
+    if (idParam) {
+      this.idPaciente = +idParam;
+      this.loadPatientData(this.idPaciente);
+      this.loadInventario(this.idPaciente);
+    } else {
+      this.isLoading = false;
+      this.medicationMessage = 'No se proporcionó un ID de paciente.';
     }
+
+    this.loadMedicamentos();
   }
+
+  loadPatientData(id: number): void {
+    this.pacienteService.obtenerPacientePorId(id).subscribe({
+      next: (patient: any) => {
+        console.log('Datos del paciente:', patient);
+        this.nombrePaciente = patient.nombre || '';
+        this.documentoPaciente = patient.numeroIdentificacion || '';
+      },
+
+      error: (err) => {
+        console.error('Error al cargar datos del paciente:', err);
+        this.nombrePaciente = '';
+        this.documentoPaciente = '';
+        this.medicationMessage = 'Error al cargar los datos del paciente.';
+      },
+    });
+  }
+
+  loadMedicamentos(): void {
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (data: any[]) => {
+        this.listaMedicamentos = data
+          .filter(
+            (item) =>
+              item.tipoActividad?.name === 'Medicamento' &&
+              item.estado === 'Activo' &&
+              !this.inventario.some(
+                (inv) => inv.nombre === (item.nombre || item.name)
+              )
+          )
+          .map((item) => ({
+            ...item,
+            name: item.nombre || item.name,
+          }));
+
+        // Mostrar mensaje si no hay medicamentos disponibles
+        if (this.listaMedicamentos.length === 0) {
+          this.medicationMessage =
+            'No hay más medicamentos activos para agregar!';
+          this.showMedicationWarning = true;
+        } else {
+          this.showMedicationWarning = false;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar medicamentos:', err);
+        this.listaMedicamentos = [];
+        this.medicationMessage = 'Error al cargar los medicamentos.';
+        this.showMedicationWarning = true;
+      },
+    });
+  }
+
+  loadInventario(id: number) {
+    this.insumoService.getInventarioCompletoPorPaciente(id).subscribe({
+      next: (data: any[]) => {
+        this.inventario = data.map(item => ({
+          idInsumo: item.id,
+          nombre: item.nombre,
+          cantidad: item.cantidadTotal,
+          usado: item.cantidadUsada,
+          disponible: item.cantidadDisponible
+        }));
+        this.isLoading = false;
+        this.loadMedicamentos();
+      },
+      error: (err) => {
+        console.error('Error al cargar inventario:', err);
+        this.isLoading = false;
+        this.medicationMessage = 'Error al cargar el inventario. Intente de nuevo.';
+        this.showMedicationWarning = true;
+      },
+    });
+  }
+
 
   isLowStock(item: any): boolean {
-    return (item.cantidad - item.usado) <= (item.cantidad * 0.3); // 20% o menos
+    return item.cantidad - item.usado <= item.cantidad * 0.3;
   }
 
-  // Abrir modal de edición
-  openEditModal(med: any, index: number) {
-    this.currentMedication = {...med};
+  openAddModal(): void {
+    this.isEditing = false;
+    this.currentMedication = {
+      id: null,
+      nombre: '',
+      dosis: '',
+      frecuencia: '',
+      cantidad: 1,
+      fechaInicio: '',
+      fechaFin: '',
+      diasTratamiento: 0,
+    };
+    this.currentIndex = -1;
+    this.showAddModal = true;
+  }
+
+  openEditModal(med: any, index: number): void {
+    this.isEditing = true;
+    this.currentMedication = { ...med };
     this.currentIndex = index;
-    this.extensionDays = 0;
     this.showEditModal = true;
   }
- 
 
-  closeEditModal() {
+  closeAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  closeEditModal(): void {
     this.showEditModal = false;
   }
-  updateMedication() {
-    if (this.extensionDays > 0) {
-      this.currentMedication.diasTratamiento += this.extensionDays;
-      this.medicationMessage = `Se extendió el tratamiento de ${this.currentMedication.nombre} por ${this.extensionDays} días. `;
-      this.medicationMessage += `Debe enviar ${this.calculateAdditionalDoses(this.currentMedication)} dosis adicionales antes de ${this.getDeliveryDate()} para que el paciente las tenga disponibles.`;
+
+  updateTotal(item: any): void {
+    if (item.cantidad < 1) {
+      alert('La cantidad debe ser al menos 1.');
+      item.cantidad = 1;
+    }
+  }
+
+  onMedicamentoChange(medicationId: number): void {
+    const selectedMed = this.listaMedicamentos.find(med => med.id === medicationId);
+    if (selectedMed) {
+      this.currentMedication.nombre = selectedMed.name;
+    } else {
+      this.currentMedication.nombre = '';
+    }
+  }
+
+  saveMedication(): void {
+
+     if (!this.currentMedication.id) {
+      this.medicationMessage = 'Por favor, seleccione un medicamento.';
       this.showMedicationWarning = true;
+      return;
     }
-    
-    this.inventario[this.currentIndex] = {...this.currentMedication};
-    this.closeEditModal();
-  }
-
-  calculateAdditionalDoses(med: any): number {
-    const dosesPerDay = this.getDosesPerDay(med.frecuencia);
-    return dosesPerDay * this.extensionDays;
-  }
-
-  getDosesPerDay(frecuencia: string): number {
-    switch(frecuencia) {
-      case 'Cada 6h': return 4;
-      case 'Cada 8h': return 3;
-      case 'Cada 12h': return 2;
-      case 'Cada 24h': return 1;
-      default: return 1;
+    if (!this.currentMedication.cantidad || this.currentMedication.cantidad < 1) {
+      this.medicationMessage = 'La cantidad debe ser al menos 1.';
+      this.showMedicationWarning = true;
+      return;
     }
-  }
 
-  getDeliveryDate(): string {
-    const date = new Date();
-    date.setDate(date.getDate() + 3); // 3 días para entrega
-    return date.toLocaleDateString();
-  }
-  
-  // Funciones para eliminar medicamento
-  confirmDelete(index: number) {
-    this.medicationToDelete = index;
-    this.showDeleteModal = true;
-  }
-
-  deleteMedication() {
-    const deletedMed = this.inventario[this.medicationToDelete].nombre;
-    this.inventario.splice(this.medicationToDelete, 1);
-    this.showDeleteModal = false;
-    
-    this.medicationMessage = `Se eliminó el medicamento ${deletedMed} del tratamiento.`;
-    this.showMedicationWarning = true;
-  }
-
-  // Agregar nuevo medicamento
-  addMedication() {
-    const newId = Math.max(...this.inventario.map(m => m.id)) + 1;
-    const newMed = {
-      id: newId,
-      nombre: 'Nuevo Medicamento',
-      dosis: '100 mg',
-      via: 'Oral',
-      frecuencia: 'Cada 12h',
-      horaInicio: '08:00',
-      cantidad: 10,
-      usado: 0,
-      diasTratamiento: 7,
-      calendario: Array(7).fill({ M: false, T: false, N: false })
+    const medicationData = {
+      pacienteId: this.idPaciente,
+      actividadId: this.currentMedication.id,
+      cantidad: this.currentMedication.cantidad,
     };
-    
-    this.inventario.push(newMed);
-    this.openEditModal(newMed, this.inventario.length - 1);
+
+    this.isLoading = true;
+    this.insumoService.addMedicamentoPorPaciente(medicationData).subscribe({
+      next: (newMedication) => {
+        console.log('Medicamento agregado:', newMedication);
+        this.closeAddModal();
+        this.loadInventario(this.idPaciente);
+        this.medicationMessage = 'Medicamento agregado correctamente.';
+        this.showMedicationWarning = true;
+      },
+      error: (err) => {
+        console.error('Error al agregar medicamento:', err);
+        this.isLoading = false;
+        this.medicationMessage = err.error || 'Error al agregar el medicamento. Intente de nuevo.';
+        this.showMedicationWarning = true;
+      },
+    });
   }
 
-  saveChanges() {
-    // Lógica para guardar todos los cambios
-    alert('Cambios guardados exitosamente');
+  updateMedication(): void {
+    if (!this.currentMedication.idInsumo) {
+      alert('No se encontró el ID del insumo para actualizar');
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.insumoService.updateCantidadMedicamento(
+      this.currentMedication.idInsumo,
+      this.currentMedication.cantidad
+    ).subscribe({
+      next: () => {
+        this.closeEditModal();
+        this.loadInventario(this.idPaciente);
+        this.medicationMessage = 'Cantidad actualizada correctamente.';
+        this.showMedicationWarning = true;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al actualizar medicamento:', err);
+        this.isLoading = false;
+        this.medicationMessage = 'Error al actualizar la cantidad.';
+        this.showMedicationWarning = true;
+      }
+    });
   }
 
+  addMedication() {
+    this.openAddModal();
+  }
 }

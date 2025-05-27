@@ -1,25 +1,51 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  </div>
+
   <div class="header">
     <h2 class="title-center">Gestión de Inventario</h2>
     <div class="search-filter-container">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" [(ngModel)]="filtroBusqueda" 
-               (input)="filtrarPacientes()" 
-               placeholder="Buscar por paciente o documento">
+        <input
+          type="text"
+          [(ngModel)]="filtroBusqueda"
+          (input)="filtrarPacientes()"
+          placeholder="Buscar por paciente o documento"
+        />
+      </div>
+      <div class="paginacion">
+        <mat-paginator
+          [length]="totalPacientes"
+          [pageSize]="size"
+          [pageIndex]="page"
+          [hidePageSize]="true"
+          (page)="handlePageEvent($event)"
+        >
+        </mat-paginator>
       </div>
     </div>
   </div>
 
   <div class="inventory-card">
-    <h3 class="section-title">Seleccione el paciente para verificar su inventario</h3>
+    <h3 class="section-title">
+      Seleccione el paciente para verificar su inventario
+    </h3>
 
-    <div *ngIf="pacientesFiltrados.length > 0; else noPacientes" class="patients-list">
+    <div
+      *ngIf="pacientesFiltrados.length > 0; else noPacientes"
+      class="patients-list"
+    >
       <div *ngFor="let paciente of pacientesFiltrados" class="patient-card">
         <div class="patient-info">
           <div class="patient-id">
             <i class="fas fa-id-card"></i>
-            <span>{{ paciente.documento }}</span>
+            <span>{{ paciente.numero_identificacion }}</span>
           </div>
           <div class="patient-name">
             <i class="fas fa-user"></i>
@@ -33,10 +59,19 @@
     </div>
 
     <ng-template #noPacientes>
-      <div class="empty-state">
-        <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
-        <h3>No se encontraron pacientes</h3>
-        <p>No hay pacientes que coincidan con los criterios de búsqueda</p>
+      <div *ngIf="!isLoading" class="empty-state">
+        <div class="empty-state-container">
+          <h3>No se encontraron pacientes</h3>
+          <p>
+            Intenta ajustar los criterios de búsqueda o agrega un nuevo
+            paciente.
+          </p>
+          <div class="empty-state-actions">
+            <button class="action-btn primary" routerLink="/registro-pacientes">
+              <i class="fas fa-plus"></i> Agregar nuevo paciente
+            </button>
+          </div>
+        </div>
       </div>
     </ng-template>
   </div>

@@ -13,5 +13,9 @@ export class AppComponent {
   isLoggedIn(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true' && this.router.url !== '/login';
   }
+
+  showHeader(): boolean {
+    return this.router.url !== '/login';
+  }
 }
 

@@ -21,16 +21,21 @@ export class LoginComponent {
 
   onSubmit(): void {
     this.isLoading = true;
-    console.log(this.email, this.password);
+
     this.authService.login(this.email, this.password).subscribe(
       (response) => {
-        localStorage.setItem('token', response);
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('email', response.email);
         this.router.navigate(['/cronograma']);
         this.isLoading = false;
+
+        //Guardar token en el local storage
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('email', response.email);
       },
       (error) => {
         this.isLoading = false;
-        alert('Usuario o contraseña incorrectos');
+        alert(error.error || 'Credenciales incorrectas');
       }
     );
   }

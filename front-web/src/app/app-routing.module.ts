@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from  'src/app/auth.guard'
 
 import { InventarioComponent } from './inventario-paciente/inventario-paciente.component';
 import { VerPacientesComponent } from './ver-pacientes/ver-pacientes.component';
@@ -19,27 +20,32 @@ import { CronogramaComponent } from './inventory/cronograma/cronograma.component
 import { AsignarPacientesComponent } from './assignment/asignar-pacientes/asignar-pacientes.component';
 import { AsignarEnfermerasComponent } from './assignment/asignar-enfermeras/asignar-enfermeras.component';
 import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-asignacion.component';
+import { TreatmentsComponent } from './inventory/treatments/treatments.component';
+import { PageNotFoundComponent } from './not-found/page-not-found/page-not-found.component';
+
 
 const routes: Routes = [
-  { path: 'cronograma', component: CronogramaComponent },
-  { path: 'registro-pacientes', component: RegisterPatientComponent },
-  { path: 'paciente/:documento', component: PatientInfoComponent},
-  { path: 'nurses-assignment/:id', component: NursesAssignmentComponent},
-  { path: 'inventario-paciente/:documento', component: StockComponent},
-  { path: 'login', component: LoginComponent },
-  { path: 'medicamento', component: MedInfoComponent},
-  {path: 'pacientes', component: PatientsListComponent},
-  { path: 'inventario', component: InventarioComponent },
-  { path: 'asignar-pacientes', component: AsignarPacientesComponent },
-  { path: 'asignar-enfermeras', component: AsignarEnfermerasComponent },
-  { path: 'pacientes', component: VerPacientesComponent },
-  { path: 'inventario-total', component: InventarioTotalComponent },
-  { path: 'registro-inventario', component: RegistroInventarioComponent },
-  { path: 'lista-enfermeras', component: ListaEnfermerasComponent},
-  { path: 'registro-enfermeras', component: RegistroEnfermerasComponent},
-  { path: 'stock', component: StockComponent },
-  { path: '', redirectTo: '/ver-pacientes', pathMatch: 'full' },
-  { path: 'detalle-asignacion', component: DetalleAsignacionComponent },
+  { path: 'cronograma', component: CronogramaComponent, canActivate: [AuthGuard] },
+  { path: 'registro-pacientes', component: RegisterPatientComponent, canActivate: [AuthGuard] },
+  { path: 'pacientes/:id', component: PatientInfoComponent, canActivate: [AuthGuard]},
+  { path: 'nurses-assignment/:id', component: NursesAssignmentComponent, canActivate: [AuthGuard]},
+  { path: 'inventario-paciente/:id', component: StockComponent, canActivate: [AuthGuard]},
+  { path: 'login', component: LoginComponent},
+  { path: 'medicamento', component: MedInfoComponent, canActivate: [AuthGuard]},
+  {path: 'pacientes', component: PatientsListComponent, canActivate: [AuthGuard]},
+  { path: 'inventario', component: InventarioComponent, canActivate: [AuthGuard]},
+  { path: 'asignar-pacientes', component: AsignarPacientesComponent, canActivate: [AuthGuard] },
+  { path: 'asignar-enfermeras', component: AsignarEnfermerasComponent, canActivate: [AuthGuard] },
+  { path: 'pacientes', component: VerPacientesComponent, canActivate: [AuthGuard] },
+  { path: 'inventario-total', component: InventarioTotalComponent, canActivate: [AuthGuard] },
+  { path: 'registro-inventario', component: RegistroInventarioComponent, canActivate: [AuthGuard] },
+  { path: 'lista-enfermeras', component: ListaEnfermerasComponent, canActivate: [AuthGuard]},
+  { path: 'registro-enfermeras', component: RegistroEnfermerasComponent, canActivate: [AuthGuard]},
+  { path: 'stock', component: StockComponent, canActivate: [AuthGuard] },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'detalle-asignacion', component: DetalleAsignacionComponent, canActivate: [AuthGuard] },
+  { path: 'treatments/:id', component: TreatmentsComponent, canActivate: [AuthGuard]},
+  { path: '**', component: PageNotFoundComponent, canActivate: [AuthGuard] }
 
 ];
 

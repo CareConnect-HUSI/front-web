@@ -1,6 +1,14 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando Asignación...</span>
+    </div>
+  </div>
+  
     <div class="header">
-      <h2 class="title-center">Asignaciones de {{ enfermeraNombre }}</h2>
+      <h2 class="title-center">Asignaciones</h2>
       <div class="search-filter-container">
         <!-- Filtro por nombre/documento de paciente -->
         <div class="search-box">
@@ -36,32 +44,31 @@
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Hora</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
             <th>Paciente</th>
             <th>Documento</th>
             <th>Dirección</th>
             <th>Estado</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let asignacion of asignacionesFiltradas" 
-              [class.completado]="asignacion.estado === 'Completado'"
-              [class.en-proceso]="asignacion.estado === 'En proceso'"
-              [class.pendiente]="asignacion.estado === 'Pendiente'">
+          <tr *ngFor="let asignacion of asignacionesFiltradas">
             <td>{{ asignacion.fecha | date:'dd/MM/yyyy' }}</td>
             <td>{{ asignacion.hora }}</td>
+            <td>{{ asignacion.horaFin }}</td>
             <td>{{ asignacion.paciente }}</td>
             <td>{{ asignacion.documento }}</td>
             <td>{{ asignacion.direccion }}</td>
             <td>
-              <span class="estado-badge">{{ asignacion.estado }}</span>
-            </td>
-            
-            <td>
-              <button class="details-btn" (click)="verDetalles(asignacion)">
-                <i class="fas fa-eye"></i> Ver
-              </button>
+              <span class="badge"
+                    [ngClass]="{
+                      'completado': asignacion.estado === 'COMPLETADA',
+                      'en-proceso': asignacion.estado === 'EN_PROGRESO',
+                      'pendiente': asignacion.estado === 'PROGRAMADA'
+                    }">
+                {{ asignacion.estado }}
+              </span>
             </td>
           </tr>
         </tbody>
@@ -77,9 +84,6 @@
     <div class="footer-actions">
       <button class="back-btn" routerLink="/lista-enfermeras">
         <i class="fas fa-arrow-left"></i> Regresar
-      </button>
-      <button class="route-btn">
-        <i class="fas fa-route"></i> Ver ruta de hoy
       </button>
     </div>
   </div>

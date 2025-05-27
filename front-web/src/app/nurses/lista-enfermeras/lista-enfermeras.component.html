@@ -1,4 +1,20 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando enfermeras...</span>
+    </div>
+  </div>
+
+  <mat-paginator
+  *ngIf="enfermeras.length"
+  [length]="length"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  (page)="handlePageEvent($event)">
+</mat-paginator>
+
   <div class="header">
     <h1 class="title-center">Lista de Enfermeras</h1>
     <div class="search-filter-container">
@@ -27,20 +43,14 @@
 
   <div *ngIf="enfermerasFiltradas.length > 0; else noEnfermeras" class="nurses-grid">
     <div *ngFor="let enfermera of enfermerasFiltradas" class="nurse-card">
-      <div class="card-header">
-        <button class="edit-btn" (click)="abrirModalEdicion(enfermera)">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
       <div class="nurse-photo">
-        <img [src]="enfermera.imagen || 'assets/images/default-nurse.png'" alt="Foto de {{enfermera.name}}">
+        <img [src]="enfermera.imagen || 'assets/images/enfermera.png'" alt="Foto de {{enfermera.nombre}}">
       </div>
       <div class="nurse-details">
-        <h3>{{ enfermera.name }} {{ enfermera.lastname }}</h3>
-        <p><i class="fas fa-id-card"></i> {{ enfermera.documento || 'Documento no registrado' }}</p>
-        <p><i class="fas fa-clock"></i> Turno {{ enfermera.turno?.toLowerCase() || 'no asignado' }}</p>
-        <p><i class="fas fa-mobile-alt"></i> {{ enfermera.celular || 'Documento no registrado' }}
-        </p>
+        <h3>{{ enfermera.nombre }} {{ enfermera.apellido }}</h3>
+        <p><i class="fas fa-id-card"></i> {{ enfermera.numeroIdentificacion || 'Documento no registrado' }}</p>
+        <p><i class="fas fa-clock"></i> Turno {{ enfermera.turnoEntity?.name || 'no asignado' }}</p>
+        <p><i class="fas fa-mobile-alt"></i> {{ enfermera.telefono || 'Teléfono no registrado' }}</p>
       </div>
       <button class="action-btn" (click)="seleccionarEnfermera(enfermera)">
         <i class="fas fa-tasks"></i> Asignaciones
@@ -49,8 +59,8 @@
   </div>
 
   <ng-template #noEnfermeras>
-    <div class="empty-state">
-      <img src="assets/images/no-nurses.png" alt="No hay enfermeras" class="empty-image">
+    <div *ngIf="!isLoading" class="empty-state">
+      <img src="assets/images/enfermera.png" alt="No hay enfermeras" class="empty-image">
       <h3>No hay enfermeras disponibles</h3>
       <p>No se encontraron enfermeras que coincidan con los criterios de búsqueda</p>
       <button class="add-btn" routerLink="/registro-enfermeras">
@@ -72,19 +82,19 @@
         <form>
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text" [(ngModel)]="enfermeraEditando.name" name="name">
+            <input type="text" [(ngModel)]="enfermeraEditando.nombre" name="nombre">
           </div>
           <div class="form-group">
             <label>Apellido</label>
-            <input type="text" [(ngModel)]="enfermeraEditando.lastname" name="lastname">
+            <input type="text" [(ngModel)]="enfermeraEditando.apellido" name="apellido">
           </div>
           <div class="form-group">
             <label>Documento</label>
-            <input type="text" [(ngModel)]="enfermeraEditando.documento" name="documento">
+            <input type="text" [(ngModel)]="enfermeraEditando.numeroIdentificacion" name="numeroIdentificacion">
           </div>
           <div class="form-group">
             <label>Turno</label>
-            <select [(ngModel)]="enfermeraEditando.turno" name="turno">
+            <select [(ngModel)]="enfermeraEditando.turnoEntity.name" name="turno">
               <option value="Mañana">Mañana</option>
               <option value="Tarde">Tarde</option>
               <option value="Noche">Noche</option>
@@ -92,7 +102,7 @@
           </div>
           <div class="form-group">
             <label>Celular</label>
-            <input type="text" [(ngModel)]="enfermeraEditando.celular" name="celular">
+            <input type="text" [(ngModel)]="enfermeraEditando.telefono" name="telefono">
           </div>
         </form>
       </div>

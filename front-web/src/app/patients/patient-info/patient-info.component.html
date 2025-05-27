@@ -9,7 +9,9 @@
       <div class="profile-icon">
         <i class="fas fa-user-circle"></i>
       </div>
-      <h3 class="patient-name">{{ paciente.nombres }} {{ paciente.apellidos }}</h3>
+      <h3 class="patient-name">
+        {{ paciente.nombres }} {{ paciente.apellidos }}
+      </h3>
       <p class="patient-id">ID: {{ paciente.documento }}</p>
     </div>
 
@@ -23,7 +25,7 @@
             <i class="fas fa-edit"></i> Modificar
           </button>
         </div>
-        
+
         <div class="info-grid">
           <div class="info-item">
             <label>Nombres:</label>
@@ -43,7 +45,7 @@
           </div>
           <div class="info-item">
             <label>Localidad:</label>
-            <span>{{ paciente.localidad}}</span>
+            <span>{{ paciente.localidad }}</span>
           </div>
           <div class="info-item">
             <label>Barrio:</label>
@@ -54,20 +56,25 @@
             <span>{{ paciente.celular }}</span>
           </div>
           <div class="info-item">
-            <label>Correo:</label>
-            <span>{{ paciente.email }}</span>
+            <label>Nombre Acudiente:</label>
+            <span>{{ paciente.nombreFamiliar}}</span>
           </div>
           <div class="info-item">
-            <label>Nombre Familiar:</label>
-            <span>{{ paciente.nombreFamiliar }}</span>
+            <label>Celular Acudiente:</label>
+            <span>{{ paciente.celularFamiliar}}</span>
           </div>
           <div class="info-item">
-            <label>Celular Familiar:</label>
-            <span>{{ paciente.celularFamiliar }}</span>
+            <label>Segundo Celular Acudiente:</label>
+            <span>{{ paciente.segundoCelularFamiliar}}</span>
           </div>
           <div class="info-item">
-            <label>Parentesco:</label>
-            <span>{{ paciente.parentesco }}</span>
+            <label>Estado:</label>
+            <span
+              [class.active]="paciente.estado === 'Activo'"
+              [class.inactive]="paciente.estado === 'Inactivo'"
+            >
+              {{ paciente.estado }}
+            </span>
           </div>
         </div>
       </div>
@@ -77,15 +84,12 @@
         <div class="section-header">
           <h3 class="section-title">Tratamiento</h3>
           <div class="section-actions">
-            <button class="action-btn" routerLink="/stock">
-              <i class="fas fa-pen"></i> Modificar
-            </button>
-            <button class="action-btn" (click)="viewTreatment()">
+            <button class="action-btn" (click)="verInventario(paciente)">
               <i class="fas fa-eye"></i> Ver
             </button>
           </div>
         </div>
-        
+
         <div class="table-responsive">
           <table class="info-table">
             <thead>
@@ -95,6 +99,7 @@
                 <th>Días</th>
                 <th>Posología</th>
                 <th>Inicio</th>
+                <th>Duración</th>
               </tr>
             </thead>
             <tbody>
@@ -103,7 +108,8 @@
                 <td>{{ med.cantidad }}</td>
                 <td>{{ med.dias }}</td>
                 <td>{{ med.posologia }}</td>
-                <td>{{ med.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ med.fechaInicio | date : "dd/MM/yyyy" }}</td>
+                <td>{{ med.duracion }}</td>
               </tr>
             </tbody>
           </table>
@@ -114,14 +120,28 @@
       <div class="info-section">
         <h3 class="section-title">Historial médico</h3>
         <div class="history-container">
-          <div *ngFor="let hist of historial" class="history-card" [class.completed]="hist.completado">
+          <div
+            *ngFor="let hist of historial"
+            class="history-card"
+            [class.completed]="hist.completado"
+          >
             <div class="history-content">
               <h4>{{ hist.tratamiento }}</h4>
               <div class="history-details">
-                <span><i class="fas fa-calendar-day"></i> {{ hist.dias }} días</span>
-                <span [class.badge-completed]="hist.completado" [class.badge-in-progress]="!hist.completado">
-                  <i class="fas" [class.fa-check-circle]="hist.completado" [class.fa-spinner]="!hist.completado"></i>
-                  {{ hist.completado ? 'Completado' : 'En curso' }}
+                <span
+                  ><i class="fas fa-calendar-day"></i>
+                  {{ hist.dias }} días</span
+                >
+                <span
+                  [class.badge-completed]="hist.completado"
+                  [class.badge-in-progress]="!hist.completado"
+                >
+                  <i
+                    class="fas"
+                    [class.fa-check-circle]="hist.completado"
+                    [class.fa-spinner]="!hist.completado"
+                  ></i>
+                  {{ hist.completado ? "Completado" : "En curso" }}
                 </span>
               </div>
             </div>
@@ -140,58 +160,125 @@
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
+
       <form class="modal-form">
         <div class="form-columns">
           <!-- Columna 1 -->
           <div class="form-column">
             <div class="form-group">
-              <label>Nombre:</label>
-              <input [(ngModel)]="paciente.nombres" name="nombre" class="form-input" />
+              <label>Nombres:</label>
+              <input
+                [(ngModel)]="paciente.nombres"
+                name="nombres"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
               <label>Apellidos:</label>
-              <input [(ngModel)]="paciente.apellidos" name="apellidos" class="form-input" />
+              <input
+                [(ngModel)]="paciente.apellidos"
+                name="apellidos"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
-              <label>Documento:</label>
-              <input [(ngModel)]="paciente.documento" name="documento" class="form-input" />
+              <label>Tipo de Documento:</label>
+              <select
+                [(ngModel)]="paciente.tipoIdentificacion.nombre"
+                name="tipoIdentificacion"
+                class="form-input"
+              >
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="Pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número de Documento:</label>
+              <input
+                [(ngModel)]="paciente.documento"
+                name="documento"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
               <label>Dirección:</label>
-              <input [(ngModel)]="paciente.direccion" name="direccion" class="form-input" />
+              <input [(ngModel)]="paciente.direccion" name="direccion" class="form-input" disabled="true"/>
+              <button type="button" class="edit-btn" (click)="openAddressModal()">
+              <i class="fas fa-edit"></i> Editar
+            </button>
             </div>
             <div class="form-group">
               <label>Localidad:</label>
-              <input [(ngModel)]="paciente.localidad" name="localidad" class="form-input" />
+              <input disabled="true"
+                [(ngModel)]="paciente.localidad"
+                name="localidad"
+                class="form-input"
+              />
             </div>
+            <div class="form-group">
+              <label>Estado:</label>
+              <select [(ngModel)]="paciente.estado" name="estado" class="form-input">
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+            
           </div>
-          
+
           <!-- Columna 2 -->
           <div class="form-column">
             <div class="form-group">
-              <label>Barrio:</label>
-              <input [(ngModel)]="paciente.barrio" name="barrio" class="form-input" />
-            </div>
-            <div class="form-group">
               <label>Celular:</label>
-              <input [(ngModel)]="paciente.celular" name="celular" class="form-input" />
+              <input
+                [(ngModel)]="paciente.celular"
+                name="celular"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
-              <label>Correo:</label>
-              <input [(ngModel)]="paciente.email" name="email" class="form-input" />
+              <label>Nombre del Acudiente:</label>
+              <input
+                [(ngModel)]="paciente.nombreFamiliar"
+                name="nombreFamiliar"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
-              <label>Nombre Familiar:</label>
-              <input [(ngModel)]="paciente.nombreFamiliar" name="nombre familiar" class="form-input" />
+              <label>Celular del Acudiente:</label>
+              <input
+                [(ngModel)]="paciente.celularFamiliar"
+                name="celularFamiliar"
+                class="form-input"
+              />
             </div>
             <div class="form-group">
-              <label>Parentesco:</label>
-              <input [(ngModel)]="paciente.parentesco" name="parentesco" class="form-input" />
+              <label>Segundo Celular Acudiente:</label>
+              <input
+                [(ngModel)]="paciente.segundoCelularFamiliar"
+                name="segundoCelularFamiliar"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Conjunto:</label>
+              <input
+                [(ngModel)]="paciente.conjunto"
+                name="conjunto"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Barrio:</label>
+              <input disabled="true"
+                [(ngModel)]="paciente.barrio"
+                name="barrio"
+                class="form-input"
+              />
             </div>
           </div>
         </div>
-        
+
         <div class="form-actions">
           <button type="button" class="cancel-btn" (click)="closeEditModal()">
             <i class="fas fa-times"></i> Cancelar
@@ -202,5 +289,131 @@
         </div>
       </form>
     </div>
+    <!-- Modal para Dirección -->
+<div *ngIf="showAddressModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dirección Completa</h3>
+      <button class="close-btn" (click)="closeAddressModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form class="modal-form" [formGroup]="addressForm">
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label>Tipo de Vía</label>
+            <select formControlName="tipoVia" required>
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Calle">Calle</option>
+              <option value="Carrera">Carrera</option>
+              <option value="Avenida">Avenida</option>
+              <option value="Diagonal">Diagonal</option>
+              <option value="Transversal">Transversal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Número Vía</label>
+            <input
+              type="text"
+              formControlName="numeroVia"
+              placeholder="Ej: 12"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Letra Vía (Opcional)</label>
+            <input type="text" formControlName="letraVia" placeholder="Ej: B" />
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group">
+            <label>Bis</label>
+            <select formControlName="bis">
+              <option value="">No</option>
+              <option value="Bis">Bis</option>
+              <option value="Bis A">Bis A</option>
+              <option value="Bis B">Bis B</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Complemento</label>
+            <input
+              type="text"
+              formControlName="complemento"
+              placeholder="Ej: Este, Oeste"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Número Placa</label>
+            <input
+              type="text"
+              formControlName="numeroPlaca"
+              placeholder="Ej: 45-67"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Conjunto/Edificio (Opcional)</label>
+        <input
+          type="text"
+          formControlName="conjunto"
+          placeholder="Ej: Conjunto Alegria"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Localidad</label>
+        <select
+          formControlName="localidad"
+          required
+          (change)="onLocalidadChange()"
+        >
+          <option value="" disabled selected>Seleccione localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">
+            {{ loc.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Barrio</label>
+        <select formControlName="barrio" required>
+          <option value="" disabled selected>Seleccione barrio</option>
+          <option
+            *ngFor="let barrio of barriosFiltrados"
+            [value]="barrio.nombre"
+          >
+            {{ barrio.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Complemento Dirección</label>
+        <textarea
+          formControlName="complementoDireccion"
+          placeholder="Ej: Torre 2, Apartamento 301"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="closeAddressModal()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="save-btn" (click)="saveAddress()">
+          <i class="fas fa-save"></i> Guardar Dirección
+        </button>
+      </div>
+    </form>
   </div>
 </div>

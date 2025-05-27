@@ -3,128 +3,243 @@
     <h2 class="title-center">Registrar Paciente</h2>
   </div>
 
-  <form [formGroup]="patientForm" (ngSubmit)="guardarPaciente()" class="form-container">
-    
+  <form [formGroup]="patientForm" class="form-container">
     <div class="form-section">
       <h3 class="section-title">Datos personales</h3>
 
       <div class="form-grid" formGroupName="personalInfo">
         <div class="form-group">
-          <label>Nombres</label>
-          <input formControlName="nombres" type="text" placeholder="Ej: María José" />
+          <label
+            >Nombres
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="nombres"
+            type="text"
+            placeholder="Ej: María José"
+          />
         </div>
         <div class="form-group">
-          <label>Apellidos</label>
-          <input formControlName="apellidos" type="text" placeholder="Ej: González Pérez" />
+          <label
+            >Apellidos
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="apellidos"
+            type="text"
+            placeholder="Ej: González Pérez"
+          />
         </div>
         <div class="form-group">
-          <label>Tipo de Documento</label>
+          <label
+            >Tipo de Documento
+            <span class="required-asterisk">*</span>
+          </label>
           <select formControlName="tipoDocumento">
-            <option value="" disabled selected>Seleccione un tipo de documento</option>
-            <option value="CC">Cédula de Ciudadanía (CC)</option>
-            <option value="TI">Tarjeta de Identidad (TI)</option>
-            <option value="Pasaporte">Pasaporte</option>
+            <option value="" disabled>Seleccione un tipo de documento</option>
+            <option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.id">
+              {{ tipo.name }}
+            </option>
           </select>
         </div>
         <div class="form-group">
-          <label>N° de Documento</label>
-          <input formControlName="numeroDocumento" type="text" placeholder="Ej: 123456789" />
+          <label
+            >N° de Documento
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="numeroDocumento"
+            type="text"
+            placeholder="Ej: 123456789"
+          />
         </div>
         <div class="form-group">
-          <label>Dirección</label>
-          <input formControlName="direccion" type="text" placeholder="Ej: Calle 123 #45-67" />
-        </div>
-        <div class="form-group">
-          <label>Localidad</label>
-          <select formControlName="localidad">
-            <option value="" disabled selected>Seleccione una localidad</option>
-            <option value="Suba">Suba</option>
-            <option value="Usaquén">Usaquén</option>
-            <option value="Chapinero">Chapinero</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Barrio</label>
-          <input formControlName="barrio" type="text" placeholder="Ej: El Prado" />
-        </div>
-        <div class="form-group">
-          <label>Celular</label>
-          <input formControlName="celular" type="text" placeholder="Ej: 3001234567" />
-        </div>
-        <div class="form-group">
-          <label>Nombre Familiar</label>
-          <input formControlName="nombreFamiliar" type="text" placeholder="Ej: Carlos López" />
-        </div>
-        <div class="form-group">
-          <label>Celular Familiar</label>
-          <input formControlName="celularFamiliar" type="text" placeholder="Ej: 3109876543" />
-        </div>
-        <div class="form-group">
-          <label>Parentesco</label>
-          <input formControlName="parentesco" type="text" placeholder="Ej: Padre" />
-        </div>
-        <div class="form-group">
-          <label>Correo</label>
-          <input formControlName="email" type="text" placeholder="Ej: correo@ejemplo.com" />
-        </div>
-        <div class="form-group">
-          <label>Foto</label>
-          <div class="file-upload">
-            <label for="foto" class="upload-btn">
-              <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
-            </label>
-            <input id="foto" type="file" formControlName="foto" />
-            <span class="file-name">{{ patientForm.get('personalInfo.foto')?.value?.name || 'Ningún archivo seleccionado' }}</span>
+          <label
+            >Dirección
+            <span class="required-asterisk">*</span>
+          </label>
+          <div class="address-input">
+            <input
+              formControlName="direccion"
+              type="text"
+              readonly
+              placeholder="Ej: Calle 123 #45-67"
+            />
+            <button type="button" class="edit-btn" (click)="openAddressModal()">
+              <i class="fas fa-edit"></i> Editar
+            </button>
           </div>
+        </div>
+        <div class="form-group">
+          <label>Conjunto/Edificio (Opcional)</label>
+          <input
+            formControlName="conjunto"
+            type="text"
+            placeholder="Ej: Conjunto Alegria"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            >Localidad
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="localidad" required>
+            <option value="" disabled selected>Seleccione localidad</option>
+            <option *ngFor="let loc of localidades" [value]="loc.nombre">
+              {{ loc.nombre }}
+            </option>
+          </select>
+
+        </div>
+        <div class="form-group">
+          <label
+            >Barrio
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="barrio" required>
+            <option value="" disabled selected>Seleccione barrio</option>
+            <option
+              *ngFor="let barrio of barriosFiltrados"
+              [value]="barrio.nombre"
+            >
+              {{ barrio.nombre }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label
+            >Celular
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="celular"
+            type="text"
+            placeholder="Ej: 3001234567"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            >Nombre Acudiente
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="nombreFamiliar"
+            type="text"
+            placeholder="Ej: Carlos López"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            >Celular Acudiente
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="celularFamiliar"
+            type="text"
+            placeholder="Ej: 3109876543"
+          />
+        </div>
+        <div class="form-group">
+          <label>Segundo Celular Acudiente</label>
+          <input
+            formControlName="segundoCelular"
+            type="text"
+            placeholder="Ej: 3124598734"
+          />
         </div>
       </div>
     </div>
 
     <!-- Sección Tratamiento -->
     <div class="form-section">
-      <h3 class="section-title">Tratamiento</h3>
+      <h3 class="section-title">Aplicación de Medicamentos</h3>
       <div class="table-responsive">
         <table class="form-table">
           <thead>
             <tr>
-              <th>Nombre medicamento</th>
-              <th>Dosis</th>
-              <th>Frecuencia</th>
-              <th>Días</th>
-              <th>Fecha Inicio</th>
-              <th>Fecha Fin</th>
-              <th>Hora</th>
-              <th>Duración</th>
+              <th>Nombre medicamento
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Dosis
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Frecuencia
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Días
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Fecha Inicio
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Fecha Fin
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Hora de Administracion
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Duración
+                <span class="required-asterisk">*</span>
+              </th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let med of tratamiento.controls; let i = index" [formGroup]="med">
+            <tr
+              *ngFor="let med of tratamiento.controls; let i = index"
+              [formGroup]="med"
+            >
               <td>
                 <select formControlName="medicamento">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let m of listaMedicamentos" [value]="m.codigo">{{ m.nombre }}</option>
+                  <option *ngFor="let m of listaMedicamentos" [value]="m.id">
+                    {{ m.name }}
+                  </option>
                 </select>
               </td>
-              <td><input type="number" formControlName="dosis" placeholder="Dosis" /></td>
+              <td>
+                <input
+                  type="number"
+                  formControlName="dosis"
+                  placeholder="Dosis"
+                  min="1"
+                />
+              </td>
+
               <td>
                 <select formControlName="frecuencia">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
+                  <option *ngFor="let f of frecuencias" [value]="f">
+                    {{ f }}h
+                  </option>
                 </select>
               </td>
-              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+              <td>
+                <input
+                  type="number"
+                  formControlName="diasTratamiento"
+                  placeholder="Días"
+                  readonly
+                />
+
+              </td>
               <td><input type="date" formControlName="fechaInicio" /></td>
               <td><input type="date" formControlName="fechaFin" /></td>
               <td><input type="time" formControlName="horaInicio" /></td>
               <td>
                 <select formControlName="duracion">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let d of duraciones" [value]="d">{{ d }}min</option>
+                  <option *ngFor="let d of duraciones" [value]="d">
+                    {{ d }}min
+                  </option>
                 </select>
               </td>
               <td>
-                <button type="button" (click)="eliminarMedicamento(i)" class="action-btn delete">
+                <button
+                  type="button"
+                  (click)="eliminarMedicamento(i)"
+                  class="action-btn delete"
+                >
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
@@ -145,42 +260,51 @@
         <table class="form-table">
           <thead>
             <tr>
-              <th>Procedimiento</th>
-              <th>Frecuencia</th>
-              <th>Días</th>
-              <th>Fecha Inicio</th>
-              <th>Fecha Fin</th>
-              <th>Hora</th>
-              <th>Duración</th>
+              <th>Procedimiento
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Fecha Tentativa
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Hora Tentativa para Realizar Procedimiento
+                <span class="required-asterisk">*</span>
+              </th>
+              <th>Duración
+                <span class="required-asterisk">*</span>
+              </th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let proc of procedimientos.controls; let i = index" [formGroup]="proc">
+            <tr
+              *ngFor="let proc of procedimientos.controls; let i = index"
+              [formGroup]="proc"
+            >
               <td>
                 <select formControlName="procedimiento">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let p of listaProcedimientos" [value]="p.codigo">{{ p.descripcion }}</option>
+                  <option *ngFor="let p of listaProcedimientos" [value]="p.id">
+                    {{ p.name }}
+                  </option>
                 </select>
               </td>
-              <td>
-                <select formControlName="frecuencia">
-                  <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let f of frecuencias" [value]="f">{{ f }}h</option>
-                </select>
-              </td>
-              <td><input type="number" formControlName="diasTratamiento" placeholder="Días" /></td>
+
               <td><input type="date" formControlName="fechaInicio" /></td>
-              <td><input type="date" formControlName="fechaFin" /></td>
               <td><input type="time" formControlName="horaInicio" /></td>
               <td>
                 <select formControlName="duracion">
                   <option value="" disabled selected>Seleccionar</option>
-                  <option *ngFor="let d of duraciones" [value]="d">{{ d }}min</option>
+                  <option *ngFor="let d of duraciones" [value]="d">
+                    {{ d }}min
+                  </option>
                 </select>
               </td>
               <td>
-                <button type="button" (click)="eliminarProcedimiento(i)" class="action-btn delete">
+                <button
+                  type="button"
+                  (click)="eliminarProcedimiento(i)"
+                  class="action-btn delete"
+                >
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
@@ -199,9 +323,137 @@
       <button type="button" class="cancel-btn" routerLink="/lista-pacientes">
         <i class="fas fa-times"></i> Cancelar
       </button>
-      <button type="submit" class="save-btn">
+      <button type="submit" class="save-btn" (click)="guardarPaciente()">
         <i class="fas fa-save"></i> Guardar Paciente
       </button>
     </div>
   </form>
+</div>
+<!-- Modal para Dirección -->
+<div *ngIf="showAddressModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dirección Completa</h3>
+      <button class="close-btn" (click)="closeAddressModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form class="modal-form" [formGroup]="addressForm">
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label>Tipo de Vía</label>
+            <select formControlName="tipoVia" required>
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Calle">Calle</option>
+              <option value="Carrera">Carrera</option>
+              <option value="Avenida">Avenida</option>
+              <option value="Diagonal">Diagonal</option>
+              <option value="Transversal">Transversal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Número Vía</label>
+            <input
+              type="text"
+              formControlName="numeroVia"
+              placeholder="Ej: 12"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Letra Vía (Opcional)</label>
+            <input type="text" formControlName="letraVia" placeholder="Ej: B" />
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group">
+            <label>Sufijo</label>
+            <select formControlName="bis">
+              <option value="">No</option>
+              <option value="Bis">Bis</option>
+              <option value="Bis A">Bis A</option>
+              <option value="Bis B">Bis B</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Complemento</label>
+            <input
+              type="text"
+              formControlName="complemento"
+              placeholder="Ej: Este, Oeste"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Número Placa</label>
+            <input
+              type="text"
+              formControlName="numeroPlaca"
+              placeholder="Ej: 45-67"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Conjunto/Edificio (Opcional)</label>
+        <input
+          type="text"
+          formControlName="conjunto"
+          placeholder="Ej: Conjunto Alegria"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Localidad</label>
+        <select
+          formControlName="localidad"
+          required
+          (change)="onLocalidadChange()"
+        >
+          <option value="" disabled selected>Seleccione localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">
+            {{ loc.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Barrio</label>
+        <select formControlName="barrio" required>
+          <option value="" disabled selected>Seleccione barrio</option>
+          <option
+            *ngFor="let barrio of barriosFiltrados"
+            [value]="barrio.nombre"
+          >
+            {{ barrio.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Complemento Dirección</label>
+        <textarea
+          formControlName="complementoDireccion"
+          placeholder="Ej: Torre 2, Apartamento 301"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="closeAddressModal()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="save-btn" (click)="saveAddress()">
+          <i class="fas fa-save"></i> Guardar Dirección
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

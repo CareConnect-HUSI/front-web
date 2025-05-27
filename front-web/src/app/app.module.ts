@@ -28,6 +28,8 @@ import { RegistroEnfermerasComponent } from './nurses/registro-enfermeras/regist
 import { ListaEnfermerasComponent } from './nurses/lista-enfermeras/lista-enfermeras.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-asignacion.component';
+import { TreatmentsComponent } from './inventory/treatments/treatments.component';
+import { PageNotFoundComponent } from './not-found/page-not-found/page-not-found.component';
 
 
 
@@ -51,7 +53,9 @@ import { DetalleAsignacionComponent } from './nurses/detalle-asignacion/detalle-
     RegistroInventarioComponent,
     RegistroEnfermerasComponent,
     ListaEnfermerasComponent,
-    DetalleAsignacionComponent
+    DetalleAsignacionComponent,
+    TreatmentsComponent,
+    PageNotFoundComponent
   ],
   imports: [
     DragDropModule,

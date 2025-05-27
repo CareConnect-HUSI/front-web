@@ -1,14 +1,36 @@
 <div class="container">
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando pacientes...</span>
+    </div>
+  </div>
+
   <div class="header">
     <h2 class="title-center">Lista de Pacientes</h2>
     <div class="search-filter-container">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" [(ngModel)]="filtro" 
-               (input)="filtrarPacientes()" 
-               placeholder="Buscar por nombre o identificación">
+        <input
+          type="text"
+          [(ngModel)]="filtro"
+          (input)="filtrarPacientes()"
+          placeholder="Buscar por nombre o identificación"
+        />
       </div>
     </div>
+  </div>
+
+  <div class="paginacion">
+    <mat-paginator
+      [length]="totalPacientes"
+      [pageSize]="size"
+      [pageIndex]="page"
+      [hidePageSize]="true"
+      (page)="handlePageEvent($event)"
+    >
+    </mat-paginator>
   </div>
 
   <div class="table-container">
@@ -18,6 +40,7 @@
           <th>Identificación</th>
           <th>Paciente</th>
           <th>Dirección</th>
+          <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -27,7 +50,16 @@
           <td>{{ paciente.nombre }}</td>
           <td>{{ paciente.direccion }}</td>
           <td>
-            <a routerLink="/paciente/{{ paciente.id }}" class="details-btn">
+            <button
+              class="status-btn"
+              [class.active]="paciente.estado === 'Activo'"
+              (click)="toggleEstado(paciente)"
+            >
+              {{ paciente.estado }}
+            </button>
+          </td>
+          <td>
+            <a routerLink="/pacientes/{{ paciente.id }}" class="details-btn">
               <i class="fas fa-eye"></i> Ver
             </a>
           </td>
@@ -35,8 +67,15 @@
       </tbody>
     </table>
 
-    <div *ngIf="pacientesFiltrados.length === 0" class="empty-state">
-      <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
+    <div
+      *ngIf="pacientesFiltrados.length === 0 && !isLoading"
+      class="empty-state"
+    >
+      <img
+        src="assets/images/avatar.png"
+        alt="No hay pacientes"
+        class="empty-image"
+      />
       <h3>No se encontraron pacientes</h3>
       <p>No hay pacientes que coincidan con los criterios de búsqueda</p>
     </div>

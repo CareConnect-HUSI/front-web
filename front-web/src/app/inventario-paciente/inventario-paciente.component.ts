@@ -1,44 +1,91 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { PatientService } from 'src/app/service/patient.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-inventario-paciente',
   templateUrl: './inventario-paciente.component.html',
-  styleUrls: ['./inventario-paciente.component.css']
+  styleUrls: ['./inventario-paciente.component.css'],
 })
-export class InventarioComponent implements OnInit{
-
+export class InventarioComponent implements OnInit {
   filtroBusqueda: string = '';
+  pacientes: any[] = [];
   pacientesFiltrados: any[] = [];
+  actividades: any[] = [];
+  inventarioPorPaciente: { [key: number]: any[] } = {};
+  page: number = 0;
+  size: number = 6;
+  isLoading: boolean = false;
+  totalPacientes: number = 0;
 
-  pacientes = [
-    { documento: '12345678910', nombre: 'Juan Pablo Rodríguez' },
-    { documento: '98765432110', nombre: 'María Fernanda López' },
-    { documento: '65432198745', nombre: 'Carlos Ramírez' },
-    { documento: '45612378965', nombre: 'Ana Sofía Méndez' }
-  ];
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, private patientService: PatientService) {}
 
   ngOnInit(): void {
-    this.pacientesFiltrados = [...this.pacientes];
-  }
-
-  filtrarPacientes(): void {
-    if (!this.filtroBusqueda) {
-      this.pacientesFiltrados = [...this.pacientes];
-      return;
-    }
-    
-    const busqueda = this.filtroBusqueda.toLowerCase();
-    this.pacientesFiltrados = this.pacientes.filter(paciente => 
-      paciente.nombre.toLowerCase().includes(busqueda) || 
-      paciente.documento.toString().includes(busqueda)
+    this.isLoading = true;
+    this.patientService.findAll(0, 10000).subscribe(
+      (data: any) => {
+        this.pacientes = data.content;
+        this.isLoading = false;
+        this.aplicarFiltroYPaginacion();
+      },
+      (error) => {
+        console.error('Error al cargar pacientes:', error);
+        this.isLoading = false;
+      }
     );
   }
 
+  loadPacientes() {
+    this.isLoading = true;
+    this.patientService.findAll(0, 10000).subscribe(
+      (data: any) => {
+        this.pacientes = data.content;
+        this.totalPacientes = this.pacientes.length;
+        this.aplicarFiltroYPaginacion();
+        this.isLoading = false;
+      },
+      (error) => {
+        console.error('Error al cargar pacientes:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  filtrarPacientes(): void {
+    this.page = 0;
+    this.aplicarFiltroYPaginacion();
+  }
 
   verInventario(paciente: any) {
-    this.router.navigate(['/inventario-paciente', paciente.documento]);
+    this.router.navigate(['/inventario-paciente', paciente.id]);
+  }
+
+  limpiarBusqueda() {
+    this.filtroBusqueda = '';
+    this.pacientesFiltrados = [...this.pacientes];
+  }
+
+  aplicarFiltroYPaginacion() {
+    const filtroLower = this.filtroBusqueda.toLowerCase();
+
+    const filtrados = this.pacientes.filter(
+      (p) =>
+        p.nombre.toLowerCase().includes(filtroLower) ||
+        p.numero_identificacion?.toString().includes(filtroLower)
+    );
+
+    this.totalPacientes = filtrados.length;
+
+    const inicio = this.page * this.size;
+    const fin = inicio + this.size;
+
+    this.pacientesFiltrados = filtrados.slice(inicio, fin);
+  }
+
+  handlePageEvent(event: PageEvent) {
+    this.page = event.pageIndex;
+    this.size = event.pageSize;
+    this.aplicarFiltroYPaginacion();
   }
 }

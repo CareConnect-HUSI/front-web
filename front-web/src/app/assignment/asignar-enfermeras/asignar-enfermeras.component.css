@@ -1,368 +1,663 @@
-/* Estilos base consistentes con los componentes anteriores */
+/* Estilos para el spinner */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #2c5697;
+}
+
+.spinner i {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  animation: spin 1s linear infinite;
+}
+
+.spinner span {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Estilo modificado para el botón "Registrar Nueva Enfermera" */
+.container .btn-primary {
+  background: #2c5697;
+  color: white;
+  margin: 0 auto 30px auto; /* Añade margen inferior de 30px y centra el botón */
+  display: block; /* Cambia a block para poder centrarlo */
+  width: fit-content; /* Ajusta el ancho al contenido */
+  padding: 12px 25px; /* Ajusta el padding para mejor apariencia */
+  font-weight: 500; /* Letra un poco más gruesa */
+  transition: background-color 0.3s ease;
+}
+
+.container .btn-primary:hover {
+  background: #1d3d6d;
+}
+
+/* Adicionalmente, aseguramos que el botón tenga un buen aspecto en móviles */
+@media (max-width: 768px) {
+  .container .btn-primary {
+    width: 100%; /* En móviles, ocupa todo el ancho disponible */
+    margin-bottom: 25px;
+  }
+}
+
+/* Estilos base */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .title-center {
-    text-align: center;
-    width: 100%;
-    color: #2c5697;
-    font-size: 28px;
-    margin: 0 0 20px 0;
-  }
-  
-  .header {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 30px;
-  }
-  
-  .info-jornada {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    margin-bottom: 20px;
-  }
-  
-  /* Sección de búsqueda y filtros */
-  .search-section {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .search-box {
-    position: relative;
-    margin-bottom: 15px;
-  }
-  
-  .search-box i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #777;
-  }
-  
-  .search-box input {
-    width: 100%;
-    padding: 10px 15px 10px 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-  
-  .turno-filters {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  .turno-filter-btn {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #f5f5f5;
-    color: #555;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-  }
-  
-  .turno-filter-btn.active {
-    background: #2c5697;
-    color: white;
-    border-color: #2c5697;
-  }
-  
-  .turno-filter-btn.clear {
-    background: transparent;
-    border: 1px dashed #aaa;
-    margin-left: auto;
-  }
-  
-  .turno-filter-btn:hover:not(.active) {
-    background: #e6f0ff;
-  }
-  
-  /* Sección de enfermeras */
-  .enfermeras-section {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .section-title {
-    color: #2c5697;
-    font-size: 18px;
-    margin: 0 0 15px 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e6f0ff;
-  }
-  
-  .enfermeras-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.title-center {
+  text-align: center;
+  color: #2c5697;
+  font-size: 28px;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+}
+
+.info-jornada {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Sección de búsqueda y filtros */
+.search-section {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #2c5697;
+  outline: none;
+}
+
+.turno-filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.turno-filter-btn {
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #f8f9fa;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.turno-filter-btn.active {
+  background: #2c5697;
+  color: white;
+  border-color: #2c5697;
+}
+
+.turno-filter-btn.clear {
+  background: transparent;
+  border: 1px dashed #aaa;
+  margin-left: auto;
+}
+
+.turno-filter-btn:hover:not(.active) {
+  background: #e6f0ff;
+  border-color: #2c5697;
+}
+
+/* Sección de enfermeras */
+.enfermeras-section {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Correcciones directas para el CSS existente */
+
+/* 1. Añadir clases específicas para los contenedores de turno */
+.seccion-manana .section-title {
+  color: #0288d1;
+  border-bottom-color: #b3e5fc;
+}
+
+.seccion-manana .section-title::before {
+  content: '\f185'; /* Ícono de sol (Font Awesome) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #0288d1;
+}
+
+.seccion-tarde .section-title {
+  color: #f57c00;
+  border-bottom-color: #ffe0b2;
+}
+
+.seccion-tarde .section-title::before {
+  content: '\f6c4'; /* Ícono de puesta de sol */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #f57c00;
+}
+
+.seccion-noche .section-title {
+  color: #1a237e;
+  border-bottom-color: #bbdefb;
+}
+
+.seccion-noche .section-title::before {
+  content: '\f186'; /* Ícono de luna */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #1a237e;
+}
+
+.seccion-no-seleccionadas .section-title {
+  color: #616161;
+  border-bottom-color: #e0e0e0;
+}
+
+.seccion-no-seleccionadas .section-title::before {
+  content: '\f0c9'; /* Ícono de lista */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #616161;
+}
+
+/* 2. Estilos para las tarjetas según el turno */
+.seccion-manana .enfermera-card {
+  border-left: 5px solid #0288d1; /* Mañana */
+  background: rgba(2, 136, 209, 0.03);
+}
+
+.seccion-tarde .enfermera-card {
+  border-left: 5px solid #f57c00; /* Tarde */
+  background: rgba(245, 124, 0, 0.03);
+}
+
+.seccion-noche .enfermera-card {
+  border-left: 5px solid #1a237e; /* Noche */
+  background: rgba(26, 35, 126, 0.03);
+}
+
+.seccion-no-seleccionadas .enfermera-card {
+  border-left: 5px solid #616161; /* No Seleccionadas */
+  background: rgba(97, 97, 97, 0.03);
+}
+
+/* 3. Asegurar que los contenedores están bien dimensionados */
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 4. Corregir alineación de elementos en la tarjeta de enfermera */
+.enfermera-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* 5. Corregir estilos de selector de turno */
+.turno-select {
+  min-width: 140px;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #333;
+  font-size: 14px;
+}
+
+/* 6. Asegurar que los botones de filtro tienen estilos correctos */
+.turno-filter-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #f8f9fa;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* 7. Corregir estilos responsivos */
+@media (max-width: 768px) {
   .enfermera-card {
-    background: #f9f9f9;
-    border-radius: 6px;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
-    border-left: 4px solid #2c5697;
-  }
-  
-  .enfermera-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .enfermera-info {
-    display: flex;
     flex-direction: column;
-    gap: 5px;
-    flex: 1;
-  }
-  
-  .enfermera-nombre {
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .enfermera-documento, .enfermera-telefono {
-    font-size: 13px;
-    color: #666;
+    align-items: flex-start;
   }
   
   .enfermera-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  
-  .turno-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  /* Botones de acción */
-  .action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-  }
-  
-  .action-btn.remove {
-    color: #e74c3c;
-    background-color: #ffebee;
-  }
-  
-  .action-btn.remove:hover {
-    background-color: #e74c3c;
-    color: white;
-  }
-  
-  /* Modal de confirmación */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .modal-header h3 {
-    margin: 0;
-    color: #2c5697;
-  }
-  
-  .modal-body {
-    padding: 20px;
-  }
-  
-  .modal-body textarea {
+    margin-top: 15px;
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 100px;
-    resize: vertical;
   }
   
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    padding: 15px 20px;
-    border-top: 1px solid #eee;
+  .turno-select,
+  .action-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+.enfermeras-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.enfermera-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+
+.enfermera-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.enfermera-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.enfermera-nombre {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.enfermera-documento,
+.enfermera-telefono {
+  font-size: 14px;
+  color: #666;
+}
+
+.enfermera-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.turno-select {
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  min-width: 140px;
+}
+
+/* Botones de acción */
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.action-btn.remove {
+  color: #e74c3c;
+  background-color: #ffebee;
+}
+
+.action-btn.remove:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Modal de confirmación */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c5697;
+  font-size: 20px;
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-body textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  min-height: 120px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  padding: 18px 25px;
+  border-top: 1px solid #eee;
+}
+
+.btn-danger {
+  background: #e74c3c;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.btn-danger:hover {
+  background: #c0392b;
+}
+
+.btn-danger[disabled] {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Estado vacío */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state h4 {
+  color: #666;
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Mejoras para los botones del footer */
+.footer-actions {
+  display: flex;
+  justify-content: center; /* Centra los botones en lugar de separarlos a las esquinas */
+  gap: 30px; /* Aumenta el espacio entre botones */
+  margin: 30px auto 40px; /* Aumenta el margen inferior a 40px */
+  padding: 25px 10% 0; /* Añade padding horizontal del 10% para alejarlos de las esquinas */
+  border-top: 1px solid #eee;
+  max-width: 90%; /* Limita el ancho para que no llegue a las esquinas */
+}
+
+.footer-actions .btn {
+  min-width: 180px; /* Ancho mínimo para los botones */
+  justify-content: center; /* Centra el contenido de los botones */
+  padding: 14px 25px; /* Padding más grande para mejor apariencia */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  border-radius: 8px; /* Bordes más redondeados */
+}
+
+.footer-actions .btn-secondary {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.footer-actions .btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.footer-actions .btn:hover:not([disabled]) {
+  transform: translateY(-2px); /* Efecto de elevación al pasar el cursor */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Adicionalmente, aseguramos que el botón tenga un buen aspecto en móviles */
+@media (max-width: 768px) {
+  .container .btn-primary {
+    width: 100%; /* En móviles, ocupa todo el ancho disponible */
+    margin-bottom: 25px;
   }
   
-  .btn-danger {
-    background: #e74c3c;
-    color: white;
-  }
-  
-  .btn-danger:hover {
-    background: #c0392b;
-  }
-  
-  /* Estado vacío */
-  .empty-state {
-    text-align: center;
-    padding: 30px 20px;
-  }
-  
-  .empty-image {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 15px;
-    opacity: 0.7;
-  }
-  
-  .empty-state h4 {
-    color: #666;
-    margin: 0;
-  }
-  
-  /* Botones del footer */
   .footer-actions {
-    display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    padding: 20px 5% 0;
     gap: 15px;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
   }
   
-  .btn {
-    padding: 12px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    border: none;
+  .footer-actions .btn {
+    width: 100%;
   }
-  
-  .btn-secondary {
-    background: #f0f0f0;
-    color: #555;
-  }
-  
-  .btn-secondary:hover {
-    background: #e0e0e0;
-  }
-  
-  .btn-primary {
-    background: #2c5697;
-    color: white;
-  }
-  
-  .btn-primary:hover {
-    background: #1d3d6d;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .enfermera-card {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    
-    .enfermera-actions {
-      width: 100%;
-      justify-content: flex-end;
-    }
-    
-    .footer-actions {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-  /* ... (otros estilos permanecen igual) ... */
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn-primary {
+  background: #2c5697;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1d3d6d;
+}
 
 .btn-success {
-    background: #28a745;
-    color: white;
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not([disabled]) {
+  background: #218838;
+}
+
+.btn-success[disabled] {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.turno-manana {
+  background: rgba(2, 136, 209, 0.03);
+}
+.turno-tarde {
+  background: rgba(245, 124, 0, 0.03);
+}
+.turno-noche {
+  background: rgba(26, 35, 126, 0.03);
+}
+.turno-no-seleccionadas {
+  background: rgba(97, 97, 97, 0.03);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
   }
-  
-  .btn-success:hover:not([disabled]) {
-    background: #218838;
-  }
-  
-  .btn-success[disabled] {
-    background: #cccccc;
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-  
-  /* Asegurar que los botones del footer tengan espacio */
-  .footer-actions {
-    display: flex;
-    justify-content: space-between;
+
+  .enfermera-card {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 15px;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
   }
-  
-  @media (max-width: 768px) {
-    .footer-actions {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
+
+  .enfermera-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
+
+  .turno-select {
+    width: 100%;
+  }
+
+  .footer-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .turno-filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .turno-filter-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-center {
+    font-size: 24px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .enfermera-card {
+    padding: 15px;
+  }
+}
+
+/* Animación para el spinner */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

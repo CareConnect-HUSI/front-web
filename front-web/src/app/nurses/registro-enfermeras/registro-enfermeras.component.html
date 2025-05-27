@@ -3,71 +3,245 @@
     <h2 class="title-center">Registrar Enfermera</h2>
   </div>
 
-  <form [formGroup]="nurseForm" (ngSubmit)="onSubmit()" class="form-container">
+  <!-- Tabs para alternar entre lista y formulario -->
+  <div class="tabs">
+    <button
+      class="tab-btn"
+      [class.active]="!showForm"
+      (click)="showForm = false"
+    >
+      Lista de Enfermeras
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="showForm"
+      (click)="showForm = true; isEditMode = false; nurseForm.reset()"
+    >
+      {{ isEditMode ? "Editar Enfermera" : "Registrar Enfermera" }}
+    </button>
+  </div>
+
+  <!-- Lista de enfermeras -->
+  <div *ngIf="!showForm" class="list-container">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre Completo</th>
+            <th>Documento</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Turno</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let nurse of nurses">
+            <td>{{ nurse.nombre }} {{ nurse.apellido }}</td>
+            <td>
+              {{ nurse.tipoIdentificacion?.name || "CC" }}
+              {{ nurse.numeroIdentificacion }}
+            </td>
+            <td>{{ nurse.email }}</td>
+            <td>{{ nurse.telefono }}</td>
+            <td>{{ nurse.turnoEntity?.name || "" }}</td>
+            <td>
+              <span
+                [class]="
+                  nurse.estado === 'Activo'
+                    ? 'status-active'
+                    : 'status-inactive'
+                "
+              >
+                {{ nurse.estado === "Activo" ? "Activo" : "Inactivo" }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="edit-btn" (click)="loadNurseForEdit(nurse)">
+                <i class="fas fa-edit"></i> Editar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalItems > itemsPerPage">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        (click)="onPageChange(page)"
+        [class.active]="page === currentPage"
+      >
+        {{ page + 1 }}
+      </button>
+    </div>
+
+    <div *ngIf="nurses.length === 0" class="no-records">
+      No hay enfermeras registradas
+    </div>
+  </div>
+
+  <!-- ... parte superior sin cambios ... -->
+
+  <form
+    *ngIf="showForm"
+    [formGroup]="nurseForm"
+    (ngSubmit)="onSubmit()"
+    class="form-container"
+  >
     <div class="form-section">
       <h3 class="section-title">Datos personales</h3>
 
-      <div class="form-grid" formGroupName="personalInfo">
+      <div class="form-grid">
         <div class="form-group">
-          <label>Nombres</label>
-          <input formControlName="name" type="text" placeholder="Ingrese nombres completos" />
+          <label
+            >Nombres
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="name"
+            type="text"
+            placeholder="Ingrese nombres completos"
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Apellidos</label>
-          <input formControlName="lastname" type="text" placeholder="Ingrese apellidos completos" />
+          <label
+            >Apellidos
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="lastname"
+            type="text"
+            placeholder="Ingrese apellidos completos"
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Tipo de Documento</label>
+          <label
+            >Tipo de Documento
+            <span class="required-asterisk">*</span>
+          </label>
           <select formControlName="identificationType">
-            <option value="" disabled selected>Seleccione un tipo</option>
-            <option value="CC">Cédula de Ciudadanía (CC)</option>
-            <option value="TI">Tarjeta de Identidad (TI)</option>
-            <option value="Pasaporte">Pasaporte</option>
+            <option
+              *ngFor="let tipo of tiposIdentificacion"
+              [value]="tipo.name"
+            >
+              {{ tipo.name }}
+            </option>
           </select>
         </div>
-        
+
         <div class="form-group">
-          <label>N° de Documento</label>
-          <input formControlName="identificationNumber" type="text" placeholder="Ingrese número de documento" />
+          <label
+            >N° de Documento
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="identificationNumber"
+            type="text"
+            placeholder="Ingrese número de documento"
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Correo Electrónico</label>
-          <input type="email" formControlName="email" placeholder="ejemplo@correo.com" required />
+          <label
+            >Correo Electrónico
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="ejemplo@correo.com"
+            required
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Contraseña</label>
+          <label
+            >Contraseña
+            <span class="required-asterisk">*</span>
+          </label>
           <div class="password-input">
-            <input type="password" formControlName="password" placeholder="Ingrese una contraseña segura" required />
-            <i class="fas fa-eye toggle-password" (click)="togglePasswordVisibility()"></i>
+            <input
+              type="password"
+              formControlName="password"
+              placeholder="Ingrese una contraseña segura"
+              required
+            />
+            <i
+              class="fas fa-eye toggle-password"
+              (click)="togglePasswordVisibility()"
+            ></i>
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label>Dirección</label>
-          <input formControlName="address" type="text" placeholder="Ingrese dirección completa" />
+          <label
+            >Dirección
+            <span class="required-asterisk">*</span>
+          </label>
+          <div class="address-input">
+            <input
+              formControlName="address"
+              type="text"
+              readonly
+              placeholder="Ej: Calle 123 #45-67"
+            />
+            <button type="button" class="edit-btn" (click)="openAddressModal()">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+          </div>
         </div>
-        
+
         <div class="form-group">
-          <label>Localidad</label>
-          <select formControlName="localidad">
+          <label
+            >Localidad
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="localidad" required (change)="onLocalidadChange()">
             <option value="" disabled selected>Seleccione localidad</option>
-            <option value="Suba">Suba</option>
-            <option value="Usaquén">Usaquén</option>
-            <option value="Chapinero">Chapinero</option>
+            <option *ngFor="let loc of localidades" [value]="loc.codigo">
+              {{ loc.nombre }}
+            </option>
           </select>
+          
         </div>
-        
+
         <div class="form-group">
-          <label>Celular</label>
-          <input formControlName="phone" type="text" placeholder="Ingrese número celular" />
+          <label
+            >Barrio
+            <span class="required-asterisk">*</span>
+          </label>
+          <select formControlName="barrio" required>
+            <option value="" disabled selected>Seleccione barrio</option>
+            <option *ngFor="let barrio of barriosFiltrados" [value]="barrio.nombre">
+              {{ barrio.nombre }}
+            </option>
+          </select>
+          
+          
+          
         </div>
-        
+
         <div class="form-group">
-          <label>Turno</label>
+          <label
+            >Celular
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            formControlName="phone"
+            type="text"
+            placeholder="Ingrese número celular"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Turno
+            <span class="required-asterisk">*</span>
+          </label>
           <select formControlName="turno">
             <option value="" disabled selected>Seleccione turno</option>
             <option value="Mañana">Mañana 7:00 a 13:00</option>
@@ -75,30 +249,144 @@
             <option value="Noche">Noche 19:00 a 7:00</option>
           </select>
         </div>
-        
-        <div class="form-group">
-          <label>Foto</label>
-          <div class="file-upload">
-            <label for="foto" class="upload-btn">
-              <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
-            </label>
-            <input id="foto" type="file" formControlName="foto" (change)="onFileChange($event)" />
-            <span class="file-name">{{ nurseForm.get('personalInfo.foto')?.value?.name || 'Ningún archivo seleccionado' }}</span>
-          </div>
-          <div *ngIf="imagePreview" class="image-preview">
-            <img [src]="imagePreview" alt="Vista previa de la foto" />
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="cancel-btn" routerLink="/lista-enfermeras">
+      <button type="button" class="cancel-btn" (click)="showForm = false">
         <i class="fas fa-times"></i> Cancelar
       </button>
       <button type="submit" class="save-btn" [disabled]="nurseForm.invalid">
-        <i class="fas fa-save"></i> Registrar Enfermera
+        <i class="fas fa-save"></i>
+        {{ isEditMode ? "Actualizar" : "Registrar" }} Enfermera
       </button>
     </div>
   </form>
+</div>
+<!-- Modal para Dirección -->
+<div *ngIf="showAddressModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dirección Completa</h3>
+      <button class="close-btn" (click)="closeAddressModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form class="modal-form" [formGroup]="addressForm">
+      <div class="form-columns">
+        <div class="form-column">
+          <div class="form-group">
+            <label
+              >Tipo de Vía
+              <span class="required-asterisk">*</span>
+            </label>
+            <select formControlName="tipoVia" required>
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="Calle">Calle</option>
+              <option value="Carrera">Carrera</option>
+              <option value="Avenida">Avenida</option>
+              <option value="Diagonal">Diagonal</option>
+              <option value="Transversal">Transversal</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label
+              >Número Vía
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="numeroVia"
+              placeholder="Ej: 12"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Letra Vía (Opcional)</label>
+            <input type="text" formControlName="letraVia" placeholder="Ej: B" />
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group">
+            <label>Sufijo</label>
+            <select formControlName="bis">
+              <option value=""></option>
+              <option value="Bis">Bis</option>
+              <option value="Bis A">Bis A</option>
+              <option value="Bis B">Bis B</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Complemento</label>
+            <input
+              type="text"
+              formControlName="complemento"
+              placeholder="Ej: Este, Oeste"
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              >Número Placa
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="numeroPlaca"
+              placeholder="Ej: 45-67"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label
+          >Localidad
+          <span class="required-asterisk">*</span>
+        </label>
+        <select formControlName="localidad" required (change)="onLocalidadChange()">
+          <option value="" disabled selected>Seleccione localidad</option>
+          <option *ngFor="let loc of localidades" [value]="loc.codigo">
+            {{ loc.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label
+          >Barrio
+          <span class="required-asterisk">*</span>
+        </label>
+        <select formControlName="barrio" required>
+          <option value="" disabled selected>Seleccione barrio</option>
+        <option *ngFor="let barrio of barriosFiltrados" [value]="barrio.nombre">
+          {{ barrio.nombre }}
+        </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Complemento Dirección</label>
+        <textarea
+          formControlName="complementoDireccion"
+          placeholder="Ej: Torre 2, Apartamento 301"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="closeAddressModal()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="save-btn" (click)="saveAddress()">
+          <i class="fas fa-save"></i> Guardar Dirección
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

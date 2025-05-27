@@ -1,141 +1,164 @@
 <div class="container">
-    <div class="header">
-      <h2 class="title-center">Asignación de Pacientes</h2>
-      <div class="info-jornada">
-        <p>Pacientes a atender hoy (7:00 AM - 7:00 AM del día siguiente)</p>
-      </div>
-    </div>
-  
-    <div class="content-container">
-      <!-- Pacientes programados para hoy -->
-      <div class="pacientes-section">
-        <div class="section-header">
-          <h3 class="section-title">Pacientes programados para hoy</h3>
-          <button class="select-all-btn" (click)="seleccionarTodosProgramados()">
-            <i class="fas fa-check-double"></i> Seleccionar todos
-          </button>
-        </div>
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" [(ngModel)]="filtroProgramados" 
-                 (input)="filtrarPacientesProgramados()" 
-                 placeholder="Buscar por nombre o documento">
-        </div>
-        
-        <div *ngIf="pacientesProgramadosNoAsignados.length > 0; else noProgramados" class="pacientes-list">
-          <div *ngFor="let paciente of pacientesProgramadosNoAsignados" class="paciente-card">
-            <div class="paciente-info">
-              <span class="paciente-nombre">{{ paciente.nombre }}</span>
-              <span class="paciente-documento">{{ paciente.documento }}</span>
-              <span class="paciente-horario">{{ paciente.horario }}</span>
-            </div>
-            <button class="action-btn assign" (click)="asignarPaciente(paciente)">
-              <i class="fas fa-user-plus"></i> Asignar
-            </button>
-          </div>
-        </div>
-  
-        <ng-template #noProgramados>
-          <div class="empty-state">
-            <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
-            <h4>No hay pacientes programados sin asignar</h4>
-          </div>
-        </ng-template>
-      </div>
-  
-      <!-- Pacientes asignados -->
-      <div class="pacientes-section">
-        <h3 class="section-title">Pacientes asignados</h3>
-        <div *ngIf="pacientesAsignados.length > 0; else noAsignados" class="pacientes-list">
-          <div *ngFor="let paciente of pacientesAsignados" class="paciente-card assigned">
-            <div class="paciente-info">
-              <span class="paciente-nombre">{{ paciente.nombre }}</span>
-              <span class="paciente-documento">{{ paciente.documento }}</span>
-              <span *ngIf="paciente.horario" class="paciente-horario">{{ paciente.horario }}</span>
-              <span *ngIf="!paciente.horario" class="paciente-horario">No programado</span>
-            </div>
-            <button class="action-btn remove" (click)="abrirModalConfirmacion(paciente)">
-              <i class="fas fa-user-minus"></i> Remover
-            </button>
-          </div>
-        </div>
-  
-        <ng-template #noAsignados>
-          <div class="empty-state">
-            <img src="assets/images/no-assignments.png" alt="No hay asignaciones" class="empty-image">
-            <h4>No hay pacientes asignados aún</h4>
-          </div>
-        </ng-template>
-      </div>
-  
-      <!-- Otros pacientes disponibles -->
-      <div class="pacientes-section">
-        <div class="section-header">
-          <h3 class="section-title">Otros pacientes disponibles</h3>
-          <button class="select-all-btn" (click)="seleccionarTodosDisponibles()">
-            <i class="fas fa-check-double"></i> Seleccionar todos
-          </button>
-        </div>
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" [(ngModel)]="filtroDisponibles" 
-                 (input)="filtrarPacientesDisponibles()" 
-                 placeholder="Buscar por nombre o documento">
-        </div>
-        
-        <div *ngIf="pacientesDisponiblesNoAsignados.length > 0; else noDisponibles" class="pacientes-list">
-          <div *ngFor="let paciente of pacientesDisponiblesNoAsignados" class="paciente-card">
-            <div class="paciente-info">
-              <span class="paciente-nombre">{{ paciente.nombre }}</span>
-              <span class="paciente-documento">{{ paciente.documento }}</span>
-            </div>
-            <button class="action-btn assign" (click)="asignarPaciente(paciente)">
-              <i class="fas fa-user-plus"></i> Asignar
-            </button>
-          </div>
-        </div>
-  
-        <ng-template #noDisponibles>
-          <div class="empty-state">
-            <img src="assets/images/no-patients.png" alt="No hay pacientes" class="empty-image">
-            <h4>No hay otros pacientes disponibles</h4>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-  
-    <!-- Modal de confirmación -->
-    <div *ngIf="mostrarModalConfirmacion" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Confirmar Remoción</h3>
-          <button class="close-btn" (click)="cerrarModalConfirmacion()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>¿Está seguro que desea remover a <strong>{{pacienteARemover?.nombre}}</strong> de los pacientes asignados?</p>
-          <div class="form-group">
-            <label>Motivo de remoción:</label>
-            <textarea [(ngModel)]="motivoRemocion" placeholder="Describa el motivo para remover este paciente"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="cerrarModalConfirmacion()">Cancelar</button>
-          <button class="btn btn-danger" [disabled]="!motivoRemocion" (click)="confirmarRemocion()">Confirmar Remoción</button>
-        </div>
-      </div>
-    </div>
-  
-    <div class="footer-actions">
-      <button class="btn btn-secondary" routerLink="/cronograma">
-        <i class="fas fa-arrow-left"></i> Volver al Cronograma
-      </button>
-      <button class="btn btn-primary" (click)="navegarARegistroPaciente()">
-        <i class="fas fa-plus-circle"></i> Registrar Nuevo Paciente
-      </button>
-      <button class="btn btn-success" [disabled]="pacientesAsignados.length === 0" routerLink="/asignar-enfermeras">
-        <i class="fas fa-user-nurse"></i> Asignar Enfermeras
-      </button>
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Cargando Pacientes...</span>
     </div>
   </div>
+
+  <div class="header">
+    <h2 class="title-center">Asignación de Pacientes</h2>
+    <div class="info-jornada">
+      <p>Pacientes a atender hoy (7:00 AM - 7:00 AM del día siguiente)</p>
+    </div>
+  </div>
+  <button class="btn btn-primary" (click)="navegarARegistroPaciente()">
+    <i class="fas fa-plus-circle"></i> Registrar Nuevo Paciente
+  </button>
+
+  <div class="content-container">
+    <!-- Pacientes programados para hoy -->
+    <div class="pacientes-section">
+      <div class="section-header">
+        <h3 class="section-title">Pacientes programados para hoy</h3>
+        <button class="select-all-btn" (click)="seleccionarTodosProgramados()">
+          <i class="fas fa-check-double"></i> Seleccionar todos
+        </button>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtroProgramados" 
+               (input)="filtrarPacientesProgramados()" 
+               placeholder="Buscar por nombre o documento">
+      </div>
+
+      <div *ngIf="pacientesProgramadosNoAsignados.length > 0; else noProgramados" class="pacientes-list">
+        <div *ngFor="let paciente of pacientesProgramadosNoAsignados" class="paciente-card">
+          <div class="paciente-info">
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
+            <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
+            <span class="paciente-horario">
+              {{
+                paciente.actividades?.[0]?.hora
+                  ? (paciente.actividades[0].hora + ' hs')
+                  : 'Sin horario'
+              }}
+            </span>
+          </div>
+          <button class="action-btn assign" (click)="asignarPaciente(paciente)">
+            <i class="fas fa-user-plus"></i> Asignar
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noProgramados>
+        <div class="empty-state">
+          <h4>No hay pacientes programados sin asignar</h4>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Pacientes asignados -->
+    <div class="pacientes-section">
+      <h3 class="section-title">Pacientes asignados</h3>
+      <div *ngIf="pacientesAsignados.length > 0; else noAsignados" class="pacientes-list">
+        <div *ngFor="let paciente of pacientesAsignados" class="paciente-card assigned">
+          <div class="paciente-info">
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
+            <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
+            <span class="paciente-horario">
+              {{
+                paciente.actividades?.[0]?.hora
+                  ? (paciente.actividades[0].hora + ' hs')
+                  : 'No programado'
+              }}
+            </span>
+          </div>
+          <button class="action-btn remove" (click)="abrirModalConfirmacion(paciente)">
+            <i class="fas fa-user-minus"></i> Remover
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noAsignados>
+        <div class="empty-state">
+          <h4>No hay pacientes asignados aún</h4>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Otros pacientes disponibles -->
+    <div class="pacientes-section">
+      <div class="section-header">
+        <h3 class="section-title">Otros pacientes disponibles</h3>
+        <button class="select-all-btn" (click)="seleccionarTodosDisponibles()">
+          <i class="fas fa-check-double"></i> Seleccionar todos
+        </button>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" [(ngModel)]="filtroDisponibles" 
+               (input)="filtrarPacientesDisponibles()" 
+               placeholder="Buscar por nombre o documento">
+      </div>
+
+      <div *ngIf="pacientesDisponiblesNoAsignados.length > 0; else noDisponibles" class="pacientes-list">
+        <div *ngFor="let paciente of pacientesDisponiblesNoAsignados" class="paciente-card">
+          <div class="paciente-info">
+            <span class="paciente-nombre">{{ paciente.nombre }}  {{paciente.apellido}}</span>
+            <span class="paciente-documento">{{ paciente.numeroIdentificacion }}</span>
+            <span class="paciente-horario">
+              {{
+                paciente.actividades?.[0]?.hora
+                  ? (paciente.actividades[0].hora + ' hs')
+                  : 'Sin horario'
+              }}
+            </span>
+          </div>
+          <button class="action-btn assign" (click)="asignarPaciente(paciente)">
+            <i class="fas fa-user-plus"></i> Asignar
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noDisponibles>
+        <div class="empty-state">
+          <h4>No hay otros pacientes disponibles</h4>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación -->
+  <div *ngIf="mostrarModalConfirmacion" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Confirmar Remoción</h3>
+        <button class="close-btn" (click)="cerrarModalConfirmacion()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Está seguro que desea remover a <strong>{{pacienteARemover?.nombre}}</strong> de los pacientes asignados?</p>
+        <div class="form-group">
+          <label>Motivo de remoción:</label>
+          <textarea [(ngModel)]="motivoRemocion" placeholder="Describa el motivo para remover este paciente"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModalConfirmacion()">Cancelar</button>
+        <button class="btn btn-danger" [disabled]="!motivoRemocion" (click)="confirmarRemocion()">Confirmar Remoción</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn btn-secondary" routerLink="/cronograma">
+      <i class="fas fa-arrow-left"></i> Volver al Cronograma
+    </button>
+    <button class="btn btn-success" [disabled]="pacientesAsignados.length === 0" (click)="navegarSiguiente()">
+      <i class="fas fa-user-nurse"></i> Asignar Enfermeras
+    </button>
+  </div>
+</div>

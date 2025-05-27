@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import {VisitsService} from '../../service/visits.service';
+import { PatientService } from 'src/app/service/patient.service';
 
 @Component({
   selector: 'app-nurses-assignment',
@@ -9,16 +11,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class NursesAssignmentComponent implements OnInit {
   enfermeraId: string | null = null;
   enfermeraNombre: string = "Enfermera Desconocida";
-  
-  // Filtros
-  filtroPaciente: string = '';
-  mesSeleccionado: string = '';
-  anioSeleccionado: string = '';
-  fechaEspecifica: string = '';
+
+  filtroPaciente = '';
+  mesSeleccionado = '';
+  anioSeleccionado = '';
+  fechaEspecifica = '';
   asignacionesFiltradas: any[] = [];
-  
-  // Opciones para filtros
-  meses = [
+  asignaciones: any[] = [];
+  isLoading: boolean = false;
+
+ meses = [
     { value: '1', nombre: 'Enero' },
     { value: '2', nombre: 'Febrero' },
     { value: '3', nombre: 'Marzo' },
@@ -34,150 +36,92 @@ export class NursesAssignmentComponent implements OnInit {
   ];
   
   anios = ['2023', '2024', '2025'];
-  
-  // Datos quemados más completos
-  asignaciones = [
-    { 
-      id: 1,
-      fecha: new Date(2024, 5, 15), // 15/Jun/2024
-      hora: "08:00 AM", 
-      paciente: "Juan Pérez", 
-      documento: "12345678",
-      direccion: "Calle 123 #45-67", 
-      estado: "Completado",
-      detalles: "Control postoperatorio"
-    },
-    { 
-      id: 2,
-      fecha: new Date(2024, 5, 15),
-      hora: "10:00 AM", 
-      paciente: "María Gómez", 
-      documento: "87654321",
-      direccion: "Avenida 45 #12-34", 
-      estado: "Completado",
-      detalles: "Aplicación de medicamentos"
-    },
-    { 
-      id: 3,
-      fecha: new Date(2024, 5, 16),
-      hora: "09:30 AM", 
-      paciente: "Carlos López", 
-      documento: "56781234",
-      direccion: "Calle 77 #22-11", 
-      estado: "Completado",
-      detalles: "Curar heridas"
-    },
-    { 
-      id: 4,
-      fecha: new Date(2024, 5, 17),
-      hora: "02:00 PM", 
-      paciente: "Ana Torres", 
-      documento: "43218765",
-      direccion: "Boulevard Central #100-20", 
-      estado: "Completado",
-      detalles: "Control de signos vitales"
-    },
-    { 
-      id: 5,
-      fecha: new Date(2024, 5, 18),
-      hora: "08:30 AM", 
-      paciente: "Luisa Fernández", 
-      documento: "98765432",
-      direccion: "Carrera 8 #15-62", 
-      estado: "En proceso",
-      detalles: "Toma de muestras"
-    },
-    { 
-      id: 6,
-      fecha: new Date(2024, 5, 18),
-      hora: "11:00 AM", 
-      paciente: "Pedro Rojas", 
-      documento: "13579246",
-      direccion: "Diagonal 25 #34-10", 
-      estado: "Pendiente",
-      detalles: "Visita de control"
-    },
-    { 
-      id: 7,
-      fecha: new Date(2024, 5, 19),
-      hora: "09:00 AM", 
-      paciente: "Sofía Mendoza", 
-      documento: "24681357",
-      direccion: "Transversal 12 #45-30", 
-      estado: "Pendiente",
-      detalles: "Aplicación de vacuna"
-    }
-  ];
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private visitaService: VisitsService,
+    private pacienteService: PatientService
   ) {}
 
   ngOnInit() {
     this.enfermeraId = this.route.snapshot.paramMap.get('id');
-    this.enfermeraNombre = `Enfermera ${this.enfermeraId}`;
-    
-    // Ordenar por fecha más reciente primero y luego por hora
-    this.asignaciones.sort((a, b) => {
-      if (b.fecha.getTime() === a.fecha.getTime()) {
-        return this.compareTime(b.hora, a.hora);
-      }
-      return b.fecha.getTime() - a.fecha.getTime();
-    });
-    
-    this.asignacionesFiltradas = [...this.asignaciones];
-  }
-  
-  // Función para comparar horas en formato "HH:MM AM/PM"
-  private compareTime(timeA: string, timeB: string): number {
-    const convertToMinutes = (time: string) => {
-      const [hours, minutes] = time.split(':').map(Number);
-      const period = time.includes('PM') && hours !== 12 ? 12 : 0;
-      return (hours % 12 + period) * 60 + minutes;
-    };
-    
-    return convertToMinutes(timeB) - convertToMinutes(timeA);
+
+    this.isLoading = true; 
+
+    if (this.enfermeraId) {
+      this.visitaService.getVisitasByEnfermeraId(this.enfermeraId).subscribe(visitas => {
+        const enrichedData$ = visitas.map(visita =>
+        this.visitaService.getActividadVisitaPacienteById(visita.actividadPacienteVisitaId)
+          .toPromise()
+          .then(async actividad => {
+            const paciente = await this.pacienteService.obtenerPacientePorId(actividad.pacienteId).toPromise();
+
+            return {
+              ...visita,
+              paciente: `${paciente.nombre} ${paciente.apellido}`,
+              documento: paciente.numeroIdentificacion,
+              direccion: paciente.direccion ?? 'No disponible',
+              detalles: `Actividad ${actividad.actividadId}`,
+              fecha: new Date(visita.fechaVisita),
+              hora: visita.horaInicioEjecutada? this.formatHora(visita.horaInicioCalculada) : '00:00',
+              horaFin: visita.horaFinEjecutada? this.formatHora(visita.horaInicioCalculada) : ' ',
+              estado: visita.estado ?? 'PROGRAMADA'
+            };
+          })
+      );
+
+        Promise.all(enrichedData$).then(completadas => {
+          this.asignaciones = completadas;
+          this.asignaciones.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+          this.asignacionesFiltradas = [...this.asignaciones];
+          this.isLoading = false;
+        });
+      });
+    }
   }
 
   aplicarFiltros() {
     let resultados = [...this.asignaciones];
-    
-    // Filtro por paciente (nombre o documento)
+    const busqueda = this.filtroPaciente.toLowerCase();
+
     if (this.filtroPaciente) {
-      const busqueda = this.filtroPaciente.toLowerCase();
-      resultados = resultados.filter(a => 
-        a.paciente.toLowerCase().includes(busqueda) || 
+      resultados = resultados.filter(a =>
+        a.paciente.toLowerCase().includes(busqueda) ||
         a.documento.toString().includes(busqueda)
       );
     }
-    
-    // Filtro por mes
+
     if (this.mesSeleccionado) {
-      resultados = resultados.filter(a => 
+      resultados = resultados.filter(a =>
         (a.fecha.getMonth() + 1).toString() === this.mesSeleccionado
       );
     }
-    
-    // Filtro por año
+
     if (this.anioSeleccionado) {
-      resultados = resultados.filter(a => 
+      resultados = resultados.filter(a =>
         a.fecha.getFullYear().toString() === this.anioSeleccionado
       );
     }
-    
-    // Filtro por fecha específica
+
     if (this.fechaEspecifica) {
       const fechaSeleccionada = new Date(this.fechaEspecifica);
-      resultados = resultados.filter(a => 
+      resultados = resultados.filter(a =>
         a.fecha.toDateString() === fechaSeleccionada.toDateString()
       );
     }
-    
+
     this.asignacionesFiltradas = resultados;
   }
-  
+
+  formatHora(time: string): string {
+    const [hour, minute] = time.split(':');
+    const h = parseInt(hour, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const formatted = ((h + 11) % 12 + 1) + ':' + minute + ' ' + ampm;
+    return formatted;
+  }
+
   verDetalles(asignacion: any) {
-    this.router.navigate(['/detalle-asignacion']);
+    
   }
 }

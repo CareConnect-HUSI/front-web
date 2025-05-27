@@ -1,119 +1,147 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { OptimizationDataService } from 'src/app/service/optimization-data.service';
+import { PatientService } from 'src/app/service/patient.service';
+
 
 @Component({
   selector: 'app-asignar-pacientes',
   templateUrl: './asignar-pacientes.component.html',
-  styleUrls: ['./asignar-pacientes.component.css']
+  styleUrls: ['./asignar-pacientes.component.css'],
 })
 export class AsignarPacientesComponent implements OnInit {
   filtroProgramados: string = '';
   filtroDisponibles: string = '';
-  
-  // Datos quemados para prueba (7am hoy a 7am mañana)
-  todosPacientesProgramados: any[] = [
-    { id: 1, nombre: 'Juan Pérez', documento: '12345678', horario: '8:00 AM', esProgramado: true },
-    { id: 2, nombre: 'María Gómez', documento: '87654321', horario: '10:00 AM', esProgramado: true },
-    { id: 3, nombre: 'Carlos López', documento: '56781234', horario: '2:00 PM', esProgramado: true },
-    { id: 4, nombre: 'Ana Torres', documento: '43218765', horario: '4:00 PM', esProgramado: true },
-    { id: 5, nombre: 'Luisa Fernández', documento: '98765432', horario: '8:00 PM', esProgramado: true },
-    { id: 6, nombre: 'Pedro Rojas', documento: '13579246', horario: '11:00 PM', esProgramado: true },
-    { id: 7, nombre: 'Sofía Mendoza', documento: '24681357', horario: '1:00 AM', esProgramado: true },
-    { id: 8, nombre: 'Ricardo Castro', documento: '36925814', horario: '5:00 AM', esProgramado: true }
-  ];
-  
-  todosPacientesDisponibles: any[] = [
-    { id: 9, nombre: 'Laura Jiménez', documento: '48263917', esProgramado: false },
-    { id: 10, nombre: 'Miguel Ángel', documento: '15926348', esProgramado: false },
-    { id: 11, nombre: 'Diana García', documento: '75315984', esProgramado: false }
-  ];
-  
-  pacientesAsignados: any[] = [];
+
+  todosPacientes: any[] = [];
+
+  todosPacientesProgramados: any[] = [];
+  todosPacientesDisponibles: any[] = [];
+
   pacientesProgramadosNoAsignados: any[] = [];
   pacientesDisponiblesNoAsignados: any[] = [];
+  pacientesAsignados: any[] = [];
 
-  // Variables para el modal de confirmación
   mostrarModalConfirmacion: boolean = false;
   pacienteARemover: any = null;
   motivoRemocion: string = '';
 
-  constructor(private router: Router) {}
+  isLoading: boolean = false;
+
+  constructor(
+    private router: Router,
+    private pacienteService: PatientService,
+    private optimizationDataService: OptimizationDataService
+  ) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
+
+    this.pacienteService.findAll(0, 50).subscribe({
+      next: (response) => {
+        this.todosPacientes = response.content;
+        this.isLoading = false;
+        this.clasificarPacientes();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.todosPacientes = [];
+      },
+    });
+  }
+
+  clasificarPacientes(): void {
+    const ahora = new Date();
+
+    this.todosPacientesProgramados = this.todosPacientes.filter((p) => {
+      return p.actividades?.some(
+        (a: { fechaFin: string | number | Date; frecuencia: number }) => {
+          const fechaFin = new Date(a.fechaFin);
+          return fechaFin > ahora && a.frecuencia < 24;
+        }
+      );
+    });
+
+    this.todosPacientesDisponibles = this.todosPacientes.filter((p) => {
+      return !this.todosPacientesProgramados.includes(p);
+    });
+
     this.actualizarListas();
   }
 
   actualizarListas(): void {
-    // Pacientes programados que no están asignados
-    this.pacientesProgramadosNoAsignados = this.todosPacientesProgramados.filter(
-      p => !this.pacientesAsignados.some(a => a.id === p.id)
-    );
-    
-    // Pacientes disponibles que no están asignados
-    this.pacientesDisponiblesNoAsignados = this.todosPacientesDisponibles.filter(
-      p => !this.pacientesAsignados.some(a => a.id === p.id)
-    );
-    
-    // Filtrar según búsquedas
+    this.pacientesProgramadosNoAsignados =
+      this.todosPacientesProgramados.filter(
+        (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
+      );
+
+    this.pacientesDisponiblesNoAsignados =
+      this.todosPacientesDisponibles.filter(
+        (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
+      );
+
     this.filtrarPacientesProgramados();
     this.filtrarPacientesDisponibles();
   }
 
   filtrarPacientesProgramados(): void {
     if (!this.filtroProgramados) {
-      this.pacientesProgramadosNoAsignados = this.todosPacientesProgramados.filter(
-        p => !this.pacientesAsignados.some(a => a.id === p.id)
-      );
+      this.pacientesProgramadosNoAsignados =
+        this.todosPacientesProgramados.filter(
+          (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
+        );
       return;
     }
-    
+
     const busqueda = this.filtroProgramados.toLowerCase();
     this.pacientesProgramadosNoAsignados = this.todosPacientesProgramados
-      .filter(p => !this.pacientesAsignados.some(a => a.id === p.id))
-      .filter(p => 
-        p.nombre.toLowerCase().includes(busqueda) || 
-        p.documento.toString().includes(busqueda)
+      .filter((p) => !this.pacientesAsignados.some((a) => a.id === p.id))
+      .filter(
+        (p) =>
+          p.nombre.toLowerCase().includes(busqueda) ||
+          p.numeroIdentificacion?.toString().includes(busqueda)
       );
   }
 
   filtrarPacientesDisponibles(): void {
     if (!this.filtroDisponibles) {
-      this.pacientesDisponiblesNoAsignados = this.todosPacientesDisponibles.filter(
-        p => !this.pacientesAsignados.some(a => a.id === p.id)
-      );
+      this.pacientesDisponiblesNoAsignados =
+        this.todosPacientesDisponibles.filter(
+          (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
+        );
       return;
     }
-    
+
     const busqueda = this.filtroDisponibles.toLowerCase();
     this.pacientesDisponiblesNoAsignados = this.todosPacientesDisponibles
-      .filter(p => !this.pacientesAsignados.some(a => a.id === p.id))
-      .filter(p => 
-        p.nombre.toLowerCase().includes(busqueda) || 
-        p.documento.toString().includes(busqueda)
+      .filter((p) => !this.pacientesAsignados.some((a) => a.id === p.id))
+      .filter(
+        (p) =>
+          p.nombre.toLowerCase().includes(busqueda) ||
+          p.numeroIdentificacion?.toString().includes(busqueda)
       );
   }
 
   seleccionarTodosProgramados(): void {
-    const nuevosPacientes = this.pacientesProgramadosNoAsignados.filter(
-      p => !this.pacientesAsignados.some(a => a.id === p.id)
+    const nuevos = this.pacientesProgramadosNoAsignados.filter(
+      (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
     );
-    
-    this.pacientesAsignados = [...this.pacientesAsignados, ...nuevosPacientes];
+    this.pacientesAsignados = [...this.pacientesAsignados, ...nuevos];
     this.actualizarListas();
   }
 
   seleccionarTodosDisponibles(): void {
-    const nuevosPacientes = this.pacientesDisponiblesNoAsignados.filter(
-      p => !this.pacientesAsignados.some(a => a.id === p.id)
+    const nuevos = this.pacientesDisponiblesNoAsignados.filter(
+      (p) => !this.pacientesAsignados.some((a) => a.id === p.id)
     );
-    
-    this.pacientesAsignados = [...this.pacientesAsignados, ...nuevosPacientes];
+    this.pacientesAsignados = [...this.pacientesAsignados, ...nuevos];
     this.actualizarListas();
   }
 
   asignarPaciente(paciente: any): void {
-    if (!this.pacientesAsignados.some(p => p.id === paciente.id)) {
-      this.pacientesAsignados.push({...paciente});
+    if (!this.pacientesAsignados.some((p) => p.id === paciente.id)) {
+      this.pacientesAsignados.push({ ...paciente });
       this.actualizarListas();
     }
   }
@@ -132,11 +160,10 @@ export class AsignarPacientesComponent implements OnInit {
 
   confirmarRemocion(): void {
     if (this.pacienteARemover && this.motivoRemocion) {
-      const index = this.pacientesAsignados.findIndex(p => p.id === this.pacienteARemover.id);
+      const index = this.pacientesAsignados.findIndex(
+        (p) => p.id === this.pacienteARemover.id
+      );
       if (index !== -1) {
-        // Registrar motivo de remoción
-        console.log(`Paciente removido: ${this.pacienteARemover.nombre}. Motivo: ${this.motivoRemocion}`);
-        
         this.pacientesAsignados.splice(index, 1);
         this.cerrarModalConfirmacion();
         this.actualizarListas();
@@ -145,6 +172,115 @@ export class AsignarPacientesComponent implements OnInit {
   }
 
   navegarARegistroPaciente(): void {
-    this.router.navigate(['/registro-paciente']);
+    const pacientesManana: any[] = [];
+    const pacientesTarde: any[] = [];
+    const pacientesNoche: any[] = [];
+
+    this.pacientesAsignados.forEach((paciente) => {
+      // Buscar la primera hora válida en las actividades
+      const hora = this.getPrimeraHoraValida(paciente.actividades);
+
+      if (!hora) {
+        console.warn(
+          `El paciente ${paciente.nombre} no tiene horario asignado. Asignado a Turno Noche por defecto.`
+        );
+        pacientesNoche.push(paciente);
+        return;
+      }
+
+      // Determinar el turno basado en la hora encontrada
+      const turno = this.getTurnoByHora(hora);
+
+      if (turno === 'Manana') {
+        pacientesManana.push(paciente);
+      } else if (turno === 'Tarde') {
+        pacientesTarde.push(paciente);
+      } else {
+        pacientesNoche.push(paciente);
+      }
+    });
+
+    // Guardar en OptimizationDataService
+    this.optimizationDataService.setInfoPacientesManana(pacientesManana);
+    this.optimizationDataService.setInfoPacientesTarde(pacientesTarde);
+    this.optimizationDataService.setInfoPacientesNoche(pacientesNoche);
+    this.router.navigate(['/registro-pacientes']);
+  }
+  // Función auxiliar para determinar el turno basado en la hora
+  private getTurnoByHora(hora: string): string {
+    if (!hora) return 'Noche'; // Valor por defecto si no hay hora
+
+    const [hours, minutes] = hora.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+
+    // Turno Mañana: 7:00 AM (420 min) - 1:00 PM (780 min)
+    if (totalMinutes >= 420 && totalMinutes < 780) {
+      return 'Manana';
+    }
+    // Turno Tarde: 1:00 PM (780 min) - 7:00 PM (1140 min)
+    else if (totalMinutes >= 780 && totalMinutes < 1140) {
+      return 'Tarde';
+    }
+    // Turno Noche: 7:00 PM (1140 min) - 7:00 AM (420 min del día siguiente)
+    else {
+      return 'Noche';
+    }
+  }
+
+  private getPrimeraHoraValida(actividades: any[]): string | null {
+    if (!actividades || !Array.isArray(actividades)) {
+      return null;
+    }
+
+    for (const actividad of actividades) {
+      if (
+        actividad?.hora &&
+        typeof actividad.hora === 'string' &&
+        actividad.hora.match(/^\d{2}:\d{2}$/)
+      ) {
+        return actividad.hora;
+      }
+    }
+
+    return null;
+  }
+
+  navegarSiguiente(): void {
+    // Clasificar pacientes por turno según la hora de sus actividades
+    const pacientesManana: any[] = [];
+    const pacientesTarde: any[] = [];
+    const pacientesNoche: any[] = [];
+
+    this.pacientesAsignados.forEach((paciente) => {
+      // Buscar la primera hora válida en las actividades
+      const hora = this.getPrimeraHoraValida(paciente.actividades);
+
+      if (!hora) {
+        console.warn(
+          `El paciente ${paciente.nombre} no tiene horario asignado. Asignado a Turno Noche por defecto.`
+        );
+        pacientesNoche.push(paciente);
+        return;
+      }
+
+      // Determinar el turno basado en la hora encontrada
+      const turno = this.getTurnoByHora(hora);
+
+      if (turno === 'Manana') {
+        pacientesManana.push(paciente);
+      } else if (turno === 'Tarde') {
+        pacientesTarde.push(paciente);
+      } else {
+        pacientesNoche.push(paciente);
+      }
+    });
+
+    // Guardar en OptimizationDataService
+    this.optimizationDataService.setInfoPacientesManana(pacientesManana);
+    this.optimizationDataService.setInfoPacientesTarde(pacientesTarde);
+    this.optimizationDataService.setInfoPacientesNoche(pacientesNoche);
+
+    // Navegar a la siguiente pantalla
+    this.router.navigate(['/asignar-enfermeras']);
   }
 }

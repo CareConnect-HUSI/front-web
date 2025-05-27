@@ -2,18 +2,12 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { PatientService } from './../../service/patient.service';
 import { AuthService } from 'src/app/service/auth.service';
+import { StockService } from 'src/app/service/stock.service'; // 👈 Agregado
 
-interface Medicamento {
+
+interface Localidad {
   codigo: string;
   nombre: string;
-  tipo: string; // Oral o Inyectable
-  total: number;
-}
-
-interface Procedimiento {
-  codigo: string;
-  abreviatura: string;
-  descripcion: string;
 }
 
 @Component({
@@ -23,48 +17,138 @@ interface Procedimiento {
 })
 export class RegisterPatientComponent implements OnInit {
   @Output() pacienteRegistrado = new EventEmitter<any>();
-
+  showAddressModal = false;
+  addressForm!: FormGroup;
   patientForm!: FormGroup;
-  listaProcedimientos: Procedimiento[] = [
-    { codigo: '1', abreviatura: 'CUR', descripcion: 'Curación' },
-    { codigo: '2', abreviatura: 'HEM', descripcion: 'Hemocultivo' },
-    { codigo: '3', abreviatura: 'CAT', descripcion: 'Curación de Cateter' },
-  ];
+  tiposIdentificacion: any[] = [];
+  tiposActividad: any[] = [];
 
-  listaMedicamentos: Medicamento[] = [
-    { codigo: '1', nombre: 'Paracetamol', tipo: 'Oral', total: 100 },
-    { codigo: '2', nombre: 'Ibuprofeno', tipo: 'Oral', total: 50 },
-    { codigo: '3', nombre: 'Amoxicilina', tipo: 'Inyectable', total: 30 },
-  ];
+  listaProcedimientos: any[] = [];
+  listaMedicamentos: any[] = [];
+
+  localidades: { codigo: string, nombre: string }[] = [];
+  barriosFiltrados: { id: number; nombre: string }[] = [];
+  
 
   frecuencias: number[] = [72, 48, 24, 12, 8, 6];
   duraciones: number[] = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180];
 
-  constructor(private fb: FormBuilder, private patientService: PatientService) {}
+  constructor(
+    private fb: FormBuilder,
+    private patientService: PatientService,
+    private stockService: StockService
+  ) {}
 
   ngOnInit() {
+    this.initPatientForm();
+    this.initAddressForm();
+    this.agregarMedicamento();
+    this.cargarTiposIdentificacion();
+    this.cargarTiposActividad();
+    this.cargarProcedimientos();
+    this.cargarTratamientos();
+    this.cargarLocalidades(); 
+  }
+
+  initPatientForm() {
     this.patientForm = this.fb.group({
       personalInfo: this.fb.group({
-        nombres: ['', Validators.required], // Inicializado vacío
-        apellidos: ['', Validators.required], // Inicializado vacío
-        tipoDocumento: ['', Validators.required], // Inicializado vacío
-        numeroDocumento: ['', Validators.required], // Inicializado vacío
-        direccion: ['', Validators.required], // Inicializado vacío
-        celular: ['', Validators.required], // Inicializado vacío
-        localidad: ['', Validators.required], // Inicializado vacío
-        barrio: ['', Validators.required], // Inicializado vacío
-        nombreFamiliar: ['', Validators.required], // Inicializado vacío
-        parentesco: ['', Validators.required], // Inicializado vacío
-        celularFamiliar: ['', Validators.required], // Inicializado vacío
-        email: ['', [Validators.required, Validators.email]], // Inicializado vacío
-        foto: [null]
+        nombres: ['', Validators.required],
+        apellidos: ['', Validators.required],
+        tipoDocumento: ['', Validators.required],
+        numeroDocumento: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        direccion: ['', Validators.required],
+        celular: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        localidad: ['', Validators.required],
+        barrio: ['', Validators.required],
+        conjunto: [''],
+        estado: ['Activo'],
+        nombreFamiliar: ['', Validators.required],
+        celularFamiliar: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        segundoCelular: ['', Validators.pattern(/^\d+$/)]
       }),
       tratamiento: this.fb.array([]),
       procedimientos: this.fb.array([])
     });
-  
-    this.agregarMedicamento();
   }
+
+  initAddressForm() {
+    this.addressForm = this.fb.group({
+      tipoVia: ['', Validators.required],
+      numeroVia: ['', Validators.required],
+      letraVia: [''],
+      bis: [''],
+      complemento: [''],
+      numeroPlaca: ['', Validators.required],
+      localidad: ['', Validators.required],
+      barrio: ['', Validators.required],
+      complementoDireccion: [''],
+      conjunto: ['']
+    });
+  }
+
+  openAddressModal() {
+    this.showAddressModal = true;
+  }
+
+  closeAddressModal() {
+    this.showAddressModal = false;
+  }
+
+  cargarLocalidades() {
+    this.patientService.getLocalidades().subscribe({
+      next: (localidades: Localidad[]) => {
+        this.localidades = localidades.map(l => ({ codigo: l.codigo, nombre: l.nombre }));
+      },
+      error: (error) => {
+        console.error('Error al cargar localidades:', error);
+      }
+    });
+  }
+
+  onLocalidadChange() {
+    const codigo = this.addressForm.get('localidad')?.value || this.patientForm.get('personalInfo.localidad')?.value;
+
+  
+    if (!codigo) return;
+  
+    this.patientService.getBarriosPorLocalidad(codigo).subscribe({
+      next: (barrios: any[]) => {
+        this.barriosFiltrados = barrios.map(b => ({ id: b.id, nombre: b.nombre }));
+      },
+      error: (err: any) => {
+        console.error('Error al cargar barrios:', err);
+      }
+    });
+  }
+
+  saveAddress() {
+  if (this.addressForm.valid) {
+    const address = this.addressForm.value;
+
+    let direccionCompleta = `${address.tipoVia} ${address.numeroVia}`;
+    if (address.letraVia?.trim()) direccionCompleta += ` ${address.letraVia}`;
+    if (address.bis?.trim()) direccionCompleta += ` ${address.bis}`;
+    if (address.complemento?.trim()) direccionCompleta += ` ${address.complemento}`;
+    direccionCompleta += ` # ${address.numeroPlaca}`;
+    if (address.complementoDireccion?.trim()) direccionCompleta += `, ${address.complementoDireccion}`;
+    if (address.conjunto?.trim()) direccionCompleta += `, Conjunto ${address.conjunto}`;
+    direccionCompleta += `, Bogotá, Colombia`;
+
+    const nombreLocalidad = this.localidades.find(l => l.codigo === address.localidad)?.nombre || address.localidad;
+  this.patientForm.get('personalInfo.localidad')?.setValue(nombreLocalidad);
+
+
+    this.patientForm.get('personalInfo.direccion')?.setValue(direccionCompleta);
+    this.patientForm.get('personalInfo.barrio')?.setValue(address.barrio);
+    this.patientForm.get('personalInfo.conjunto')?.setValue(address.conjunto || '');
+
+    this.closeAddressModal();
+  } else {
+    alert('Por favor complete todos los campos obligatorios de la dirección.');
+  }
+}
+
   get tratamiento(): FormArray<FormGroup> {
     return this.patientForm.get('tratamiento') as FormArray<FormGroup>;
   }
@@ -76,14 +160,17 @@ export class RegisterPatientComponent implements OnInit {
   agregarMedicamento() {
     const medicamentoForm = this.fb.group({
       medicamento: ['', Validators.required],
-      dosis: ['', Validators.required],
+      dosis: ['', [Validators.required, Validators.min(1)]],
       frecuencia: ['', Validators.required],
-      diasTratamiento: ['', Validators.required],
+      diasTratamiento: [''],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
       horaInicio: ['', Validators.required],
       duracion: ['', Validators.required]
     });
+
+    medicamentoForm.get('fechaInicio')?.valueChanges.subscribe(() => this.calcularDiasTratamiento(medicamentoForm));
+    medicamentoForm.get('fechaFin')?.valueChanges.subscribe(() => this.calcularDiasTratamiento(medicamentoForm));
 
     this.tratamiento.push(medicamentoForm);
   }
@@ -91,46 +178,167 @@ export class RegisterPatientComponent implements OnInit {
   agregarProcedimiento() {
     const procedimientoForm = this.fb.group({
       procedimiento: ['', Validators.required],
-      frecuencia: ['', Validators.required],
-      diasTratamiento: ['', Validators.required],
+      frecuencia: ['',],
+      diasTratamiento: [''],
       fechaInicio: ['', Validators.required],
-      fechaFin: ['', Validators.required],
+      fechaFin: ['' ],
       horaInicio: ['', Validators.required],
-      duracion: ['', Validators.required]
+      duracion: ['', Validators.required],
     });
 
     this.procedimientos.push(procedimientoForm);
   }
 
   eliminarMedicamento(index: number) {
-    if (this.tratamiento.length > 1) {
-      this.tratamiento.removeAt(index);
-    } else {
-      alert('Debe haber al menos un medicamento en el tratamiento.');
-    }
+    this.tratamiento.removeAt(index);
   }
 
   eliminarProcedimiento(index: number) {
-    if (this.procedimientos.length > 1) {
-      this.procedimientos.removeAt(index);
-    } else {
-      alert('Debe haber al menos un procedimiento.');
-    }
+    this.procedimientos.removeAt(index);
   }
 
   guardarPaciente() {
+    if (this.patientForm.invalid) {
+      alert('Por favor complete todos los campos obligatorios.');
+      return;
+    }
+  
     const personalInfo = this.patientForm.get('personalInfo')?.value;
-    const nuevoPaciente = {
-      documento: personalInfo.numeroDocumento,
-      nombre: `${personalInfo.nombres} ${personalInfo.apellidos}`,
-      recienAgregado: true
+    const tipoTratamiento = this.tiposActividad.find(t => t.name.toUpperCase() === 'MEDICAMENTO');
+    const tipoProcedimiento = this.tiposActividad.find(t => t.name.toUpperCase() === 'PROCEDIMIENTO');
+  
+    if (!tipoTratamiento || !tipoProcedimiento) {
+      alert('No se encontraron los tipos de actividad necesarios.');
+      return;
+    }
+  
+    const actividades: any[] = [];
+  
+    this.tratamiento.controls.forEach(trat => {
+      const t = trat.getRawValue();
+      actividades.push({
+        actividad: { id: Number(t.medicamento) },
+        tipoActividad: { id: tipoTratamiento.id },
+        dosis: Number(t.dosis),
+        frecuencia: Number(t.frecuencia),
+        diasTratamiento: Number(t.diasTratamiento),
+        fechaInicio: t.fechaInicio,
+        fechaFin: t.fechaFin,
+        hora: t.horaInicio,
+        duracionVisita: Number(t.duracion)
+      });
+    });
+  
+    this.procedimientos.controls.forEach(proc => {
+      const p = proc.getRawValue();
+      actividades.push({
+        actividad: { id: Number(p.procedimiento) },
+        tipoActividad: { id: tipoProcedimiento.id },
+        dosis: null,
+        frecuencia: Number(p.frecuencia) || null,
+        diasTratamiento: Number(p.diasTratamiento),
+        fechaInicio: p.fechaInicio,
+        fechaFin: null,
+        hora: p.horaInicio,
+        duracionVisita: Number(p.duracion)
+      });
+    });
+  
+    const pacienteData = {
+      nombre: personalInfo.nombres,
+      apellido: personalInfo.apellidos,
+      numero_identificacion: personalInfo.numeroDocumento,
+      direccion: personalInfo.direccion,
+      telefono: personalInfo.celular,
+      barrio: personalInfo.barrio,
+      conjunto: personalInfo.conjunto || '',
+      latitud: '',
+      longitud: '',
+      localidad: personalInfo.localidad,
+      nombre_acudiente: personalInfo.nombreFamiliar,
+      telefono_acudiente: personalInfo.celularFamiliar,
+      telefono_acudiente2: personalInfo.segundoCelular,
+      estado: personalInfo.estado,
+      tipoIdentificacion: {
+        id: Number(personalInfo.tipoDocumento)
+      },
+      actividades: actividades
     };
+  
+    this.patientService.registrarPaciente(pacienteData).subscribe({
+      next: () => {
+        alert('Paciente registrado con éxito');
+        this.patientForm.reset();
+      },
+      error: (err) => {
+        console.error('Error al registrar paciente:', err);
+        alert('Error al registrar paciente');
+      }
+    });
+  }
+  
 
-    if (nuevoPaciente.documento && nuevoPaciente.nombre) {
-      this.pacienteRegistrado.emit(nuevoPaciente);
-      this.patientForm.reset();
-    } else {
-      alert('Por favor, complete todos los campos.');
+  calcularDiasTratamiento(medicamentoForm: FormGroup) {
+    const fechaInicio = medicamentoForm.get('fechaInicio')?.value;
+    const fechaFin = medicamentoForm.get('fechaFin')?.value;
+
+    if (fechaInicio && fechaFin) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      if (inicio <= fin) {
+        const dias = Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24));
+        medicamentoForm.get('diasTratamiento')?.setValue(dias);
+      } else {
+        alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+        medicamentoForm.get('diasTratamiento')?.setValue(0);
+      }
     }
   }
+
+  cargarTiposActividad() {
+    this.patientService.getTiposActividad().subscribe({
+      next: tipos => this.tiposActividad = tipos,
+      error: err => console.error('Error cargando tipos de actividad', err)
+    });
+  }
+
+  cargarTiposIdentificacion() {
+    this.patientService.getTiposIdentificacion().subscribe({
+      next: tipos => this.tiposIdentificacion = tipos,
+      error: err => console.error('Error al cargar tipos de identificación', err)
+    });
+  }
+
+  cargarProcedimientos() {
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (actividades: any[]) => {
+        this.listaProcedimientos = actividades.filter(
+          a =>
+            a.tipoActividad?.name?.toUpperCase() === 'PROCEDIMIENTO' &&
+            a.estado?.toUpperCase() === 'ACTIVO'
+        );
+        console.log('Procedimientos cargados:', this.listaProcedimientos);
+      },
+      error: (err) => {
+        console.error('Error al cargar procedimientos:', err);
+      }
+    });
+  }
+
+  cargarTratamientos(){
+    this.stockService.getListaMedicamentos().subscribe({
+      next: (actividades: any[]) => {
+        this.listaMedicamentos = actividades.filter(
+          a =>
+            a.tipoActividad?.name?.toUpperCase() === 'MEDICAMENTO' &&
+            a.estado?.toUpperCase() === 'ACTIVO'
+        );
+        console.log('Tratamientos cargados:', this.listaMedicamentos);
+      },
+      error: (err) => {
+        console.error('Error al cargar tratamientos:', err);
+      }
+    });
+  }
+  
 }
